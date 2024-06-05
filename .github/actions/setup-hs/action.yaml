@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Haskell
-      uses: haskell/actions/setup@v1.2
+      uses: haskell-actions/setup@v2
       with:
         ghc-version: ${{ inputs.ghc }}
         enable-stack: true
