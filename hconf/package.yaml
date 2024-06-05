@@ -1,5 +1,5 @@
 name: hconf
-version: 0.27.3
+version: 0.1.0
 github: nalchevanidze/morpheus-graphql
 license: MIT
 author: Daviti Nalchevanidze
@@ -37,5 +37,5 @@ executables:
     dependencies:
     - Glob                  >=  0.7.0   &&  <   1.0.0
     - filepath              >=  1.1.0   &&  <=  1.5.2.0
-    - hconf                 >=  0.27.0  &&  <   0.28.0
+    - hconf                 >=  0.1.0   &&  <   0.2.0
     - optparse-applicative  >=  0.12.0  &&  <   0.20.0

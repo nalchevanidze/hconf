@@ -1,0 +1,8 @@
+cradle:
+  stack:
+    stackYaml: ./stack.yaml
+    components:
+    - path: ./hconf/src
+      component: hconf:lib
+    - path: ./hconf/app
+      component: hconf:exe:hconf
