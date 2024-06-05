@@ -1,6 +1,6 @@
 name: hconf
 version: 0.1.0
-github: nalchevanidze/morpheus-graphql
+github: nalchevanidze/hconf
 license: MIT
 author: Daviti Nalchevanidze
 category: web, graphql

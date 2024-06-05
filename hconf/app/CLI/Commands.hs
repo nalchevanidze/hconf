@@ -88,4 +88,4 @@ parseOptions =
     <*> switch (long "silence" <> short 's' <> help "show Version number")
 
 description :: OA.InfoMod a
-description = fullDesc <> progDesc "Morpheus GraphQL CLI - haskell Api Generator"
+description = fullDesc <> progDesc "HConf CLI - manage multiple haskell projects"

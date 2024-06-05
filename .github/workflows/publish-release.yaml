@@ -12,13 +12,13 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux
-            executable: morpheus
+            executable: hconf
           - os: macOS-latest
             target: mac-os
-            executable: morpheus
+            executable: hconf
           - os: windows-latest
             target: windows
-            executable: morpheus.exe
+            executable: hconf.exe
     name: Upload Artifacts for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -63,8 +63,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Download and extract Artifact
         run: |
-          curl -o morpheus.zip -LO https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/morpheus-${{ matrix.target }}.zip
-          7z e morpheus.zip
+          curl -o hconf.zip -LO https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/hconf-${{ matrix.target }}.zip
+          7z e hconf.zip
       - name: Test CLI Commands
         run: ./hconf about
 
