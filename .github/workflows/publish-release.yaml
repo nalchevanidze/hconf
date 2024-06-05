@@ -29,11 +29,11 @@ jobs:
 
       - name: Build Artifact
         run: |
-          stack build morpheus-graphql-code-gen
+          stack build hconf
           mkdir out
           cd ./out
-          cp $(stack exec which morpheus) ./${{ matrix.executable }}
-          7z a ../morpheus.zip .
+          cp $(stack exec which hconf) ./${{ matrix.executable }}
+          7z a ../hconf.zip .
 
       - name: Upload Artifact
         uses: actions/upload-release-asset@v1
@@ -41,8 +41,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: morpheus.zip
-          asset_name: morpheus-${{ matrix.target }}.zip
+          asset_path: hconf.zip
+          asset_name: hconf-${{ matrix.target }}.zip
           asset_content_type: application/zip
 
   test_artifact:
@@ -63,12 +63,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Download and extract Artifact
         run: |
-          curl -o morpheus.zip -LO https://github.com/${{ github.repository }}/releases/download/${{ needs.publish_release.outputs.tag_name }}/morpheus-${{ matrix.target }}.zip
+          curl -o morpheus.zip -LO https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/morpheus-${{ matrix.target }}.zip
           7z e morpheus.zip
       - name: Test CLI Commands
-        run: |
-          ./morpheus about
-          ./morpheus build examples/code-gen
-          ./morpheus build examples/code-gen-docs
-          ./morpheus check examples/code-gen
-          ./morpheus check examples/code-gen-docs
+        run: ./hconf about
+
