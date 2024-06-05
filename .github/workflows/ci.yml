@@ -1,0 +1,79 @@
+name: Haskell CI
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  push:
+    branches:
+      - main
+
+jobs:
+  hconf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hs
+      - name: Build
+        run: |
+          stack build hconf
+          mkdir cli
+          cp $(stack exec which hconf) ./cli/hconf
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hconf-cli
+          path: ./cli
+
+  build:
+    needs: hconf
+    strategy:
+      matrix:
+        ghc: ["8.4.4", "8.6.5", "8.8.3", "8.10.7", "9.0.2", "latest"]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    name: GHC ${{ matrix.ghc}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: hconf-cli
+          path: ./cli
+
+      - name: Setup file
+        run: |
+          chmod +x ./cli/hconf
+          ./cli/hconf setup ${{ matrix.ghc }}
+
+      - name: Setup
+        uses: ./.github/actions/setup-hs
+        with:
+          ghc: ${{ matrix.ghc }}
+
+      - name: Install dependencies
+        run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
+
+      - name: Build
+        run: stack build --fast
+
+      - name: Build Bench and Haddock
+        run: stack build --fast --no-run-benchmarks --haddock --no-haddock-deps
+
+
+  hlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: lint
+        run: curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s .
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mrkkrp/ormolu-action@v7
+        with:
+          pattern: hconf*/**/*.hs
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
