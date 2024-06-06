@@ -27,14 +27,15 @@ fi
 
 readonly URL="https://github.com/nalchevanidze/hconf/releases/download/$VERSION/hconf-$OS.zip"
 
-if [ -f /tmp/testfile ]; then
-  rm -rf .local
+
+if [ -d .hconf-local ]; then
+  rm -rf .hconf-local
 fi
 
-mkdir .local
-cd .local
+mkdir .hconf-local
+cd .hconf-local
 
-echo "\n${INFO}installing hconf-$VERSION)${STD}" 
+echo "\n${INFO}installing hconf $VERSION ${STD}\n" 
 echo " - source: $URL";
 curl -o "hconf.zip" -LO "$URL" -s
 
@@ -50,9 +51,8 @@ cp ./hconf $BIN_DIR/hconf
 echo " - clean up"
 
 cd ..  
-rm -rf .local
+rm -rf .hconf-local
 
-# reuprt status
 echo "";
 
 if ! command -v hconf &> /dev/null
@@ -62,5 +62,4 @@ else
   echo "${SUCCSESS}honf-$(hconf version) installation succeeded.${STD}";
 fi
 
-echo "if you are mac user allow execution at: ${INFO}System Settings > Privacy & security${STD}";
 echo "";
