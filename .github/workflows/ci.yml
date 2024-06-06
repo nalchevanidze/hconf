@@ -8,6 +8,15 @@ on:
       - main
 
 jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        shell: bash
+        run: |
+          curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
+          hconf setup
   hconf:
     runs-on: ubuntu-latest
     steps:
