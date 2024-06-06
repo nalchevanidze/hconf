@@ -58,7 +58,7 @@ library
     , base >=4.7.0 && <5.0.0
     , bytestring >=0.10.4 && <0.15.0
     , containers >=0.4.2.1 && <=0.7
-    , directory
+    , directory >=1.0 && <2.0
     , filepath >=1.1.0 && <=1.5.2.0
     , modern-uri >=0.1.0.0 && <1.0.0
     , process >=1.0 && <2.0
@@ -83,7 +83,7 @@ executable hconf
     , base >=4.7.0 && <5.0.0
     , bytestring >=0.10.4 && <0.15.0
     , containers >=0.4.2.1 && <=0.7
-    , directory
+    , directory >=1.0 && <2.0
     , filepath >=1.1.0 && <=1.5.2.0
     , hconf >=0.1.0 && <0.2.0
     , modern-uri >=0.1.0.0 && <1.0.0
