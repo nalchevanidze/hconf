@@ -12,7 +12,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     readonly OS_NAME="mac-os"
 else
-    echo "${ALERT}unsupported operating system${STD}";
+    echo "${ALERT}unsupported operating system: $OSTYPE ${STD}";
     exit 1
 fi
 
