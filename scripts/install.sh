@@ -4,57 +4,62 @@ readonly STD='\033[0m'
 readonly INFO='\033[1;36m'
 readonly WARN='\033[1;33m'
 readonly SUCCSESS='\033[1;32m'
+readonly VERSION='0.1.2'
 
-if [[ "$OSTYPE" == "linux"* ]]; then
-    readonly OS_NAME="linux"
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    readonly OS_NAME="linux"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    readonly OS_NAME="mac-os"
-else
-    echo "${ALERT}unsupported operating system: $OSTYPE ${STD}";
-    exit 1
-fi
-
-echo "installing hconf on: ${INFO}$OS_NAME${STD}"
-
-readonly MIME_TYPE="Accept: application/octet-stream"
-readonly GH_URL="https://github.com/nalchevanidze/hconf/releases/download/0.1.2/hconf-$OS_NAME.zip"
-
-echo "downloading: ${INFO}$GH_URL${STD}";
-
-mkdir .local
-cd .local
-curl -o "hconf.zip" -LO  "$GH_URL"
-
-echo "extracting: ${INFO}hconf.zip${STD}"
-
-unzip -q hconf.zip
-.. cd 
+case "$(uname)" in
+    "Darwin")
+        OS=mac-os;;
+    MINGW64_NT-*|MSYS_NT-*)
+        OS=windows;;
+    *)
+        OS=linux
+esac
 
 ## install bin
 if [ -d "$HOME/bin"  ]; then
-  LOCAL_BIN_DIR="$HOME/bin"
+  BIN_DIR="$HOME/bin"
 elif [ -d "$HOME/.local/bin"  ]; then
-  LOCAL_BIN_DIR="$HOME/.local/bin"
+  BIN_DIR="$HOME/.local/bin"
 else 
-  LOCAL_BIN_DIR="$HOME/.local/bin"
-  mkdir -p $LOCAL_BIN_DIR
+  BIN_DIR="$HOME/.local/bin"
+  mkdir -p $BIN_DIR
 fi
 
+readonly URL="https://github.com/nalchevanidze/hconf/releases/download/$VERSION/hconf-$OS.zip"
+
+if [ -f /tmp/testfile ]; then
+  rm -rf .local
+fi
+
+mkdir .local
+cd .local
+
+echo "\n${INFO}installing hconf-$VERSION)${STD}" 
+echo " - source: $URL";
+curl -o "hconf.zip" -LO "$URL" -s
+
+echo " - extracting"
+
+unzip -q hconf.zip
 chmod 777 ./hconf
-mv ./hconf $LOCAL_BIN_DIR/hconf
-rm hconf.zip
+
+echo " - copying binary to $BIN_DIR"
+
+cp ./hconf $BIN_DIR/hconf
+
+echo " - clean up"
+
+cd ..  
+rm -rf .local
 
 # reuprt status
 echo "";
 
 if ! command -v hconf &> /dev/null
 then
-  echo "add ${WARN}$LOCAL_BIN_DIR${STD} to enviroment PATH to execute hconf.";
+  echo "add ${WARN}$BIN_DIR${STD} to enviroment PATH to execute hconf.";
 else 
-  readonly VERSION=$(hconf version);
-  echo "${SUCCSESS}honf-$VERSION installation succeeded.${STD}";
+  echo "${SUCCSESS}honf-$(hconf version) installation succeeded.${STD}";
 fi
 
 echo "if you are mac user allow execution at: ${INFO}System Settings > Privacy & security${STD}";
