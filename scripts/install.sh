@@ -4,7 +4,7 @@ readonly STD='\033[0m'
 readonly INFO='\033[1;36m'
 readonly WARN='\033[1;33m'
 readonly SUCCSESS='\033[1;32m'
-readonly VERSION='0.1.2'
+readonly VERSION='0.1.3'
 
 case "$(uname)" in
     "Darwin")
