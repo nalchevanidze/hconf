@@ -7,9 +7,11 @@ module HConf.Utils.Yaml
   ( readYaml,
     writeYaml,
     rewriteYaml,
+    removeIfExists,
   )
 where
 
+import Control.Exception
 import Data.Aeson
   ( FromJSON (..),
     Object,
@@ -22,13 +24,15 @@ import HConf.Utils.Class (HConfIO (..))
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
 import Relude hiding (Show, Undefined, intercalate, show)
+import System.Directory
+import System.IO.Error hiding (catch)
 import Prelude (Show (..))
 
 serializeYaml :: (ToJSON a) => a -> ByteString
 serializeYaml =
-  encodePretty $
-    setConfDropNull True $
-      setConfCompare compareFields defConfig
+  encodePretty
+    $ setConfDropNull True
+    $ setConfCompare compareFields defConfig
 
 readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
 readYaml = read >=> (liftIO . decodeThrow)
@@ -69,3 +73,10 @@ rewriteYaml path f = do
   readYaml path
     >>= mapYaml f
     >>= \x -> writeYaml path x >> pure (getData x)
+
+removeIfExists :: FilePath -> IO ()
+removeIfExists name = removeFile name `catch` handleExists
+  where
+    handleExists e
+      | isDoesNotExistError e = return ()
+      | otherwise = throwIO e

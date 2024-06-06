@@ -17,9 +17,11 @@ import HConf.Config.ConfigT (ConfigT)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name)
+import HConf.Utils.Yaml (removeIfExists)
 import HConf.Utils.Log (alert, field, subTask, task, warn)
 import Relude
 import System.Process
+
 
 toLines :: Text -> [Text]
 toLines = T.split (== '\n')
@@ -36,9 +38,11 @@ parseFields =
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField k = maybe (fail $ "missing field" <> T.unpack k) pure . lookup k
 
+cabalPath path pkgName = path <> "/" <> T.unpack pkgName <> ".cabal"
+
 getCabalFields :: FilePath -> Name -> ConfigT (Name, Version)
 getCabalFields path pkgName = do
-  bs <- read (path <> "/" <> T.unpack pkgName <> ".cabal")
+  bs <- read (cabalPath path pkgName)
   let fields = parseFields bs
   name <- getField "name" fields
   version <- getField "version" fields >>= parseText
@@ -81,12 +85,13 @@ toWarning (x : xs)
 toWarning _ = []
 
 buildCabal :: String -> ConfigT ()
-buildCabal name = do
+buildCabal name = do 
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
 
 checkCabal :: Name -> Name -> Version -> ConfigT ()
 checkCabal path name version = subTask "cabal" $ do
+  liftIO (removeIfExists (cabalPath (T.unpack path) name))
   buildCabal (T.unpack path)
   (pkgName, pkgVersion) <- getCabalFields (T.unpack path) name
   if pkgVersion == version && pkgName == name then pure () else fail (T.unpack path <> "mismatching version or name")
