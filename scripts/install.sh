@@ -55,11 +55,11 @@ rm -rf .hconf-local
 
 echo "";
 
-if ! command -v hconf &> /dev/null
+if command -v hconf  
 then
-  echo "add ${WARN}$BIN_DIR${STD} to enviroment PATH to execute hconf.";
+  echo "${SUCCSESS}installation succeeded for honf $(hconf version).${STD}";
 else 
-  echo "${SUCCSESS}honf-$(hconf version) installation succeeded.${STD}";
+  echo "add ${WARN}$BIN_DIR${STD} to enviroment PATH to execute hconf.";
 fi
 
 echo "";
