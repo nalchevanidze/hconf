@@ -5,7 +5,9 @@ readonly INFO='\033[1;36m'
 readonly WARN='\033[1;33m'
 readonly SUCCSESS='\033[1;32m'
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "$OSTYPE" == "linux"* ]]; then
+    readonly OS_NAME="linux"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     readonly OS_NAME="linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     readonly OS_NAME="mac-os"
