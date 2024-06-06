@@ -17,6 +17,7 @@ jobs:
         run: |
           curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
           hconf setup
+
   hconf:
     runs-on: ubuntu-latest
     steps:
