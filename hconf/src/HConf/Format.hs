@@ -19,34 +19,50 @@ import Ormolu
   )
 import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
-import System.Exit (ExitCode (..), exitWith)
+import Relude hiding (exitWith)
+import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
-import Relude hiding(exitWith)
 
-format :: MonadIO m =>[FilePath] -> m ()
+format :: (MonadIO m) => [FilePath] -> m ()
 format files = liftIO $ do
-  ls <- glob "hconf"
+  ls <- glob "hconf/**/**.hs"
   print ls
   let mode = InPlace
-  exitCode <- case files of
-    [] -> pure ExitSuccess
-    [x] -> formatOne mode x
+  case files of
+    [] -> pure ()
+    [x] -> formatOne mode x $> ()
     xs -> do
       let selectFailure = \case
             ExitSuccess -> Nothing
             ExitFailure n -> Just n
       errorCodes <-
         mapMaybe selectFailure <$> mapM (formatOne mode) (sort xs)
-      return $
-        if null errorCodes
-          then ExitSuccess
-          else
-            ExitFailure $
-              if all (== 100) errorCodes
-                then 100
-                else 102
-  exitWith exitCode
+      if null errorCodes then pure () else fail "Error"
+
+-- format :: MonadIO m =>[FilePath] -> m ()
+-- format files = liftIO $ do
+--   ls <- glob "hconf/**/**.hs"
+--   print ls
+--   let mode = InPlace
+--   exitCode <- case files of
+--     [] -> pure ExitSuccess
+--     [x] -> formatOne mode x
+--     xs -> do
+--       let selectFailure = \case
+--             ExitSuccess -> Nothing
+--             ExitFailure n -> Just n
+--       errorCodes <-
+--         mapMaybe selectFailure <$> mapM (formatOne mode) (sort xs)
+--       return $
+--         if null errorCodes
+--           then ExitSuccess
+--           else
+--             ExitFailure $
+--               if all (== 100) errorCodes
+--                 then 100
+--                 else 102
+--   exitWith exitCode
 
 data Mode = InPlace | Check
   deriving (Eq, Show)
@@ -64,8 +80,8 @@ formatOne mode path = withPrettyOrmoluExceptions colorMode (result mode)
       originalInput <- T.Utf8.readFile inputFile
       formattedInput <-
         ormolu config inputFile originalInput
-      when (formattedInput /= originalInput) $
-        T.Utf8.writeFile inputFile formattedInput
+      when (formattedInput /= originalInput)
+        $ T.Utf8.writeFile inputFile formattedInput
       return ExitSuccess
     result Check = do
       originalInput <- T.Utf8.readFile inputFile
