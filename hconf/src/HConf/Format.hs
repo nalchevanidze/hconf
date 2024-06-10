@@ -9,7 +9,6 @@ module HConf.Format (format) where
 import Data.Text (unpack)
 import qualified Data.Text.IO.Utf8 as T.Utf8
 import HConf.Config.ConfigT (ConfigT, packages)
-import HConf.Stack.Package (resolvePackages)
 import HConf.Utils.Log (label, task)
 import Ormolu
   ( ColorMode (..),
@@ -21,10 +20,10 @@ import Ormolu
   )
 import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
+import Relude hiding (exitWith)
 import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
-import Relude hiding (exitWith)
 
 toPattern :: Text -> String
 toPattern x = unpack x <> "/**/*.hs"
@@ -35,45 +34,43 @@ format = label "ormolu"
   $ do
     fs <- map toPattern <$> packages
     files <- concat <$> liftIO (traverse glob fs)
-    liftIO $ formatPattern InPlace files
+    liftIO $ formatFiles True files
 
-formatPattern :: Mode -> [FilePath] -> IO ()
-formatPattern mode files = do
+formatFiles :: Bool -> [FilePath] -> IO ()
+formatFiles fix files = do
   case files of
     [] -> pure ()
-    [x] -> formatOne mode x $> ()
+    [x] -> formatOne fix x $> ()
     xs -> do
       let selectFailure = \case
             ExitSuccess -> Nothing
             ExitFailure n -> Just n
       errorCodes <-
-        mapMaybe selectFailure <$> mapM (formatOne mode) (sort xs)
+        mapMaybe selectFailure <$> mapM (formatOne fix) (sort xs)
       if null errorCodes then pure () else fail "Error"
-
-data Mode = InPlace | Check
-  deriving (Eq, Show)
 
 colorMode :: ColorMode
 colorMode = Always
 
 formatOne ::
-  Mode ->
+  Bool ->
   FilePath ->
   IO ExitCode
-formatOne mode path = withPrettyOrmoluExceptions colorMode (result mode)
+formatOne fix path = withPrettyOrmoluExceptions colorMode result
   where
-    result InPlace = do
-      originalInput <- T.Utf8.readFile inputFile
-      formattedInput <-
-        ormolu config inputFile originalInput
-      when (formattedInput /= originalInput)
-        $ T.Utf8.writeFile inputFile formattedInput
-      return ExitSuccess
-    result Check = do
-      originalInput <- T.Utf8.readFile inputFile
-      formattedInput <-
-        ormolu config inputFile originalInput
-      handleDiff originalInput formattedInput inputFile
+    result
+      | fix = do
+          originalInput <- T.Utf8.readFile inputFile
+          formattedInput <-
+            ormolu config inputFile originalInput
+          when (formattedInput /= originalInput)
+            $ T.Utf8.writeFile inputFile formattedInput
+          return ExitSuccess
+      | otherwise = do
+          originalInput <- T.Utf8.readFile inputFile
+          formattedInput <-
+            ormolu config inputFile originalInput
+          handleDiff originalInput formattedInput inputFile
     inputFile = normalise path
     config =
       defaultConfig
