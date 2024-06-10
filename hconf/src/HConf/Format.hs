@@ -20,24 +20,25 @@ import Ormolu
   )
 import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
-import Relude hiding (exitWith)
+import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
 
-toPattern :: Text -> String
-toPattern x = unpack x <> "/**/*.hs"
+explore :: Text -> ConfigT [String]
+explore x = liftIO $ glob (unpack x <> "/**/*.hs")
 
 format :: ConfigT ()
-format = label "ormolu"
-  $ task "format"
-  $ do
-    fs <- map toPattern <$> packages
-    files <- concat <$> liftIO (traverse glob fs)
-    liftIO $ formatFiles True files
+format =
+  label "ormolu"
+    $ task "format"
+    $ packages
+    >>= traverse explore
+    >>= formatFiles True
+    . concat
 
-formatFiles :: Bool -> [FilePath] -> IO ()
-formatFiles fix files = do
+formatFiles :: Bool -> [FilePath] -> ConfigT ()
+formatFiles fix files = liftIO $ do
   case files of
     [] -> pure ()
     [x] -> formatOne fix x $> ()
@@ -49,13 +50,7 @@ formatFiles fix files = do
         mapMaybe selectFailure <$> mapM (formatOne fix) (sort xs)
       if null errorCodes then pure () else fail "Error"
 
-colorMode :: ColorMode
-colorMode = Always
-
-formatOne ::
-  Bool ->
-  FilePath ->
-  IO ExitCode
+formatOne :: Bool -> FilePath -> IO ExitCode
 formatOne fix path = withPrettyOrmoluExceptions colorMode result
   where
     result
@@ -86,3 +81,6 @@ handleDiff originalInput formattedInput fileRepr =
     Just diff -> do
       runTerm (printTextDiff diff) colorMode stderr
       return (ExitFailure 100)
+
+colorMode :: ColorMode
+colorMode = Always
