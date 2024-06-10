@@ -1,13 +1,10 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module HConf.Format (main) where
 
-import Control.Exception (throwIO)
+
 import Control.Monad
 import Data.List (sort)
 import qualified Data.Map.Strict as Map
@@ -23,29 +20,23 @@ import Ormolu.Fixity
 import Ormolu.Terminal
 import System.Directory
 import System.Exit (ExitCode (..), exitWith)
--- import System.FilePath qualified as FP
+import qualified System.FilePath as FP
 import System.IO (hPutStrLn, stderr)
 
 -- | Entry point of the program.
-main :: IO ()
-main = do
-  Opts {..} <- optsParser
-  let formatOne' =
-        formatOne
-          optConfigFileOpts
-          optMode
-          Nothing
-          optConfig
-  exitCode <- case optInputFiles of
-    [] -> formatOne' Nothing
-    ["-"] -> formatOne' Nothing
-    [x] -> formatOne' (Just x)
+main :: [FilePath] -> IO ()
+main files = do
+  let mode = InPlace
+  exitCode <- case files of
+    [] -> formatOne mode Nothing
+    ["-"] -> formatOne mode Nothing
+    [x] -> formatOne mode (Just x)
     xs -> do
       let selectFailure = \case
             ExitSuccess -> Nothing
             ExitFailure n -> Just n
       errorCodes <-
-        mapMaybe selectFailure <$> mapM (formatOne' . Just) (sort xs)
+        mapMaybe selectFailure <$> mapM (formatOne mode . Just) (sort xs)
       return $
         if null errorCodes
           then ExitSuccess
@@ -58,22 +49,15 @@ main = do
 
 -- | Format a single input.
 formatOne ::
-  -- | How to use .cabal files
-  ConfigFileOpts ->
   -- | Mode of operation
   Mode ->
-  -- | The 'SourceType' requested by the user
-  Maybe SourceType ->
-  -- | Configuration
-  Config RegionIndices ->
-  -- | File to format or stdin as 'Nothing'
   Maybe FilePath ->
   IO ExitCode
-formatOne ConfigFileOpts {..} mode reqSourceType rawConfig mpath =
-  withPrettyOrmoluExceptions (cfgColorMode rawConfig) $ do
+formatOne mode mpath =
+  withPrettyOrmoluExceptions (cfgColorMode config) $ do
     let getCabalInfoForSourceFile' sourceFile = do
           cabalSearchResult <- getCabalInfoForSourceFile sourceFile
-          let debugEnabled = cfgDebug rawConfig
+          let debugEnabled = cfgDebug config
           case cabalSearchResult of
             CabalNotFound -> do
               when debugEnabled $
@@ -91,25 +75,12 @@ formatOne ConfigFileOpts {..} mode reqSourceType rawConfig mpath =
                     <> sourceFile
               return (Just cabalInfo)
             CabalFound cabalInfo -> return (Just cabalInfo)
-        getDotOrmoluForSourceFile' sourceFile = do
-          if optDoNotUseDotOrmolu
-            then return Nothing
-            else Just <$> getDotOrmoluForSourceFile sourceFile
+        getDotOrmoluForSourceFile' _ = return Nothing
     case FP.normalise <$> mpath of
       -- input source = STDIN
       Nothing -> do
-        mcabalInfo <- case (optStdinInputFile, optDoNotUseCabal) of
-          (_, True) -> return Nothing
-          (Nothing, False) -> throwIO OrmoluMissingStdinInputFile
-          (Just inputFile, False) -> getCabalInfoForSourceFile' inputFile
-        mdotOrmolu <- case optStdinInputFile of
-          Nothing -> return Nothing
-          Just inputFile -> getDotOrmoluForSourceFile' inputFile
-        config <- patchConfig Nothing mcabalInfo mdotOrmolu
+        config <- patchConfig Nothing Nothing Nothing
         case mode of
-          Stdout -> do
-            ormoluStdin config >>= T.Utf8.putStr
-            return ExitSuccess
           InPlace -> do
             hPutStrLn
               stderr
@@ -125,20 +96,13 @@ formatOne ConfigFileOpts {..} mode reqSourceType rawConfig mpath =
             handleDiff originalInput formattedInput stdinRepr
       -- input source = a file
       Just inputFile -> do
-        mcabalInfo <-
-          if optDoNotUseCabal
-            then return Nothing
-            else getCabalInfoForSourceFile' inputFile
         mdotOrmolu <- getDotOrmoluForSourceFile' inputFile
         config <-
           patchConfig
             (Just (detectSourceType inputFile))
-            mcabalInfo
+            Nothing
             mdotOrmolu
         case mode of
-          Stdout -> do
-            ormoluFile config inputFile >>= T.Utf8.putStr
-            return ExitSuccess
           InPlace -> do
             -- ormoluFile is not used because we need originalInput
             originalInput <- T.Utf8.readFile inputFile
@@ -155,17 +119,14 @@ formatOne ConfigFileOpts {..} mode reqSourceType rawConfig mpath =
             handleDiff originalInput formattedInput inputFile
   where
     patchConfig mdetectedSourceType mcabalInfo mdotOrmolu = do
-      let sourceType =
-            fromMaybe
-              ModuleSource
-              (reqSourceType <|> mdetectedSourceType)
+      let sourceType = fromMaybe ModuleSource mdetectedSourceType
       return $
         refineConfig
           sourceType
           mcabalInfo
-          (Just (cfgFixityOverrides rawConfig))
-          (Just (cfgModuleReexports rawConfig))
-          ( rawConfig
+          (Just (cfgFixityOverrides config))
+          (Just (cfgModuleReexports config))
+          ( config
               { cfgFixityOverrides = maybe defaultFixityOverrides fst mdotOrmolu,
                 cfgModuleReexports = maybe defaultModuleReexports snd mdotOrmolu
               }
@@ -174,65 +135,18 @@ formatOne ConfigFileOpts {..} mode reqSourceType rawConfig mpath =
       case diffText originalInput formattedInput fileRepr of
         Nothing -> return ExitSuccess
         Just diff -> do
-          runTerm (printTextDiff diff) (cfgColorMode rawConfig) stderr
+          runTerm (printTextDiff diff) (cfgColorMode config) stderr
           -- 100 is different to all the other exit code that are emitted
           -- either from an 'OrmoluException' or from 'error' and
           -- 'notImplemented'.
           return (ExitFailure 100)
 
-----------------------------------------------------------------------------
--- Command line options parsing
-
--- | All command line options.
-data Opts = Opts
-  { -- | Mode of operation
-    optMode :: !Mode,
-    -- | Ormolu 'Config'
-    optConfig :: !(Config RegionIndices),
-    -- | Options related to info extracted from files
-    optConfigFileOpts :: ConfigFileOpts,
-    -- | Source type option, where 'Nothing' means autodetection
-    optSourceType :: !(Maybe SourceType),
-    -- | Haskell source files to format or stdin (when the list is empty)
-    optInputFiles :: ![FilePath]
-  }
-
 -- | Mode of operation.
-data Mode
-  = -- | Output formatted source code to stdout
-    Stdout
-  | -- | Overwrite original file
-    InPlace
-  | -- | Exit with non-zero status code if
-    -- source is not already formatted
-    Check
+data Mode = InPlace | Check
   deriving (Eq, Show)
 
--- | Options related to configuration stored in the file system.
-data ConfigFileOpts = ConfigFileOpts
-  { -- | DO NOT extract default-extensions and dependencies from .cabal files
-    optDoNotUseCabal :: Bool,
-    -- | DO NOT look for @.ormolu@ files
-    optDoNotUseDotOrmolu :: Bool,
-    -- | Optional path to a file which will be used to find a .cabal file
-    -- when using input from stdin
-    optStdinInputFile :: Maybe FilePath
-  }
-  deriving (Show)
-
-
-parseMode :: Bool -> Mode
-parseMode True = InPlace
-parseMode False = Check
-
-optsParser :: Mode -> [String] -> Opts
-optsParser mode = Opts mode configParser configFileOptsParser Nothing 
-
-configFileOptsParser :: ConfigFileOpts
-configFileOptsParser = ConfigFileOpts False False Nothing
-
-configParser :: (Config RegionIndices)
-configParser =
+config :: (Config RegionIndices)
+config =
   Config
     []
     (FixityOverrides Map.empty)
