@@ -1,14 +1,16 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Format (format) where
 
+import Data.Text (unpack)
 import qualified Data.Text.IO.Utf8 as T.Utf8
 import HConf.Config.ConfigT (ConfigT)
 import HConf.Stack.Package (resolvePackages)
+import HConf.Utils.Log (label, task)
 import Ormolu
   ( ColorMode (..),
     Config (..),
@@ -23,11 +25,9 @@ import Relude hiding (exitWith)
 import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
-import Data.Text (unpack)
-import HConf.Utils.Log (label, task)
 
 toPattern :: Text -> String
-toPattern x =  unpack x <> "/**/*.hs"
+toPattern x = unpack x <> "/**/*.hs"
 
 format :: ConfigT ()
 format = label "ormolu"
@@ -35,11 +35,10 @@ format = label "ormolu"
   $ do
     fs <- map (toPattern . fst) <$> resolvePackages
     files <- concat <$> liftIO (traverse glob fs)
-    liftIO $ formatPattern files
+    liftIO $ formatPattern InPlace files
 
-formatPattern :: [FilePath] -> IO ()
-formatPattern files = do
-  let mode = Check
+formatPattern :: Mode -> [FilePath] -> IO ()
+formatPattern mode files = do
   case files of
     [] -> pure ()
     [x] -> formatOne mode x $> ()
