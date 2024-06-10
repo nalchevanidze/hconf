@@ -44,4 +44,4 @@ runApp App {..}
     runOperation (Next isBreaking) = updateVersion isBreaking env
     runOperation UpperBounds = upperBounds env
     runOperation CurrentVersion = getVersion env
-    runOperation (Format fix) = format fix env
+    runOperation (Format fix) = format (not fix) env

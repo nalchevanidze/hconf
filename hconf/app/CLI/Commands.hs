@@ -58,7 +58,7 @@ commandParser =
       ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
       ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
       ("version", "get current version", pure CurrentVersion),
-      ("format", "format files in projects", Format <$> switch (long "fix" <> short 'f'))
+      ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
     ]
 
 buildOperation :: [(String, String, Parser Command)] -> Parser Command
