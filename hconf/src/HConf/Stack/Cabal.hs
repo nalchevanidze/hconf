@@ -17,11 +17,10 @@ import HConf.Config.ConfigT (ConfigT)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name)
-import HConf.Utils.Yaml (removeIfExists)
 import HConf.Utils.Log (alert, field, subTask, task, warn)
+import HConf.Utils.Yaml (removeIfExists)
 import Relude
 import System.Process
-
 
 toLines :: Text -> [Text]
 toLines = T.split (== '\n')
@@ -85,7 +84,7 @@ toWarning (x : xs)
 toWarning _ = []
 
 buildCabal :: String -> ConfigT ()
-buildCabal name = do 
+buildCabal name = do
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
 
