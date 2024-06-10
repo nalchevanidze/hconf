@@ -62,8 +62,8 @@ updatePackage Package {..} = do
   newExecutables <- updateLibraries executables
   newBenchmarks <- updateLibraries benchmarks
   newDependencies <- updateDependencies dependencies
-  pure $
-    Package
+  pure
+    $ Package
       { version = C.version cfg,
         library = newLibrary,
         tests = newTests,
@@ -75,8 +75,8 @@ updatePackage Package {..} = do
 
 rewritePackage :: Name -> ConfigT Package
 rewritePackage path =
-  subTask "package" $
-    rewriteYaml (toPath path) updatePackage
+  subTask "package"
+    $ rewriteYaml (toPath path) updatePackage
 
 checkPackage :: Name -> ConfigT ()
 checkPackage path =
@@ -86,6 +86,6 @@ checkPackage path =
 
 checkPackages :: ConfigT ()
 checkPackages =
-  label "packages" $
-    packages
-      >>= traverse_ checkPackage
+  label "packages"
+    $ packages
+    >>= traverse_ checkPackage

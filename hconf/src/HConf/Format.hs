@@ -5,9 +5,6 @@
 
 module HConf.Format (format) where
 
-import Control.Monad
-import Data.List (sort)
-import Data.Maybe (mapMaybe)
 import qualified Data.Text.IO.Utf8 as T.Utf8
 import Ormolu
   ( ColorMode (..),
@@ -25,9 +22,8 @@ import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
 
 format :: (MonadIO m) => [FilePath] -> m ()
-format files = liftIO $ do
-  ls <- glob "hconf/**/**.hs"
-  print ls
+format patterns = liftIO $ do
+  files <- concat <$> traverse glob patterns
   let mode = InPlace
   case files of
     [] -> pure ()
