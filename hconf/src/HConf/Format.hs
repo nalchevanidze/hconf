@@ -36,30 +36,6 @@ format patterns = liftIO $ do
         mapMaybe selectFailure <$> mapM (formatOne mode) (sort xs)
       if null errorCodes then pure () else fail "Error"
 
--- format :: MonadIO m =>[FilePath] -> m ()
--- format files = liftIO $ do
---   ls <- glob "hconf/**/**.hs"
---   print ls
---   let mode = InPlace
---   exitCode <- case files of
---     [] -> pure ExitSuccess
---     [x] -> formatOne mode x
---     xs -> do
---       let selectFailure = \case
---             ExitSuccess -> Nothing
---             ExitFailure n -> Just n
---       errorCodes <-
---         mapMaybe selectFailure <$> mapM (formatOne mode) (sort xs)
---       return $
---         if null errorCodes
---           then ExitSuccess
---           else
---             ExitFailure $
---               if all (== 100) errorCodes
---                 then 100
---                 else 102
---   exitWith exitCode
-
 data Mode = InPlace | Check
   deriving (Eq, Show)
 
