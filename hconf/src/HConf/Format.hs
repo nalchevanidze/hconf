@@ -7,9 +7,9 @@
 module HConf.Format (format) where
 
 import Data.Text (unpack)
-import qualified Data.Text.IO.Utf8 as T.Utf8
+import qualified Data.Text.IO.Utf8 as T
 import HConf.Config.ConfigT (ConfigT, packages)
-import HConf.Utils.Log (label, task)
+import HConf.Utils.Log (label)
 import Ormolu
   ( ColorMode (..),
     Config (..),
@@ -26,57 +26,37 @@ import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
 
 explore :: Text -> ConfigT [String]
-explore x = liftIO $ glob (unpack x <> "/**/*.hs")
+explore x = map normalise <$> liftIO (glob (unpack x <> "/**/*.hs"))
 
-format :: ConfigT ()
-format =
-  label "ormolu"
-    $ task "format"
-    $ packages
-    >>= traverse explore
-    >>= formatFiles True
-    . concat
+format :: Bool -> ConfigT ()
+format fix = label "ormolu" $ do
+  files <- sort . concat <$> (packages >>= traverse explore)
+  errorCodes <- mapMaybe selectFailure <$> mapM (formatFile fix) files
+  unless (null errorCodes) (fail "Error")
 
-formatFiles :: Bool -> [FilePath] -> ConfigT ()
-formatFiles fix files = liftIO $ do
-  case files of
-    [] -> pure ()
-    [x] -> formatOne fix x $> ()
-    xs -> do
-      let selectFailure = \case
-            ExitSuccess -> Nothing
-            ExitFailure n -> Just n
-      errorCodes <-
-        mapMaybe selectFailure <$> mapM (formatOne fix) (sort xs)
-      if null errorCodes then pure () else fail "Error"
-
-formatOne :: Bool -> FilePath -> IO ExitCode
-formatOne fix path = withPrettyOrmoluExceptions colorMode result
+formatFile :: (MonadIO m) => Bool -> FilePath -> m ExitCode
+formatFile fix path = liftIO $ withPrettyOrmoluExceptions colorMode $ do
+  original <- T.readFile path
+  formatted <- formatter path original
+  handle original formatted
   where
-    result
-      | fix = do
-          originalInput <- T.Utf8.readFile inputFile
-          formattedInput <-
-            ormolu config inputFile originalInput
-          when (formattedInput /= originalInput)
-            $ T.Utf8.writeFile inputFile formattedInput
-          return ExitSuccess
-      | otherwise = do
-          originalInput <- T.Utf8.readFile inputFile
-          formattedInput <-
-            ormolu config inputFile originalInput
-          handleDiff originalInput formattedInput inputFile
-    inputFile = normalise path
-    config =
-      defaultConfig
-        { cfgCheckIdempotence = True,
-          cfgColorMode = colorMode,
-          cfgSourceType = detectSourceType inputFile
-        }
+    handle original formatted
+      | fix = when (formatted /= original) (T.writeFile path formatted) $> ExitSuccess
+      | otherwise = handleDiff original formatted path
+
+formatter :: (MonadIO m) => FilePath -> Text -> m Text
+formatter path =
+  ormolu
+    defaultConfig
+      { cfgCheckIdempotence = True,
+        cfgColorMode = colorMode,
+        cfgSourceType = detectSourceType path
+      }
+    path
 
 handleDiff :: Text -> Text -> FilePath -> IO ExitCode
-handleDiff originalInput formattedInput fileRepr =
-  case diffText originalInput formattedInput fileRepr of
+handleDiff original formatted path =
+  case diffText original formatted path of
     Nothing -> return ExitSuccess
     Just diff -> do
       runTerm (printTextDiff diff) colorMode stderr
@@ -84,3 +64,7 @@ handleDiff originalInput formattedInput fileRepr =
 
 colorMode :: ColorMode
 colorMode = Always
+
+selectFailure :: ExitCode -> Maybe Int
+selectFailure ExitSuccess = Nothing
+selectFailure (ExitFailure n) = Just n

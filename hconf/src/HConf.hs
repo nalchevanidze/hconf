@@ -9,6 +9,7 @@ module HConf
     Parse (..),
     getVersion,
     upperBounds,
+    format,
   )
 where
 
@@ -32,7 +33,7 @@ upperBounds =
 
 setup :: String -> Env -> IO ()
 setup v = runTask "setup" $ do
-  format
+  format True
   parse v >>= setupStack
   genHie
   checkPackages
