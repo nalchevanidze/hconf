@@ -21,8 +21,8 @@ import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
 
-format :: (MonadIO m) => [FilePath] -> m ()
-format patterns = liftIO $ do
+format :: [FilePath] -> IO ()
+format patterns = do
   files <- concat <$> traverse glob patterns
   let mode = InPlace
   case files of
@@ -67,7 +67,9 @@ formatOne mode path = withPrettyOrmoluExceptions colorMode (result mode)
           cfgColorMode = colorMode,
           cfgSourceType = detectSourceType inputFile
         }
-    handleDiff originalInput formattedInput fileRepr =
+
+handleDiff :: Text -> Text -> FilePath -> IO ExitCode
+handleDiff originalInput formattedInput fileRepr =
       case diffText originalInput formattedInput fileRepr of
         Nothing -> return ExitSuccess
         Just diff -> do

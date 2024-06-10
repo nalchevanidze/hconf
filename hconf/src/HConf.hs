@@ -32,9 +32,9 @@ upperBounds =
 
 setup :: String -> Env -> IO ()
 setup v = runTask "setup" $ do
+  liftIO $ format ["hconf/**/**.hs"]
   parse v >>= setupStack
   genHie
-  format ["hconf/**/**.hs"]
   checkPackages
 
 updateVersion :: Bool -> Env -> IO ()
