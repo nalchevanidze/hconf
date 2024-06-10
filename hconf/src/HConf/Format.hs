@@ -24,7 +24,7 @@ import System.FilePath.Glob (glob)
 format :: [FilePath] -> IO ()
 format patterns = do
   files <- concat <$> traverse glob patterns
-  let mode = InPlace
+  let mode = Check
   case files of
     [] -> pure ()
     [x] -> formatOne mode x $> ()
@@ -40,7 +40,7 @@ data Mode = InPlace | Check
   deriving (Eq, Show)
 
 colorMode :: ColorMode
-colorMode = Auto
+colorMode = Always
 
 formatOne ::
   Mode ->
@@ -70,8 +70,8 @@ formatOne mode path = withPrettyOrmoluExceptions colorMode (result mode)
 
 handleDiff :: Text -> Text -> FilePath -> IO ExitCode
 handleDiff originalInput formattedInput fileRepr =
-      case diffText originalInput formattedInput fileRepr of
-        Nothing -> return ExitSuccess
-        Just diff -> do
-          runTerm (printTextDiff diff) colorMode stderr
-          return (ExitFailure 100)
+  case diffText originalInput formattedInput fileRepr of
+    Nothing -> return ExitSuccess
+    Just diff -> do
+      runTerm (printTextDiff diff) colorMode stderr
+      return (ExitFailure 100)
