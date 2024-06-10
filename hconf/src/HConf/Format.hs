@@ -27,18 +27,18 @@ import Data.Text (unpack)
 import HConf.Utils.Log (label, task)
 
 toPattern :: Text -> String
-toPattern x =  unpack x <> "**/*.hs"
+toPattern x =  unpack x <> "/**/*.hs"
 
 format :: ConfigT ()
 format = label "ormolu"
   $ task "format"
   $ do
-    files <- map (toPattern . fst) <$> resolvePackages
+    fs <- map (toPattern . fst) <$> resolvePackages
+    files <- concat <$> liftIO (traverse glob fs)
     liftIO $ formatPattern files
 
 formatPattern :: [FilePath] -> IO ()
-formatPattern patterns = do
-  files <- concat <$> traverse glob patterns
+formatPattern files = do
   let mode = Check
   case files of
     [] -> pure ()
