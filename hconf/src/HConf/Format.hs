@@ -225,13 +225,8 @@ parseMode :: Bool -> Mode
 parseMode True = InPlace
 parseMode False = Check
 
-optsParser :: m Opts
-optsParser =
-  Opts InPlace configParser configFileOptsParser Nothing
-    <$> (many . strArgument . mconcat)
-      [ metavar "FILE",
-        help "Haskell source files to format or stdin (the default)"
-      ]
+optsParser :: Mode -> [String] -> Opts
+optsParser mode = Opts mode configParser configFileOptsParser Nothing 
 
 configFileOptsParser :: ConfigFileOpts
 configFileOptsParser = ConfigFileOpts False False Nothing
