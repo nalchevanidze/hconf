@@ -11,9 +11,23 @@ import Data.Maybe (fromMaybe, mapMaybe)
 import qualified Data.Set as Set
 import qualified Data.Text.IO.Utf8 as T.Utf8
 import Ormolu
+  ( ColorMode (..),
+    Config (..),
+    RegionIndices (RegionIndices),
+    SourceType (ModuleSource),
+    defaultFixityOverrides,
+    defaultModuleReexports,
+    detectSourceType,
+    ormolu,
+    refineConfig,
+    withPrettyOrmoluExceptions,
+  )
 import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Fixity
-import Ormolu.Terminal
+  ( FixityOverrides (FixityOverrides),
+    ModuleReexports (ModuleReexports),
+  )
+import Ormolu.Terminal (runTerm)
 import System.Exit (ExitCode (..), exitWith)
 import qualified System.FilePath as FP
 import System.IO (stderr)
@@ -43,6 +57,9 @@ format files = do
 data Mode = InPlace | Check
   deriving (Eq, Show)
 
+colorMode :: ColorMode
+colorMode = Auto
+
 rawConfig :: (Config RegionIndices)
 rawConfig =
   Config
@@ -63,23 +80,20 @@ formatOne ::
   Mode ->
   FilePath ->
   IO ExitCode
-formatOne mode mpath =
-  withPrettyOrmoluExceptions (cfgColorMode rawConfig) $ do
-    case mode of
-      InPlace -> do
-        originalInput <- T.Utf8.readFile inputFile
-        formattedInput <-
-          ormolu config inputFile originalInput
-        when (formattedInput /= originalInput) $
-          T.Utf8.writeFile inputFile formattedInput
-        return ExitSuccess
-      Check -> do
-        -- ormoluFile is not used because we need originalInput
-        originalInput <- T.Utf8.readFile inputFile
-        formattedInput <-
-          ormolu config inputFile originalInput
-        handleDiff originalInput formattedInput inputFile
+formatOne mode mpath = withPrettyOrmoluExceptions colorMode (result mode)
   where
+    result InPlace = do
+      originalInput <- T.Utf8.readFile inputFile
+      formattedInput <-
+        ormolu config inputFile originalInput
+      when (formattedInput /= originalInput) $
+        T.Utf8.writeFile inputFile formattedInput
+      return ExitSuccess
+    result Check = do
+      originalInput <- T.Utf8.readFile inputFile
+      formattedInput <-
+        ormolu config inputFile originalInput
+      handleDiff originalInput formattedInput inputFile
     inputFile = FP.normalise mpath
     config =
       refineConfig
