@@ -25,6 +25,7 @@ dependencies:
 - text                  >=  1.2.3    &&  <   3.0.0
 - unordered-containers  >=  0.2.8    &&  <   0.3.0
 - yaml                  >=  0.8.32   &&  <   1.0.0
+- ormolu
 library:
   source-dirs: src
   ghc-options: -Wall
