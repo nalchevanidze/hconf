@@ -2,10 +2,13 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module HConf.Format (format) where
 
 import qualified Data.Text.IO.Utf8 as T.Utf8
+import HConf.Config.ConfigT (ConfigT)
+import HConf.Stack.Package (resolvePackages)
 import Ormolu
   ( ColorMode (..),
     Config (..),
@@ -20,9 +23,21 @@ import Relude hiding (exitWith)
 import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
+import Data.Text (unpack)
+import HConf.Utils.Log (label, task)
 
-format :: [FilePath] -> IO ()
-format patterns = do
+toPattern :: Text -> String
+toPattern x =  unpack x <> "**/*.hs"
+
+format :: ConfigT ()
+format = label "ormolu"
+  $ task "format"
+  $ do
+    files <- map (toPattern . fst) <$> resolvePackages
+    liftIO $ formatPattern files
+
+formatPattern :: [FilePath] -> IO ()
+formatPattern patterns = do
   files <- concat <$> traverse glob patterns
   let mode = Check
   case files of
