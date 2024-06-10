@@ -9,40 +9,32 @@ module HConf.Format (main) where
 
 import Control.Exception (throwIO)
 import Control.Monad
-import Data.Bool (bool)
-import Data.List (intercalate, sort)
-import Data.List.NonEmpty (NonEmpty)
-import Data.Map.Strict qualified as Map
-import Data.Maybe (fromMaybe, mapMaybe, maybeToList)
-import Data.Set qualified as Set
-import Data.Text.IO.Utf8 qualified as T.Utf8
-import Data.Version (showVersion)
-import Distribution.ModuleName (ModuleName)
-import Distribution.Types.PackageName (PackageName)
-import Language.Haskell.TH.Env (envQ)
-import Options.Applicative
+import Data.List (sort)
+import qualified Data.Map.Strict as Map
+import Data.Maybe (fromMaybe, mapMaybe)
+import qualified Data.Set as Set
+import qualified Data.Text.IO.Utf8 as T.Utf8
+-- import Distribution.ModuleName (ModuleName)
+-- import Distribution.Types.PackageName (PackageName)
+-- import Language.Haskell.TH.Env (envQ)
 import Ormolu
 import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Fixity
-import Ormolu.Parser (manualExts)
 import Ormolu.Terminal
-import Ormolu.Utils (showOutputable)
-import Ormolu.Utils.Fixity
-import Paths_ormolu (version)
 import System.Directory
 import System.Exit (ExitCode (..), exitWith)
-import System.FilePath qualified as FP
+-- import System.FilePath qualified as FP
 import System.IO (hPutStrLn, stderr)
 
 -- | Entry point of the program.
 main :: IO ()
 main = do
-  Opts {..} <- execParser optsParserInfo
+  Opts {..} <- optsParser
   let formatOne' =
         formatOne
           optConfigFileOpts
           optMode
-          optSourceType
+          Nothing
           optConfig
   exitCode <- case optInputFiles of
     [] -> formatOne' Nothing
@@ -228,189 +220,32 @@ data ConfigFileOpts = ConfigFileOpts
   }
   deriving (Show)
 
-optsParserInfo :: ParserInfo Opts
-optsParserInfo =
-  info (helper <*> ver <*> exts <*> optsParser) . mconcat $
-    [fullDesc]
-  where
-    ver :: Parser (a -> a)
-    ver =
-      infoOption verStr . mconcat $
-        [ long "version",
-          short 'v',
-          help "Print version of the program"
-        ]
-    verStr =
-      intercalate
-        "\n"
-        [ unwords $
-            ["ormolu", showVersion version]
-              <> maybeToList $$(envQ @String "ORMOLU_REV"),
-          "using ghc-lib-parser " ++ VERSION_ghc_lib_parser
-        ]
-    exts :: Parser (a -> a)
-    exts =
-      infoOption displayExts . mconcat $
-        [ long "manual-exts",
-          help "Display extensions that need to be enabled manually"
-        ]
-    displayExts = unlines $ sort (showOutputable <$> manualExts)
 
-optsParser :: Parser Opts
+parseMode :: Bool -> Mode
+parseMode True = InPlace
+parseMode False = Check
+
+optsParser :: m Opts
 optsParser =
-  Opts
-    <$> ( (fmap (bool Stdout InPlace) . switch . mconcat)
-            [ short 'i',
-              help "A shortcut for --mode inplace"
-            ]
-            <|> (option parseMode . mconcat)
-              [ long "mode",
-                short 'm',
-                metavar "MODE",
-                value Stdout,
-                help "Mode of operation: 'stdout' (the default), 'inplace', or 'check'"
-              ]
-        )
-    <*> configParser
-    <*> configFileOptsParser
-    <*> sourceTypeParser
-    <*> (many . strArgument . mconcat)
+  Opts InPlace configParser configFileOptsParser Nothing
+    <$> (many . strArgument . mconcat)
       [ metavar "FILE",
         help "Haskell source files to format or stdin (the default)"
       ]
 
-configFileOptsParser :: Parser ConfigFileOpts
-configFileOptsParser =
-  ConfigFileOpts
-    <$> (switch . mconcat)
-      [ long "no-cabal",
-        help "Do not extract default-extensions and dependencies from .cabal files"
-      ]
-    <*> (switch . mconcat)
-      [ long "no-dot-ormolu",
-        help "Do not look for .ormolu files"
-      ]
-    <*> (optional . strOption . mconcat)
-      [ long "stdin-input-file",
-        help "Path which will be used to find the .cabal file when using input from stdin"
-      ]
+configFileOptsParser :: ConfigFileOpts
+configFileOptsParser = ConfigFileOpts False False Nothing
 
-configParser :: Parser (Config RegionIndices)
+configParser :: (Config RegionIndices)
 configParser =
   Config
-    <$> (fmap (fmap DynOption) . many . strOption . mconcat)
-      [ long "ghc-opt",
-        short 'o',
-        metavar "OPT",
-        help "GHC options to enable (e.g. language extensions)"
-      ]
-    <*> ( fmap (FixityOverrides . Map.fromList . mconcat)
-            . many
-            . option parseFixityDeclaration
-            . mconcat
-        )
-      [ long "fixity",
-        short 'f',
-        metavar "FIXITY",
-        help "Fixity declaration to use (an override)"
-      ]
-    <*> ( fmap (ModuleReexports . Map.fromListWith (<>) . mconcat . pure)
-            . many
-            . option parseModuleReexportDeclaration
-            . mconcat
-        )
-      [ long "reexport",
-        short 'r',
-        metavar "REEXPORT",
-        help "Module re-export that Ormolu should know about"
-      ]
-    <*> (fmap Set.fromList . many . strOption . mconcat)
-      [ long "package",
-        short 'p',
-        metavar "PACKAGE",
-        help "Explicitly specified dependency (for operator fixity/precedence only)"
-      ]
-    <*> (switch . mconcat)
-      [ long "unsafe",
-        short 'u',
-        help "Do formatting faster but without automatic detection of defects"
-      ]
-    <*> (switch . mconcat)
-      [ long "debug",
-        short 'd',
-        help "Output information useful for debugging"
-      ]
-    <*> (switch . mconcat)
-      [ long "check-idempotence",
-        short 'c',
-        help "Fail if formatting is not idempotent"
-      ]
-    -- We cannot parse the source type here, because we might need to do
-    -- autodection based on the input file extension (not available here)
-    -- before storing the resolved value in the config struct.
-    <*> pure ModuleSource
-    <*> (option parseColorMode . mconcat)
-      [ long "color",
-        metavar "WHEN",
-        value Auto,
-        help "Colorize the output; WHEN can be 'never', 'always', or 'auto' (the default)"
-      ]
-    <*> ( RegionIndices
-            <$> (optional . option auto . mconcat)
-              [ long "start-line",
-                metavar "START",
-                help "Start line of the region to format (starts from 1)"
-              ]
-            <*> (optional . option auto . mconcat)
-              [ long "end-line",
-                metavar "END",
-                help "End line of the region to format (inclusive)"
-              ]
-        )
-
-sourceTypeParser :: Parser (Maybe SourceType)
-sourceTypeParser =
-  (option parseSourceType . mconcat)
-    [ long "source-type",
-      short 't',
-      metavar "TYPE",
-      value Nothing,
-      help "Set the type of source; TYPE can be 'module', 'sig', or 'auto' (the default)"
-    ]
-
-----------------------------------------------------------------------------
--- Helpers
-
--- | Parse 'Mode'.
-parseMode :: ReadM Mode
-parseMode = eitherReader $ \case
-  "stdout" -> Right Stdout
-  "inplace" -> Right InPlace
-  "check" -> Right Check
-  s -> Left $ "unknown mode: " ++ s
-
--- | Parse a fixity declaration.
-parseFixityDeclaration :: ReadM [(OpName, FixityInfo)]
-parseFixityDeclaration = eitherReader parseFixityDeclarationStr
-
--- | Parse a module reexport declaration.
-parseModuleReexportDeclaration ::
-  ReadM (ModuleName, NonEmpty (Maybe PackageName, ModuleName))
-parseModuleReexportDeclaration = eitherReader parseModuleReexportDeclarationStr
-
--- | Parse 'ColorMode'.
-parseColorMode :: ReadM ColorMode
-parseColorMode = eitherReader $ \case
-  "never" -> Right Never
-  "always" -> Right Always
-  "auto" -> Right Auto
-  s -> Left $ "unknown color mode: " ++ s
-
--- | Parse the 'SourceType'. 'Nothing' means that autodetection based on
--- file extension is requested.
-parseSourceType :: ReadM (Maybe SourceType)
-parseSourceType = eitherReader $ \case
-  "module" -> Right (Just ModuleSource)
-  "sig" -> Right (Just SignatureSource)
-  "auto" -> Right Nothing
-  s -> Left $ "unknown source type: " ++ s
+    []
+    (FixityOverrides Map.empty)
+    (ModuleReexports Map.empty)
+    Set.empty
+    False
+    False
+    True -- "check-idempotence"
+    ModuleSource
+    Auto
+    (RegionIndices Nothing Nothing)
