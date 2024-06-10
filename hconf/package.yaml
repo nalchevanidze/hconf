@@ -26,6 +26,7 @@ dependencies:
 - unordered-containers  >=  0.2.8    &&  <   0.3.0
 - yaml                  >=  0.8.32   &&  <   1.0.0
 - ormolu
+- Glob                  >=  0.7.0   &&  <   1.0.0
 library:
   source-dirs: src
   ghc-options: -Wall
@@ -37,7 +38,6 @@ executables:
     source-dirs: app
     ghc-options: -Wall
     dependencies:
-    - Glob                  >=  0.7.0   &&  <   1.0.0
     - filepath              >=  1.1.0   &&  <=  1.5.2.0
     - hconf                 >=  0.1.0   &&  <   0.2.0
     - optparse-applicative  >=  0.12.0  &&  <   0.20.0

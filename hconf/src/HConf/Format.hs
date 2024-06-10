@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Format (format) where
 
@@ -20,10 +21,13 @@ import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
 import System.Exit (ExitCode (..), exitWith)
 import System.FilePath (normalise)
-import System.IO (stderr)
+import System.FilePath.Glob (glob)
+import Relude hiding(exitWith)
 
-format :: [FilePath] -> IO ()
-format files = do
+format :: MonadIO m =>[FilePath] -> m ()
+format files = liftIO $ do
+  ls <- glob "hconf"
+  print ls
   let mode = InPlace
   exitCode <- case files of
     [] -> pure ExitSuccess

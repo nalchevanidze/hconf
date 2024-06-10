@@ -21,6 +21,7 @@ import HConf.Stack.Config (setupStack)
 import HConf.Stack.Package (checkPackages)
 import HConf.Utils.Class (Parse (..))
 import Relude
+import HConf.Format (format)
 
 upperBounds :: Env -> IO ()
 upperBounds =
@@ -33,6 +34,7 @@ setup :: String -> Env -> IO ()
 setup v = runTask "setup" $ do
   parse v >>= setupStack
   genHie
+  format []
   checkPackages
 
 updateVersion :: Bool -> Env -> IO ()

@@ -55,7 +55,8 @@ library
       src
   ghc-options: -Wall
   build-depends:
-      aeson >=1.4.4 && <3.0.0
+      Glob >=0.7.0 && <1.0.0
+    , aeson >=1.4.4 && <3.0.0
     , base >=4.7.0 && <5.0.0
     , bytestring >=0.10.4 && <0.15.0
     , containers >=0.4.2.1 && <=0.7
