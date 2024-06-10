@@ -8,7 +8,7 @@ module HConf.Format (format) where
 
 import Data.Text (unpack)
 import qualified Data.Text.IO.Utf8 as T.Utf8
-import HConf.Config.ConfigT (ConfigT)
+import HConf.Config.ConfigT (ConfigT, packages)
 import HConf.Stack.Package (resolvePackages)
 import HConf.Utils.Log (label, task)
 import Ormolu
@@ -33,7 +33,7 @@ format :: ConfigT ()
 format = label "ormolu"
   $ task "format"
   $ do
-    fs <- map (toPattern . fst) <$> resolvePackages
+    fs <- map toPattern <$> packages
     files <- concat <$> liftIO (traverse glob fs)
     liftIO $ formatPattern InPlace files
 
