@@ -21,10 +21,10 @@ import Ormolu
   )
 import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
-import Relude hiding (exitWith)
 import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
+import Relude hiding (exitWith)
 
 toPattern :: Text -> String
 toPattern x = unpack x <> "/**/*.hs"
