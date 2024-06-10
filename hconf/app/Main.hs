@@ -15,9 +15,9 @@ import CLI.Commands
     parseCLI,
   )
 import Data.Version (showVersion)
-import HConf (Env (..), getVersion, setup, updateVersion, upperBounds)
+import HConf (Env (..), format, getVersion, setup, updateVersion, upperBounds)
 import qualified Paths_hconf as CLI
-import Relude hiding (ByteString)
+import Relude hiding (ByteString, fix)
 
 currentVersion :: String
 currentVersion = showVersion CLI.version
@@ -44,3 +44,4 @@ runApp App {..}
     runOperation (Next isBreaking) = updateVersion isBreaking env
     runOperation UpperBounds = upperBounds env
     runOperation CurrentVersion = getVersion env
+    runOperation (Format fix) = format fix env

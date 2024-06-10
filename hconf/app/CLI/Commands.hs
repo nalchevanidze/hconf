@@ -35,6 +35,7 @@ data Command
   | UpperBounds
   | About
   | CurrentVersion
+  | Format Bool
   deriving (Show)
 
 data App = App
@@ -56,7 +57,8 @@ commandParser =
       ("about", "api information", pure About),
       ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
       ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
-      ("version", "get current version", pure CurrentVersion)
+      ("version", "get current version", pure CurrentVersion),
+      ("format", "format files in projects", Format <$> switch (long "fix" <> short 'f'))
     ]
 
 buildOperation :: [(String, String, Parser Command)] -> Parser Command

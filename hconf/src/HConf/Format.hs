@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Format (format) where
+module HConf.Format (formatWith) where
 
 import Data.Text (unpack)
 import qualified Data.Text.IO.Utf8 as T
@@ -25,8 +25,8 @@ import System.FilePath.Glob (glob)
 explore :: Text -> ConfigT [String]
 explore x = map normalise <$> liftIO (glob (unpack x <> "/**/*.hs"))
 
-format :: Bool -> ConfigT ()
-format fix = label "ormolu" $ do
+formatWith :: Bool -> ConfigT ()
+formatWith fix = label "ormolu" $ do
   files <- sort . concat <$> (packages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile fix) files
   unless (null errorCodes) (fail "Error")
