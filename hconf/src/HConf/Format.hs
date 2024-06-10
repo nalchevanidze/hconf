@@ -6,27 +6,17 @@ module HConf.Format (format) where
 
 import Control.Monad
 import Data.List (sort)
-import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe, mapMaybe)
-import qualified Data.Set as Set
+import Data.Maybe (mapMaybe)
 import qualified Data.Text.IO.Utf8 as T.Utf8
 import Ormolu
   ( ColorMode (..),
     Config (..),
-    RegionIndices (RegionIndices),
-    SourceType (ModuleSource),
-    defaultFixityOverrides,
-    defaultModuleReexports,
+    defaultConfig,
     detectSourceType,
     ormolu,
-    refineConfig,
     withPrettyOrmoluExceptions,
   )
 import Ormolu.Diff.Text (diffText, printTextDiff)
-import Ormolu.Fixity
-  ( FixityOverrides (FixityOverrides),
-    ModuleReexports (ModuleReexports),
-  )
 import Ormolu.Terminal (runTerm)
 import System.Exit (ExitCode (..), exitWith)
 import qualified System.FilePath as FP
@@ -60,20 +50,6 @@ data Mode = InPlace | Check
 colorMode :: ColorMode
 colorMode = Auto
 
-rawConfig :: (Config RegionIndices)
-rawConfig =
-  Config
-    []
-    (FixityOverrides Map.empty)
-    (ModuleReexports Map.empty)
-    Set.empty
-    False
-    False
-    True -- "check-idempotence"
-    ModuleSource
-    Auto
-    (RegionIndices Nothing Nothing)
-
 -- | Format a single input.
 formatOne ::
   -- | Mode of operation
@@ -96,21 +72,16 @@ formatOne mode mpath = withPrettyOrmoluExceptions colorMode (result mode)
       handleDiff originalInput formattedInput inputFile
     inputFile = FP.normalise mpath
     config =
-      refineConfig
-        (fromMaybe ModuleSource (Just (detectSourceType inputFile)))
-        Nothing
-        (Just (cfgFixityOverrides rawConfig))
-        (Just (cfgModuleReexports rawConfig))
-        ( rawConfig
-            { cfgFixityOverrides = maybe defaultFixityOverrides fst Nothing,
-              cfgModuleReexports = maybe defaultModuleReexports snd Nothing
-            }
-        )
+      defaultConfig
+        { cfgCheckIdempotence = True,
+          cfgColorMode = Auto,
+          cfgSourceType = detectSourceType inputFile
+        }
     handleDiff originalInput formattedInput fileRepr =
       case diffText originalInput formattedInput fileRepr of
         Nothing -> return ExitSuccess
         Just diff -> do
-          runTerm (printTextDiff diff) (cfgColorMode rawConfig) stderr
+          runTerm (printTextDiff diff) colorMode stderr
           -- 100 is different to all the other exit code that are emitted
           -- either from an 'OrmoluException' or from 'error' and
           -- 'notImplemented'.
