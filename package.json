@@ -1,0 +1,24 @@
+{
+  "name": "hconf",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:nalchevanidze/hconf.git",
+  "author": "Davit Nalchevanidze <d.nalchevanidze@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "check:spelling": "cspell --cache --no-progress '**/*.hs'",
+    "release": "ts-node scripts/release.ts",
+    "lint": "curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s ."
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "cspell": "^6.31.1"
+  },
+  "dependencies": {
+    "commander": "^9.1.0",
+    "gh-rel-easy": "^0.3.0",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  }
+}

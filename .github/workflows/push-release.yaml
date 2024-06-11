@@ -1,0 +1,32 @@
+name: Publish Release
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  publish_release:
+    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'publish-release/') && github.event.pull_request.merged == true  }}
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      tag_name: ${{ steps.describe.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-hs
+
+      - name: Describe
+        id: describe
+        run: echo "VERSION=$(hconf version)" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.describe.outputs.VERSION }}
+          release_name: ${{ steps.describe.outputs.VERSION }}
+          body: ${{ github.event.pull_request.body }}
