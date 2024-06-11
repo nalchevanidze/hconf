@@ -3,7 +3,7 @@ version: 0.1.4
 github: nalchevanidze/hconf
 license: MIT
 author: Daviti Nalchevanidze
-category: web, graphql
+category: web
 synopsis: Stack Config
 maintainer: d.nalchevanidze@gmail.com
 copyright: (c) 2019 Daviti Nalchevanidze

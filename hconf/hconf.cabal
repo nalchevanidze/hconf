@@ -8,7 +8,7 @@ name:           hconf
 version:        0.1.4
 synopsis:       Stack Config
 description:    cli to manage multiple stack projects
-category:       web, graphql
+category:       web
 homepage:       https://github.com/nalchevanidze/hconf#readme
 bug-reports:    https://github.com/nalchevanidze/hconf/issues
 author:         Daviti Nalchevanidze
