@@ -50,8 +50,8 @@ data GlobalOptions = GlobalOptions
   }
   deriving (Show)
 
-commandParser :: Parser Command
-commandParser =
+parseCommand :: Parser Command
+parseCommand =
   parsers
     [ ("setup", "builds Haskell code from GQL source", Setup <$> optional parseVersion),
       ("about", "api information", pure About),
@@ -61,14 +61,14 @@ commandParser =
       ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
     ]
 
-
-
 parsers :: [(String, String, Parser Command)] -> Parser Command
-parsers = subparser . mconcat . map parseOperation 
-
-parseOperation :: (String, String, Parser Command) -> OA.Mod OA.CommandFields Command
-parseOperation (bName, bDesc, bValue) =
-  command bName (info (helper <*> bValue) (fullDesc <> progDesc bDesc))
+parsers =
+  subparser
+    . mconcat
+    . map
+      ( \(bName, bDesc, bValue) ->
+          command bName (info (helper <*> bValue) (fullDesc <> progDesc bDesc))
+      )
 
 parseVersion :: Parser String
 parseVersion = (strArgument . mconcat) [metavar "version", help "existing version"]
@@ -80,7 +80,7 @@ parseCLI =
     (info (helper <*> parseApp) description)
 
 parseApp :: OA.Parser App
-parseApp = App <$> commandParser <*> parseOptions
+parseApp = App <$> parseCommand <*> parseOptions
 
 parseOptions :: Parser GlobalOptions
 parseOptions =
