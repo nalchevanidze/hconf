@@ -52,7 +52,7 @@ data GlobalOptions = GlobalOptions
 
 commandParser :: Parser Command
 commandParser =
-  buildOperation
+  parsers
     [ ("setup", "builds Haskell code from GQL source", Setup <$> optional parseVersion),
       ("about", "api information", pure About),
       ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
@@ -61,11 +61,10 @@ commandParser =
       ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
     ]
 
-buildOperation :: [(String, String, Parser Command)] -> Parser Command
-buildOperation xs = joinParsers $ map parseOperation xs
 
-joinParsers :: [OA.Mod OA.CommandFields a] -> Parser a
-joinParsers xs = subparser $ mconcat xs
+
+parsers :: [(String, String, Parser Command)] -> Parser Command
+parsers = subparser . mconcat . map parseOperation 
 
 parseOperation :: (String, String, Parser Command) -> OA.Mod OA.CommandFields Command
 parseOperation (bName, bDesc, bValue) =
