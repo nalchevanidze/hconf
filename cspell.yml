@@ -1,0 +1,17 @@
+language: en
+useGitignore: true
+ignorePaths:
+  - cspell.yml
+  - package.json
+  - ./.stack-work
+  - ./**/*.cabal
+  - ./**/*.json
+  - ./node_modules
+overrides:
+  - filename: "**/docs/APIReference-*.md"
+    ignoreRegExpList:
+      - /href="[^"]*"/
+ignoreRegExpList:
+  - u\{[0-9a-f]{1,8}\}
+words:
+  - hconf
