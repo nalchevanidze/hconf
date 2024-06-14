@@ -8,7 +8,7 @@ module CLI.Commands
   )
 where
 
-import HConf (Parse (parse), VersionTag)
+import HConf (Command (..), Parse (parse), VersionTag)
 import Options.Applicative
   ( Parser,
     argument,
@@ -30,15 +30,6 @@ import Options.Applicative
 import qualified Options.Applicative as OA
 import Options.Applicative.Builder (str)
 import Relude hiding (ByteString)
-
-data Command
-  = Setup (Maybe VersionTag)
-  | Next Bool
-  | UpperBounds
-  | About
-  | CurrentVersion
-  | Format Bool
-  deriving (Show)
 
 data App = App
   { operations :: Command,

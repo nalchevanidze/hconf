@@ -15,12 +15,9 @@ import CLI.Commands
     parseCLI,
   )
 import Data.Version (showVersion)
-import HConf (Env (..), VersionTag (..), format, getVersion, setup, updateVersion, upperBounds)
-import qualified Paths_hconf as CLI
+import HConf
+import HConf (Command (..), Env (..), currentVersion, exec)
 import Relude hiding (ByteString, fix)
-
-currentVersion :: String
-currentVersion = showVersion CLI.version
 
 main :: IO ()
 main = parseCLI >>= runApp
@@ -37,11 +34,4 @@ env =
 runApp :: App -> IO ()
 runApp App {..}
   | version options = putStrLn currentVersion
-  | otherwise = runOperation operations
-  where
-    runOperation About = putStrLn $ "Stack Config CLI, version " <> currentVersion
-    runOperation (Setup version) = setup (fromMaybe Latest version) env
-    runOperation (Next isBreaking) = updateVersion isBreaking env
-    runOperation UpperBounds = upperBounds env
-    runOperation CurrentVersion = getVersion env
-    runOperation (Format fix) = format (not fix) env
+  | otherwise = exec env operations
