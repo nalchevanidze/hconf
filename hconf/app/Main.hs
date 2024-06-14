@@ -7,7 +7,7 @@ module Main
   )
 where
 
-import HConf (Command (..), Env (..), Parse (parse), VersionTag, currentVersion, exec)
+import HConf (Command (..), Env (..), Parse (parse), Tag, currentVersion, exec)
 import Options.Applicative
   ( Parser,
     argument,
@@ -53,7 +53,7 @@ parsers =
           command name (info (helper <*> value) (fullDesc <> progDesc desc))
       )
 
-parseVersion :: Parser VersionTag
+parseVersion :: Parser Tag
 parseVersion = argument (str >>= parse) (metavar "version" <> help "version tag")
 
 parseCommand :: Parser Command

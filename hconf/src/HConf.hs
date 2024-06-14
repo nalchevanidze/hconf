@@ -4,7 +4,7 @@
 
 module HConf
   ( Env (..),
-    VersionTag (..),
+    Tag (..),
     Parse (..),
     exec,
     Command (..),
@@ -15,7 +15,7 @@ where
 import Data.Version (showVersion)
 import HConf.Config.Config (Config (..), updateConfig, updateConfigUpperBounds)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
-import HConf.Config.Tag (VersionTag (..))
+import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Format (formatWith)
 import HConf.Hie (genHie)
@@ -35,7 +35,7 @@ upperBounds =
     >>= updateConfigUpperBounds
     >>= save
 
-setup :: Maybe VersionTag -> Env -> IO ()
+setup :: Maybe Tag -> Env -> IO ()
 setup v = runTask "setup" $ do
   setupStack (fromMaybe Latest v)
   genHie
@@ -48,7 +48,7 @@ getVersion :: Env -> IO ()
 getVersion = run (Just . version <$> asks config)
 
 data Command
-  = Setup {tag :: Maybe VersionTag}
+  = Setup {tag :: Maybe Tag}
   | Next {isBreaking :: Bool}
   | UpperBounds
   | About

@@ -4,7 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Config.Tag
-  ( VersionTag (..),
+  ( Tag (..),
   )
 where
 
@@ -19,7 +19,7 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Class (Parse (..))
 import Relude hiding (show)
 
-data VersionTag
+data Tag
   = Version Version
   | Latest
   deriving
@@ -27,29 +27,29 @@ data VersionTag
       Eq
     )
 
-instance Parse VersionTag where
+instance Parse Tag where
   parse = parseText . pack
   parseText "latest" = pure Latest
   parseText s = Version <$> parseText s
 
-instance ToString VersionTag where
+instance ToString Tag where
   toString Latest = "latest"
   toString (Version v) = toString v
 
-instance Show VersionTag where
+instance Show Tag where
   show = toString
 
-instance ToText VersionTag where
+instance ToText Tag where
   toText = pack . toString
 
-instance FromJSON VersionTag where
+instance FromJSON Tag where
   parseJSON (String s) = parseText s
   parseJSON v = Version <$> parseJSON v
 
-instance ToJSON VersionTag where
+instance ToJSON Tag where
   toJSON = String . toText
 
-instance Ord VersionTag where
+instance Ord Tag where
   compare Latest Latest = EQ
   compare Latest Version {} = GT
   compare Version {} Latest = LT
