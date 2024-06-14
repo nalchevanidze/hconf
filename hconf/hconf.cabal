@@ -75,7 +75,6 @@ library
 executable hconf
   main-is: Main.hs
   other-modules:
-      CLI.Commands
       Paths_hconf
   hs-source-dirs:
       app
