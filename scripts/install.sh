@@ -57,7 +57,7 @@ echo "";
 
 if command -v hconf  
 then
-  echo "${SUCCSESS}installation succeeded for honf $(hconf version).${STD}";
+  echo "${SUCCSESS}installation succeeded for honf $(hconf about).${STD}";
 else 
   echo "add ${WARN}$BIN_DIR${STD} to enviroment PATH to execute hconf.";
 fi
