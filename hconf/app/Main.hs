@@ -9,7 +9,6 @@ where
 
 import HConf
   ( Command (..),
-    Env (..),
     Parse (parse),
     Tag,
     currentVersion,
@@ -61,28 +60,30 @@ parsers =
           command name (info (helper <*> value) (fullDesc <> progDesc desc))
       )
 
-parseVersion :: Parser Tag
-parseVersion = argument (str >>= parse) (metavar "version" <> help "version tag")
+version :: Parser Tag
+version = argument (str >>= parse) (metavar "version" <> help "version tag")
 
-parseCommand :: Parser Command
-parseCommand =
-  parsers
-    [ ("setup", "builds Haskell code from GQL source", Setup <$> optional parseVersion),
-      ("about", "api information", pure About),
-      ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
-      ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
-      ("version", "get current version", pure CurrentVersion),
-      ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
-    ]
-
-parseOptions :: Parser Options
-parseOptions =
-  Options
-    <$> switch (long "version" <> short 'v' <> help "show Version number")
-    <*> switch (long "silence" <> short 's' <> help "silent")
+flag :: Char -> String -> String -> Parser Bool
+flag s l h = switch (long l <> short s <> help h)
 
 main :: IO ()
-main = run ((,) <$> parseCommand <*> parseOptions) >>= runApp
+main =
+  run
+    ( (,)
+        <$> parsers
+          [ ("setup", "builds Haskell code from GQL source", Setup <$> optional version),
+            ("about", "api information", pure About),
+            ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
+            ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
+            ("version", "get current version", pure CurrentVersion),
+            ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
+          ]
+        <*> ( Options
+                <$> flag 'v' "version" "show Version number"
+                <*> flag 's' "silence" "silent"
+            )
+    )
+    >>= runApp
   where
     runApp (cmd, ops)
       | optVersion ops = putStrLn currentVersion
