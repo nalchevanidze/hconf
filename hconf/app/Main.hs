@@ -15,7 +15,7 @@ import CLI.Commands
     parseCLI,
   )
 import Data.Version (showVersion)
-import HConf (Env (..), format, getVersion, setup, updateVersion, upperBounds)
+import HConf (Env (..), VersionTag (..), format, getVersion, setup, updateVersion, upperBounds)
 import qualified Paths_hconf as CLI
 import Relude hiding (ByteString, fix)
 
