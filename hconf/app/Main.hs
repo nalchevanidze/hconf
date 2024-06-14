@@ -36,11 +36,17 @@ import Options.Applicative
 import Options.Applicative.Builder (str)
 import Relude hiding (ByteString, fix)
 
-data Options = Options
-  { optVersion :: Bool,
-    optSilence :: Bool
-  }
-  deriving (Show)
+commands :: [(String, String, Parser a)] -> Parser a
+commands =
+  subparser
+    . mconcat
+    . map
+      ( \(name, desc, value) ->
+          command name (info (helper <*> value) (fullDesc <> progDesc desc))
+      )
+
+flag :: Char -> String -> String -> Parser Bool
+flag s l h = switch (long l <> short s <> help h)
 
 run :: Parser a -> IO a
 run app =
@@ -51,39 +57,37 @@ run app =
         (fullDesc <> progDesc "HConf CLI - manage multiple haskell projects")
     )
 
-commands :: [(String, String, Parser a)] -> Parser a
-commands =
-  subparser
-    . mconcat
-    . map
-      ( \(name, desc, value) ->
-          command name (info (helper <*> value) (fullDesc <> progDesc desc))
-      )
+class CLIType a where
+  cliType :: Parser a
 
-version :: Parser Tag
-version = argument (str >>= parse) (metavar "version" <> help "version tag")
+instance CLIType Tag where
+  cliType = argument (str >>= parse) (metavar "version" <> help "version tag")
 
-flag :: Char -> String -> String -> Parser Bool
-flag s l h = switch (long l <> short s <> help h)
+instance CLIType Command where
+  cliType =
+    commands
+      [ ("setup", "builds Haskell code from GQL source", Setup <$> optional cliType),
+        ("about", "api information", pure About),
+        ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
+        ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
+        ("version", "get current version", pure CurrentVersion),
+        ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
+      ]
+
+data Options = Options
+  { optVersion :: Bool,
+    optSilence :: Bool
+  }
+  deriving (Show)
+
+instance CLIType Options where
+  cliType =
+    Options
+      <$> flag 'v' "version" "show Version number"
+      <*> flag 's' "silence" "silent"
 
 main :: IO ()
-main =
-  run
-    ( (,)
-        <$> commands
-          [ ("setup", "builds Haskell code from GQL source", Setup <$> optional version),
-            ("about", "api information", pure About),
-            ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
-            ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
-            ("version", "get current version", pure CurrentVersion),
-            ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
-          ]
-        <*> ( Options
-                <$> flag 'v' "version" "show Version number"
-                <*> flag 's' "silence" "silent"
-            )
-    )
-    >>= runApp
+main = run ((,) <$> cliType <*> cliType) >>= runApp
   where
     runApp (cmd, ops)
       | optVersion ops = putStrLn currentVersion
