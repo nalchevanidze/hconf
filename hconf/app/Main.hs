@@ -10,28 +10,24 @@ where
 
 import CLI.Commands
   ( App (..),
-    Command (..),
     Options (..),
-    parseCLI,
+    parseApp,
   )
-import Data.Version (showVersion)
-import HConf
-import HConf (Command (..), Env (..), currentVersion, exec)
+import HConf (Env (..), currentVersion, exec)
 import Relude hiding (ByteString, fix)
 
 main :: IO ()
-main = parseCLI >>= runApp
-
-env :: Env
-env =
-  Env
-    { hconf = "./hconf.yaml",
-      hie = "./hie.yaml",
-      stack = "./stack.yaml",
-      silence = False
-    }
-
-runApp :: App -> IO ()
-runApp App {..}
-  | version options = putStrLn currentVersion
-  | otherwise = exec env operations
+main = parseApp >>= runApp
+  where
+    runApp App {..}
+      | version options = putStrLn currentVersion
+      | otherwise =
+          exec
+            ( Env
+                { hconf = "./hconf.yaml",
+                  hie = "./hie.yaml",
+                  stack = "./stack.yaml",
+                  silence = False
+                }
+            )
+            operations

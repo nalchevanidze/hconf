@@ -4,7 +4,7 @@ module CLI.Commands
   ( Options (..),
     App (..),
     Command (..),
-    parseCLI,
+    parseApp,
   )
 where
 
@@ -66,14 +66,11 @@ parsers =
 parseVersion :: Parser VersionTag
 parseVersion = argument (str >>= parse) (metavar "version" <> help "version tag")
 
-parseCLI :: IO App
-parseCLI =
+parseApp :: IO App
+parseApp =
   customExecParser
     (prefs showHelpOnError)
-    (info (helper <*> parseApp) description)
-
-parseApp :: OA.Parser App
-parseApp = App <$> parseCommand <*> parseOptions
+    (info (helper <*> (App <$> parseCommand <*> parseOptions)) description)
 
 parseOptions :: Parser Options
 parseOptions =
