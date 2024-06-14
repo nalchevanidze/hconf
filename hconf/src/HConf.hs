@@ -1,3 +1,4 @@
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -47,8 +48,8 @@ getVersion :: Env -> IO ()
 getVersion = run (Just . version <$> asks config)
 
 data Command
-  = Setup (Maybe VersionTag)
-  | Next Bool
+  = Setup {tag :: Maybe VersionTag}
+  | Next {isBreaking :: Bool}
   | UpperBounds
   | About
   | CurrentVersion
@@ -61,7 +62,7 @@ currentVersion = showVersion CLI.version
 exec :: Env -> Command -> IO ()
 exec _ About = putStrLn $ "Stack Config CLI, version " <> currentVersion
 exec e (Setup v) = setup v e
-exec e (Next isBreaking) = updateVersion isBreaking e
+exec e Next {isBreaking} = updateVersion isBreaking e
 exec e UpperBounds = upperBounds e
 exec e CurrentVersion = getVersion e
 exec e (Format fix) = format (not fix) e
