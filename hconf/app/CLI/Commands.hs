@@ -59,8 +59,8 @@ parsers =
   subparser
     . mconcat
     . map
-      ( \(bName, bDesc, bValue) ->
-          command bName (info (helper <*> bValue) (fullDesc <> progDesc bDesc))
+      ( \(name, desc, value) ->
+          command name (info (helper <*> value) (fullDesc <> progDesc desc))
       )
 
 parseVersion :: Parser VersionTag
