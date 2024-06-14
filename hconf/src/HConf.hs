@@ -9,6 +9,7 @@ module HConf
     exec,
     Command (..),
     currentVersion,
+    defaultConfig,
   )
 where
 
@@ -66,3 +67,12 @@ exec e Next {isBreaking} = updateVersion isBreaking e
 exec e UpperBounds = upperBounds e
 exec e CurrentVersion = getVersion e
 exec e (Format fix) = format (not fix) e
+
+defaultConfig :: Env
+defaultConfig =
+  Env
+    { hconf = "./hconf.yaml",
+      hie = "./hie.yaml",
+      stack = "./stack.yaml",
+      silence = False
+    }

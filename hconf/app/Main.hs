@@ -7,7 +7,15 @@ module Main
   )
 where
 
-import HConf (Command (..), Env (..), Parse (parse), Tag, currentVersion, exec)
+import HConf
+  ( Command (..),
+    Env (..),
+    Parse (parse),
+    Tag,
+    currentVersion,
+    defaultConfig,
+    exec,
+  )
 import Options.Applicative
   ( Parser,
     argument,
@@ -78,13 +86,4 @@ main = run ((,) <$> parseCommand <*> parseOptions) >>= runApp
   where
     runApp (cmd, ops)
       | optVersion ops = putStrLn currentVersion
-      | otherwise = do
-          exec
-            ( Env
-                { hconf = "./hconf.yaml",
-                  hie = "./hie.yaml",
-                  stack = "./stack.yaml",
-                  silence = False
-                }
-            )
-            cmd
+      | otherwise = exec defaultConfig cmd
