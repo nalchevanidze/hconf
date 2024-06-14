@@ -1,15 +1,17 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module CLI.Commands
-  ( GlobalOptions (..),
+  ( Options (..),
     App (..),
     Command (..),
     parseCLI,
   )
 where
 
+import HConf (Parse (parse), VersionTag)
 import Options.Applicative
   ( Parser,
+    argument,
     command,
     customExecParser,
     fullDesc,
@@ -22,15 +24,15 @@ import Options.Applicative
     progDesc,
     short,
     showHelpOnError,
-    strArgument,
     subparser,
     switch,
   )
 import qualified Options.Applicative as OA
+import Options.Applicative.Builder (str)
 import Relude hiding (ByteString)
 
 data Command
-  = Setup (Maybe String)
+  = Setup (Maybe VersionTag)
   | Next Bool
   | UpperBounds
   | About
@@ -40,11 +42,11 @@ data Command
 
 data App = App
   { operations :: Command,
-    options :: GlobalOptions
+    options :: Options
   }
   deriving (Show)
 
-data GlobalOptions = GlobalOptions
+data Options = Options
   { version :: Bool,
     silence :: Bool
   }
@@ -70,8 +72,8 @@ parsers =
           command bName (info (helper <*> bValue) (fullDesc <> progDesc bDesc))
       )
 
-parseVersion :: Parser String
-parseVersion = (strArgument . mconcat) [metavar "version", help "existing version"]
+parseVersion :: Parser VersionTag
+parseVersion = argument (str >>= parse) (metavar "version" <> help "version tag")
 
 parseCLI :: IO App
 parseCLI =
@@ -82,11 +84,11 @@ parseCLI =
 parseApp :: OA.Parser App
 parseApp = App <$> parseCommand <*> parseOptions
 
-parseOptions :: Parser GlobalOptions
+parseOptions :: Parser Options
 parseOptions =
-  GlobalOptions
+  Options
     <$> switch (long "version" <> short 'v' <> help "show Version number")
-    <*> switch (long "silence" <> short 's' <> help "show Version number")
+    <*> switch (long "silence" <> short 's' <> help "silent")
 
 description :: OA.InfoMod a
 description = fullDesc <> progDesc "HConf CLI - manage multiple haskell projects"

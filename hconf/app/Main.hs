@@ -11,7 +11,7 @@ where
 import CLI.Commands
   ( App (..),
     Command (..),
-    GlobalOptions (..),
+    Options (..),
     parseCLI,
   )
 import Data.Version (showVersion)
@@ -40,7 +40,7 @@ runApp App {..}
   | otherwise = runOperation operations
   where
     runOperation About = putStrLn $ "Stack Config CLI, version " <> currentVersion
-    runOperation (Setup version) = setup (fromMaybe "latest" version) env
+    runOperation (Setup version) = setup (fromMaybe Latest version) env
     runOperation (Next isBreaking) = updateVersion isBreaking env
     runOperation UpperBounds = upperBounds env
     runOperation CurrentVersion = getVersion env

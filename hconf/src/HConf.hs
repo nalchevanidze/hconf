@@ -5,7 +5,7 @@ module HConf
   ( setup,
     Env (..),
     updateVersion,
-    VersionTag,
+    VersionTag (..),
     Parse (..),
     getVersion,
     upperBounds,
@@ -15,7 +15,7 @@ where
 
 import HConf.Config.Config (Config (..), updateConfig, updateConfigUpperBounds)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
-import HConf.Config.Tag (VersionTag)
+import HConf.Config.Tag (VersionTag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Format (formatWith)
 import HConf.Hie (genHie)
@@ -34,9 +34,9 @@ upperBounds =
     >>= updateConfigUpperBounds
     >>= save
 
-setup :: String -> Env -> IO ()
+setup :: VersionTag -> Env -> IO ()
 setup v = runTask "setup" $ do
-  parse v >>= setupStack
+  setupStack v
   genHie
   checkPackages
 
