@@ -51,8 +51,8 @@ run app =
         (fullDesc <> progDesc "HConf CLI - manage multiple haskell projects")
     )
 
-parsers :: [(String, String, Parser a)] -> Parser a
-parsers =
+commands :: [(String, String, Parser a)] -> Parser a
+commands =
   subparser
     . mconcat
     . map
@@ -70,7 +70,7 @@ main :: IO ()
 main =
   run
     ( (,)
-        <$> parsers
+        <$> commands
           [ ("setup", "builds Haskell code from GQL source", Setup <$> optional version),
             ("about", "api information", pure About),
             ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
