@@ -70,7 +70,7 @@ instance CLIType Command where
         ("about", "api information", pure About),
         ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
         ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
-        ("version", "get current version", pure CurrentVersion),
+        ("version", "get current version", pure Version),
         ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
       ]
 
