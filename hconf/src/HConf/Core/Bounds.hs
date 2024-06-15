@@ -4,7 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Core.Bounds
-  ( Bounds (..),
+  ( Bounds ,
     versionBounds,
     diff,
     printBoundParts,
