@@ -18,6 +18,7 @@ words:
   - bimap
   - concat
   - Creds
+  - fmap
   - hackage
   - hconf
   - mconcat
