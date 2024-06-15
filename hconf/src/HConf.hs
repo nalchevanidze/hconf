@@ -66,7 +66,7 @@ exec e Setup {tag} = setup tag e
 exec e Next {isBreaking} = updateVersion isBreaking e
 exec e UpperBounds = upperBounds e
 exec e Version = getVersion e
-exec e Format {check} = format (not check) e
+exec e Format {check} = format check e
 
 defaultConfig :: Env
 defaultConfig =
