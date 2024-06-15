@@ -24,8 +24,8 @@ import HConf.Utils.Class (HConfIO (..))
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
 import Relude hiding (Show, Undefined, intercalate, show)
-import System.Directory
-import System.IO.Error hiding (catch)
+import System.Directory (removeFile)
+import System.IO.Error (isDoesNotExistError)
 import Prelude (Show (..))
 
 serializeYaml :: (ToJSON a) => a -> ByteString
