@@ -32,17 +32,12 @@ builds:
     fastsum: 0.1.1.1
 - ghc: 9.0.2
   resolver: lts-19.28
-  exclude:
-  - examples/scotty-fraxl
   extra:
     attoparsec-aeson: 2.1.0.0
     dependent-map: 0.2.4.0
     dependent-sum: '0.4'
 - ghc: latest
   resolver: nightly-2024-05-29
-  exclude:
-  - examples/scotty-fraxl
-  - examples/scotty-freer-simple
   extra:
     fastsum: 0.1.1.1
     type-aligned: 0.9.6
