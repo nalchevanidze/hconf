@@ -40,7 +40,11 @@ import Relude hiding
     toList,
   )
 
-data Version = Version {major :: Int, minor :: Int, revision :: [Int]}
+data Version = Version
+  { major :: Int,
+    minor :: Int,
+    revision :: [Int]
+  }
   deriving
     ( Generic,
       Eq
