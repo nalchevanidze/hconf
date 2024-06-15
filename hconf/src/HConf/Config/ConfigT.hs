@@ -20,8 +20,7 @@ import Control.Exception (tryJust)
 import HConf.Config.Config (Config, getPackages)
 import HConf.Core.Env (Env (..))
 import HConf.Utils.Chalk (Color (Green), chalk)
-import HConf.Utils.Class (Check (..), HConfIO (..))
-import HConf.Utils.Core (Name)
+import HConf.Utils.Class (Check (..), HConfIO (..), ReadConf (..))
 import HConf.Utils.Log (Log (..), alert, label, task)
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
@@ -48,8 +47,6 @@ printException = show
 runConfigT :: ConfigT a -> Env -> Config -> IO (Either String a)
 runConfigT (ConfigT (ReaderT f)) env config = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
-packages :: ConfigT [Name]
-packages = getPackages <$> asks config
 
 indent :: Int -> String
 indent i = replicate (i * 2) ' '
@@ -64,6 +61,9 @@ instance HConfIO ConfigT where
   eitherRead = liftIO . eitherRead
   read = liftIO . read
   write f = liftIO . write f
+  
+instance ReadConf ConfigT where
+  packages = getPackages <$> asks config
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
