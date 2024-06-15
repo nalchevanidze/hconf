@@ -87,8 +87,8 @@ instance CLIType Options where
       <*> flag 's' "silence" "silent"
 
 main :: IO ()
-main = run ((,) <$> cliType <*> cliType) >>= runApp
-  where
-    runApp (cmd, ops)
-      | optVersion ops = putStrLn currentVersion
-      | otherwise = exec defaultConfig cmd
+main = do
+  (cmd, ops) <- run ((,) <$> cliType <*> cliType)
+  if optVersion ops
+    then putStrLn currentVersion
+    else exec defaultConfig cmd

@@ -26,19 +26,19 @@ explore :: Text -> ConfigT [String]
 explore x = map normalise <$> liftIO (glob (unpack x <> "/**/*.hs"))
 
 formatWith :: Bool -> ConfigT ()
-formatWith fix = label "ormolu" $ do
+formatWith check = label "ormolu" $ do
   files <- sort . concat <$> (packages >>= traverse explore)
-  errorCodes <- mapMaybe selectFailure <$> mapM (formatFile fix) files
+  errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
   unless (null errorCodes) (fail "Error")
 
 formatFile :: (MonadIO m) => Bool -> FilePath -> m ExitCode
-formatFile fix path = liftIO $ withPrettyOrmoluExceptions colorMode $ do
+formatFile check path = liftIO $ withPrettyOrmoluExceptions colorMode $ do
   original <- T.readFile path
   formatted <- formatter path original
   handle original formatted
   where
     handle original formatted
-      | fix = when (formatted /= original) (T.writeFile path formatted) $> ExitSuccess
+      | not check = when (formatted /= original) (T.writeFile path formatted) $> ExitSuccess
       | otherwise = handleDiff original formatted path
 
 formatter :: (MonadIO m) => FilePath -> Text -> m Text

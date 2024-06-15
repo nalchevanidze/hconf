@@ -16,7 +16,7 @@ where
 import Data.Version (showVersion)
 import HConf.Config.Config (Config (..), updateConfig, updateConfigUpperBounds)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
-import HConf.Config.Tag (Tag (..))
+import HConf.Config.Tag (Tag (Latest))
 import HConf.Core.Env (Env (..))
 import HConf.Format (formatWith)
 import HConf.Hie (genHie)
@@ -27,7 +27,7 @@ import qualified Paths_hconf as CLI
 import Relude hiding (fix)
 
 format :: Bool -> Env -> IO ()
-format fix = runTask "format" $ formatWith fix
+format check = runTask "format" $ formatWith check
 
 upperBounds :: Env -> IO ()
 upperBounds =
@@ -53,8 +53,8 @@ data Command
   | Next {isBreaking :: Bool}
   | UpperBounds
   | About
-  | CurrentVersion
-  | Format Bool
+  | Version
+  | Format {check :: Bool}
   deriving (Show)
 
 currentVersion :: String
@@ -62,11 +62,11 @@ currentVersion = showVersion CLI.version
 
 exec :: Env -> Command -> IO ()
 exec _ About = putStrLn $ "Stack Config CLI, version " <> currentVersion
-exec e (Setup v) = setup v e
+exec e Setup {tag} = setup tag e
 exec e Next {isBreaking} = updateVersion isBreaking e
 exec e UpperBounds = upperBounds e
-exec e CurrentVersion = getVersion e
-exec e (Format fix) = format (not fix) e
+exec e Version = getVersion e
+exec e Format {check} = format (not check) e
 
 defaultConfig :: Env
 defaultConfig =
