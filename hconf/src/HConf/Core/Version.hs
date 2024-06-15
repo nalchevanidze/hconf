@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -79,15 +80,18 @@ parseSeries :: Text -> Maybe [Int]
 parseSeries = traverse (readMaybe . unpack) . split (== '.')
 
 fromSeries :: (MonadFail m) => [Int] -> m Version
-fromSeries [ma] = pure $ Version ma 0 []
-fromSeries (ma : (mi : xs)) = pure $ Version ma mi xs
 fromSeries [] = fail "invalid version: version should have at least one number !"
+fromSeries [major] = pure $ Version {major, minor = 0, revision = []}
+fromSeries (major : (minor : revision)) = pure Version {..}
+
+toSeries :: Version -> [Int]
+toSeries Version {..} = [major, minor] <> revision
 
 instance ToString Version where
-  toString Version {..} = intercalate "." $ map show ([major, minor] <> revision)
+  toString = intercalate "." . map show . toSeries
 
 instance Ord Version where
-  compare (Version maj1 min1 v1) (Version maj2 min2 v2) = compareSeries ([maj1, min1] <> v1) ([maj2, min2] <> v2)
+  compare a b = compareSeries (toSeries a) (toSeries b)
 
 instance Show Version where
   show = toString
