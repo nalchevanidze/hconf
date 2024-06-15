@@ -54,9 +54,20 @@ instance ToJSON Build where
 
 instance Check Build where
   check Build {..} =
-    traverse_
-      (checkVersion . first unpack)
-      (maybe [] M.toList extra)
+    sequence_
+      [ checkExtraDeps extra,
+        checkPackageNames include,
+        checkPackageNames exclude
+      ]
+
+checkPackageNames :: (MonadFail f, MonadIO f) => Maybe [Text] -> f ()
+checkPackageNames _ = pure ()
+
+checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
+checkExtraDeps extra =
+  traverse_
+    (checkVersion . first unpack)
+    (maybe [] M.toList extra)
 
 type Builds = [Build]
 
