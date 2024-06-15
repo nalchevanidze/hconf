@@ -67,7 +67,7 @@ checkPackageNames i = do
   let unknown = fromMaybe [] i \\ known
   unless (null unknown) (fail ("unknown packages: " <> show unknown))
 
--- check if they are used?
+--TODO: check if they are used?
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
 checkExtraDeps extra =
   traverse_
