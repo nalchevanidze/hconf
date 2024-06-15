@@ -21,12 +21,13 @@ import Data.Aeson
 import Data.Aeson.Types
   ( defaultOptions,
   )
+import Data.List ((\\))
 import qualified Data.Map as M
 import Data.Text (unpack)
 import HConf.Config.Tag (Tag)
 import HConf.Core.Version (Version, checkVersion)
-import HConf.Utils.Class (Check (..))
-import HConf.Utils.Core (notElemError)
+import HConf.Utils.Class (Check (..), ReadConf (..))
+import HConf.Utils.Core (Name, notElemError)
 import Relude hiding
   ( Undefined,
     group,
@@ -40,8 +41,8 @@ data Build = Build
   { ghc :: Tag,
     resolver :: Text,
     extra :: Maybe Extras,
-    include :: Maybe [Text],
-    exclude :: Maybe [Text]
+    include :: Maybe [Name],
+    exclude :: Maybe [Name]
   }
   deriving
     ( Generic,
@@ -61,8 +62,11 @@ instance Check Build where
       ]
 
 -- TODO: check if exclude /include packages exist
-checkPackageNames :: (MonadFail f, MonadIO f) => Maybe [Text] -> f ()
-checkPackageNames _ = pure ()
+checkPackageNames :: (MonadFail m, MonadIO m, ReadConf m) => Maybe [Name] -> m ()
+checkPackageNames i = do
+  known <- packages
+  let unknown = fromMaybe [] i \\ known
+  unless (null unknown) (fail ("unknown packages: " <> show unknown))
 
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
 checkExtraDeps extra =
