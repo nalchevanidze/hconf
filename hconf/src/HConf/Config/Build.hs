@@ -60,6 +60,7 @@ instance Check Build where
         checkPackageNames exclude
       ]
 
+-- TODO: check if exclude /include packages exist
 checkPackageNames :: (MonadFail f, MonadIO f) => Maybe [Text] -> f ()
 checkPackageNames _ = pure ()
 
