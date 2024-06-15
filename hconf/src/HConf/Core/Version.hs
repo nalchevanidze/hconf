@@ -80,7 +80,7 @@ fromSeries (ma : (mi : xs)) = pure $ Version ma mi xs
 fromSeries [] = fail "invalid version: version should have at least one number !"
 
 instance ToString Version where
-  toString (Version maj mi ns) = intercalate "." $ map show ([maj, mi] <> ns)
+  toString Version {..} = intercalate "." $ map show ([major, minor] <> revision)
 
 instance Ord Version where
   compare (Version maj1 min1 v1) (Version maj2 min2 v2) = compareSeries ([maj1, min1] <> v1) ([maj2, min2] <> v2)
