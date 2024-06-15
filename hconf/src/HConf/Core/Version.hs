@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Core.Version
@@ -39,7 +40,7 @@ import Relude hiding
     toList,
   )
 
-data Version = Version Int Int [Int]
+data Version = Version {major :: Int, minor :: Int, revision :: [Int]}
   deriving
     ( Generic,
       Eq
@@ -50,12 +51,12 @@ getNumber (n : _) = n
 getNumber [] = 0
 
 nextVersion :: Bool -> Version -> Version
-nextVersion isBreaking (Version major minor revision)
-  | isBreaking = Version major (minor + 1) [0]
-  | otherwise = Version major minor [getNumber revision + 1]
+nextVersion isBreaking Version {..}
+  | isBreaking = Version {minor = minor + 1, revision = [0], ..}
+  | otherwise = Version {revision = [getNumber revision + 1], ..}
 
 dropPatch :: Version -> Version
-dropPatch (Version ma mi _) = Version ma mi [0]
+dropPatch Version {..} = Version {revision = [0], ..}
 
 compareSeries :: (Ord a) => [a] -> [a] -> Ordering
 compareSeries [] _ = EQ
