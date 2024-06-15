@@ -14,9 +14,19 @@ overrides:
 ignoreRegExpList:
   - u\{[0-9a-f]{1,8}\}
 words:
+  - Aeson
+  - bimap
+  - concat
+  - Creds
+  - hackage
   - hconf
   - mconcat
+  - mempty
   - metavar
+  - normalise
+  - Posix
   - prefs
   - Relude
+  - sdist
   - subparser
+  - tupled

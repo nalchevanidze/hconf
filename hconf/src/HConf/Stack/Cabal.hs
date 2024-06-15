@@ -37,6 +37,7 @@ parseFields =
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField k = maybe (fail $ "missing field" <> T.unpack k) pure . lookup k
 
+cabalPath :: String -> Text -> String
 cabalPath path pkgName = path <> "/" <> T.unpack pkgName <> ".cabal"
 
 getCabalFields :: FilePath -> Name -> ConfigT (Name, Version)
