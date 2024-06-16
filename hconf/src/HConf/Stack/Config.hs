@@ -50,9 +50,12 @@ setupStack ::
   ) =>
   Tag ->
   m ()
-setupStack version = label ("stack(" <> show version <> ")") $ task "stack.yaml" $ do
-  p <- stack <$> fromConf
-  rewriteYaml p (updateStack version) $> ()
+setupStack version =
+  label ("stack(" <> show version <> ")")
+    $ task "stack.yaml"
+    $ do
+      p <- stack <$> fromConf
+      rewriteYaml p (updateStack version) $> ()
 
 updateStack :: (FromConf m Builds) => Tag -> Stack -> m Stack
 updateStack version _ = do
