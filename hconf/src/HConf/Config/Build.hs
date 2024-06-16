@@ -85,8 +85,8 @@ getBuild v = do
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)
 
-getExtras :: Tag -> [Build] -> Extras
-getExtras version = M.fromList . concatMap getExtra . selectBuilds version
+getExtras :: (FromConf m Builds) => Tag -> m [(Text, Version)]
+getExtras tag = M.toList . M.fromList . concatMap getExtra . selectBuilds tag <$> fromConf
 
 getExtra :: Build -> [(Text, Version)]
 getExtra b = maybe [] M.toList (extra b)

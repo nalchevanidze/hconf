@@ -15,7 +15,6 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import Data.List ((\\))
-import qualified Data.Map as M
 import HConf.Config.Build (Build (..), Builds, getBuild, getExtras)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
@@ -58,7 +57,7 @@ setupStack version = label ("stack(" <> show version <> ")") $ task "stack.yaml"
 updateStack :: (FromConf m Builds) => Tag -> Stack -> m Stack
 updateStack version _ = do
   Build {..} <- getBuild version
-  builds <- fromConf
+  extras <- getExtras version
   pkgs <- readPackages
   let packages = (pkgs <> maybeList include) \\ maybeList exclude
   pure
@@ -67,7 +66,7 @@ updateStack version _ = do
         resolver,
         allowNewer = Just (Latest == version),
         saveHackageCreds = Just False,
-        extraDeps = sort $ map printExtra $ M.toList $ getExtras version builds
+        extraDeps = sort $ map printExtra extras
       }
 
 printExtra :: (Text, Version) -> Text
