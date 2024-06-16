@@ -19,6 +19,7 @@ import HConf.Config.Build (Build (..), getExtras)
 import HConf.Config.Config (Config (builds), getBuild, getPackages)
 import HConf.Config.ConfigT (ConfigT, HCEnv (..))
 import HConf.Config.Tag (Tag (..))
+import HConf.Core.Bounds (ReadBounds (readEnv))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Core (Name, aesonYAMLOptions, maybeList)
@@ -46,7 +47,7 @@ instance ToJSON Stack where
 
 setupStack :: Tag -> ConfigT ()
 setupStack version = label ("stack(" <> show version <> ")") $ task "stack.yaml" $ do
-  p <- asks (stack . env)
+  p <- stack <$> readEnv
   rewriteYaml p (updateStack version) $> ()
 
 updateStack :: Tag -> Stack -> ConfigT Stack
