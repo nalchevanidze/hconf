@@ -14,7 +14,7 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import Data.Text (unpack)
-import HConf.Config.ConfigT (ConfigT, packages)
+import HConf.Config.ConfigT (packages)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
