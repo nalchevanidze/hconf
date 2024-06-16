@@ -70,7 +70,6 @@ instance ReadConf ConfigT where
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name
   readVersion = asks (version . config)
-  readEnv = asks env
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
@@ -93,3 +92,6 @@ save cfg = label "save" $ task "hconf.yaml" $ do
 
 instance FromConf ConfigT Builds where
   fromConf = asks (builds . config)
+
+instance FromConf ConfigT Env where
+  fromConf = asks env

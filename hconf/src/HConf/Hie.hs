@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -14,11 +15,11 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), Value (..), object)
 import qualified Data.Map as M
-import HConf.Core.Bounds (ReadBounds (readEnv))
 import HConf.Core.Env (Env (..))
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
-import HConf.Utils.Log (label, task)
+import HConf.Utils.Class (FromConf (fromConf))
+import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
 
@@ -70,10 +71,10 @@ toLib (path, Package {..}) =
       ]
     comp _ _ = []
 
-genHie :: (ReadBounds m) => m ()
+genHie :: (FromConf m Env, Log m) => m ()
 genHie = label "hie"
   $ task "hie.yaml"
   $ do
-    Env {..} <- readEnv
+    Env {..} <- fromConf
     components <- concatMap toLib <$> resolvePackages
     writeYaml hie (packHie Components {stackYaml = stack, components})

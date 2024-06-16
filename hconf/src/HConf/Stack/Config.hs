@@ -18,7 +18,6 @@ import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Build (Build (..), Builds, getBuild, getExtras)
 import HConf.Config.Tag (Tag (..))
-import HConf.Core.Bounds (ReadBounds (readEnv))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (FromConf (fromConf), ReadConf (..))
@@ -45,9 +44,15 @@ instance FromJSON Stack where
 instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
-setupStack :: (FromConf m Builds, Log m, ReadBounds m) => Tag -> m ()
+setupStack ::
+  ( FromConf m Builds,
+    FromConf m Env,
+    Log m
+  ) =>
+  Tag ->
+  m ()
 setupStack version = label ("stack(" <> show version <> ")") $ task "stack.yaml" $ do
-  p <- stack <$> readEnv
+  p <- stack <$> fromConf
   rewriteYaml p (updateStack version) $> ()
 
 updateStack :: (FromConf m Builds) => Tag -> Stack -> m Stack
