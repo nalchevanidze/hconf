@@ -14,7 +14,7 @@ import Data.Map (lookup)
 import qualified Data.Text as T
 import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (HConfIO (..), Parse (..), ReadConf)
+import HConf.Utils.Class (HConfIO (..), Parse (..), ReadConf (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Yaml (removeIfExists)

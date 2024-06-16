@@ -61,7 +61,7 @@ instance Check Build where
         checkPackageNames exclude
       ]
 
-checkPackageNames :: (MonadFail m, MonadIO m, ReadConf m) => Maybe [Name] -> m ()
+checkPackageNames :: (ReadConf m) => Maybe [Name] -> m ()
 checkPackageNames i = do
   known <- readPackages
   let unknown = fromMaybe [] i \\ known

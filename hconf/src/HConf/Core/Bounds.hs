@@ -29,7 +29,7 @@ import GHC.Show (Show (show))
 import HConf.Core.Env (Env)
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Parse (..), ReadConf)
+import HConf.Utils.Class (Parse (..), ReadConf (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
 import Relude hiding

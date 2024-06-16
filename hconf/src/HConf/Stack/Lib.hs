@@ -34,7 +34,7 @@ import Data.Aeson.Types
 import GHC.Generics (Generic (..))
 import HConf.Core.Bounds (Bounds, ReadBounds (..), diff)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
-import HConf.Utils.Class (ReadConf)
+import HConf.Utils.Class (ReadConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (Log, field)
 import Relude hiding
