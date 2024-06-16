@@ -24,8 +24,18 @@ import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
-import HConf.Utils.Class (Check (..), FromConf (..), HConfIO (..), ReadConf (..))
-import HConf.Utils.Log (Log (..), alert, label, task)
+import HConf.Utils.Class
+  ( Check (..),
+    FromConf (..),
+    HConfIO (..),
+    ReadConf (..),
+  )
+import HConf.Utils.Log
+  ( Log (..),
+    alert,
+    label,
+    task,
+  )
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
 
