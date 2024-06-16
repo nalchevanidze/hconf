@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -19,7 +20,7 @@ import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (ReadConf (..))
+import HConf.Utils.Class (FromConf (..), ReadConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
@@ -54,14 +55,14 @@ resolvePackages = readPackages >>= traverse (tupled (readYaml . toPath))
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: (ReadBounds m) => Package -> m Package
+updatePackage :: (ReadBounds m, FromConf m Version) => Package -> m Package
 updatePackage Package {..} = do
   newLibrary <- traverse updateLibrary library
   newTests <- updateLibraries tests
   newExecutables <- updateLibraries executables
   newBenchmarks <- updateLibraries benchmarks
   newDependencies <- updateDependencies dependencies
-  newVersion <- readVersion
+  newVersion <- fromConf
   pure
     $ Package
       { version = newVersion,
@@ -73,18 +74,18 @@ updatePackage Package {..} = do
         ..
       }
 
-rewritePackage :: (ReadBounds m) => Name -> m Package
+rewritePackage :: (ReadBounds m, FromConf m Version) => Name -> m Package
 rewritePackage path =
   subTask "package"
     $ rewriteYaml (toPath path) updatePackage
 
-checkPackage :: (ReadBounds m) => Name -> m ()
+checkPackage :: (ReadBounds m, FromConf m Version) => Name -> m ()
 checkPackage path =
   task path $ do
     Package {..} <- rewritePackage path
     checkCabal path name version
 
-checkPackages :: (ReadBounds m) => m ()
+checkPackages :: (ReadBounds m, FromConf m Version) => m ()
 checkPackages =
   label "packages"
     $ readPackages

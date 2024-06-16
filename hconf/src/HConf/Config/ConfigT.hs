@@ -22,6 +22,7 @@ import HConf.Config.Build (Builds)
 import HConf.Config.Config (Config (..), getPackages, getRule)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Env (Env (..))
+import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class (Check (..), FromConf (..), HConfIO (..), ReadConf (..))
 import HConf.Utils.Log (Log (..), alert, label, task)
@@ -69,7 +70,6 @@ instance ReadConf ConfigT where
 
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name
-  readVersion = asks (version . config)
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
@@ -95,3 +95,6 @@ instance FromConf ConfigT Builds where
 
 instance FromConf ConfigT Env where
   fromConf = asks env
+
+instance FromConf ConfigT Version where
+  fromConf = asks (version . config)
