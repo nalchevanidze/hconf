@@ -14,13 +14,13 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), Value (..), object)
 import qualified Data.Map as M
-import HConf.Config.ConfigT (ConfigT, HCEnv (..))
 import HConf.Core.Env (Env (..))
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Log (label, task)
 import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
+import HConf.Core.Bounds (ReadBounds (readEnv))
 
 data Component = Component
   { path :: Text,
@@ -70,10 +70,10 @@ toLib (path, Package {..}) =
       ]
     comp _ _ = []
 
-genHie :: ConfigT ()
+genHie :: (ReadBounds m) => m ()
 genHie = label "hie"
   $ task "hie.yaml"
   $ do
-    Env {..} <- asks env
+    Env {..} <- readEnv
     components <- concatMap toLib <$> resolvePackages
     writeYaml hie (packHie Components {stackYaml = stack, components})

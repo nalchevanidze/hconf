@@ -42,6 +42,7 @@ import Relude hiding
     show,
     toList,
   )
+import HConf.Core.Env (Env)
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
@@ -135,3 +136,4 @@ updateUpperBound name bounds = do
 class (ReadConf m, Log  m) => ReadBounds m where
   readBounds :: Name -> m Bounds
   readVersion :: m Version
+  readEnv :: m Env
