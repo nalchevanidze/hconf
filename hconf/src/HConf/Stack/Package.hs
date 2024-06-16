@@ -20,8 +20,9 @@ import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
+import HConf.Utils.Class (ReadConf)
 import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
-import HConf.Utils.Log (label, subTask, task)
+import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
 import Relude hiding (Undefined, length, replicate)
 
@@ -48,7 +49,7 @@ instance ToJSON Package where
 toPath :: Name -> FilePath
 toPath = (<> "/package.yaml") . unpack
 
-resolvePackages :: ConfigT [(Name, Package)]
+resolvePackages :: (ReadConf m, Log m) => m [(Name, Package)]
 resolvePackages = packages >>= traverse (tupled (readYaml . toPath))
 
 updateLibraries :: Maybe Libraries -> ConfigT (Maybe Libraries)

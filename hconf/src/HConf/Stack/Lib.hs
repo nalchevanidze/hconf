@@ -36,8 +36,9 @@ import HConf.Config.Config (getRule)
 import HConf.Config.ConfigT (ConfigT, HCEnv (config))
 import HConf.Core.Bounds (Bounds, diff)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
+import HConf.Utils.Class (ReadConf)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
-import HConf.Utils.Log (field)
+import HConf.Utils.Log (Log, field)
 import Relude hiding
   ( Undefined,
     break,
@@ -76,7 +77,7 @@ toObject :: Value -> Object
 toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
-withRule :: Text -> Bounds -> Bounds -> ConfigT Bounds
+withRule :: (ReadConf m, Log m) => Text -> Bounds -> Bounds -> m Bounds
 withRule name oldBounds bounds =
   when (oldBounds /= bounds) (field (toString name) (diff oldBounds bounds))
     $> bounds
