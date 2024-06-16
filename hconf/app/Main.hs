@@ -67,9 +67,9 @@ instance CLIType Command where
   cliType =
     commands
       [ ("setup", "builds Haskell code from GQL source", Setup <$> optional cliType),
-        ("about", "api information", pure About),
-        ("update", "check/fix upper bounds for dependencies", pure UpperBounds),
         ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
+        ("update", "check/fix upper bounds for dependencies", pure Update),
+        ("about", "api information", pure About),
         ("version", "get current version", pure Version),
         ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
       ]

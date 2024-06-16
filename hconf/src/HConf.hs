@@ -51,7 +51,7 @@ getVersion = run (Just . version <$> asks config)
 data Command
   = Setup {tag :: Maybe Tag}
   | Next {isBreaking :: Bool}
-  | UpperBounds
+  | Update
   | About
   | Version
   | Format {check :: Bool}
@@ -64,6 +64,6 @@ exec :: Env -> Command -> IO ()
 exec _ About = putStrLn $ "Stack Config CLI, version " <> currentVersion
 exec e Setup {tag} = setup tag e
 exec e Next {isBreaking} = updateVersion isBreaking e
-exec e UpperBounds = upperBounds e
+exec e Update = upperBounds e
 exec e Version = getVersion e
 exec e Format {check} = format check e
