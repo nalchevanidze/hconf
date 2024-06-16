@@ -25,6 +25,7 @@ words:
   - mempty
   - metavar
   - normalise
+  - pkgs
   - Posix
   - prefs
   - Relude

@@ -26,6 +26,7 @@ import Data.Text
   )
 import qualified Data.Text as T
 import GHC.Show (Show (show))
+import HConf.Core.Env (Env)
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..), ReadConf)
@@ -42,7 +43,6 @@ import Relude hiding
     show,
     toList,
   )
-import HConf.Core.Env (Env)
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
@@ -133,7 +133,7 @@ updateUpperBound name bounds = do
   if ma == Just newVersion then pure () else field (T.unpack name) (show newVersion)
   pure (Bounds (mi <> [newVersion]))
 
-class (ReadConf m, Log  m) => ReadBounds m where
+class (ReadConf m, Log m) => ReadBounds m where
   readBounds :: Name -> m Bounds
   readVersion :: m Version
   readEnv :: m Env

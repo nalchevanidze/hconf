@@ -17,7 +17,7 @@ import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Build (Build (..), getExtras)
 import HConf.Config.Config (Config (builds), getBuild, getPackages)
-import HConf.Config.ConfigT (ConfigT, HCEnv (..))
+import HConf.Config.ConfigT (ConfigT, HCEnv (..), ReadConf (readPackages))
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Bounds (ReadBounds (readEnv))
 import HConf.Core.Env (Env (..))
@@ -54,7 +54,8 @@ updateStack :: Tag -> Stack -> ConfigT Stack
 updateStack version _ = do
   config <- asks config
   Build {..} <- getBuild version config
-  let packages = (getPackages config <> maybeList include) \\ maybeList exclude
+  pkgs <- readPackages
+  let packages = (pkgs <> maybeList include) \\ maybeList exclude
   pure
     Stack
       { packages,
