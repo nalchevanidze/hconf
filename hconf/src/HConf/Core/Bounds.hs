@@ -9,6 +9,7 @@ module HConf.Core.Bounds
     diff,
     printBoundParts,
     updateUpperBound,
+    ReadBounds (..),
   )
 where
 
@@ -27,7 +28,7 @@ import qualified Data.Text as T
 import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Parse (..))
+import HConf.Utils.Class (Parse (..), ReadConf)
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
 import Relude hiding
@@ -130,3 +131,6 @@ updateUpperBound name bounds = do
   let newVersion = maximum (latest : maybeToList ma)
   if ma == Just newVersion then pure () else field (T.unpack name) (show newVersion)
   pure (Bounds (mi <> [newVersion]))
+
+class (ReadConf m, Log  m) => ReadBounds m where
+  readBounds :: Name -> m Bounds

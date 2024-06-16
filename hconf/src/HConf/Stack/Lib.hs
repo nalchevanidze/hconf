@@ -32,9 +32,7 @@ import Data.Aeson.Types
     withObject,
   )
 import GHC.Generics (Generic (..))
-import HConf.Config.Config (getRule)
-import HConf.Config.ConfigT (ConfigT, HCEnv (config))
-import HConf.Core.Bounds (Bounds, diff)
+import HConf.Core.Bounds (Bounds, ReadBounds (..), diff)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
 import HConf.Utils.Class (ReadConf)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
@@ -82,16 +80,15 @@ withRule name oldBounds bounds =
   when (oldBounds /= bounds) (field (toString name) (diff oldBounds bounds))
     $> bounds
 
-updateDependency :: Name -> Bounds -> ConfigT Bounds
+updateDependency :: (ReadBounds m) => Name -> Bounds -> m Bounds
 updateDependency name oldBounds =
-  asks config
-    >>= getRule name
+  readBounds name
     >>= withRule name oldBounds
 
-updateDependencies :: Dependencies -> ConfigT Dependencies
+updateDependencies :: (ReadBounds m) => Dependencies -> m Dependencies
 updateDependencies = traverseDeps updateDependency
 
-updateLibrary :: Library -> ConfigT Library
+updateLibrary :: (ReadBounds m) => Library -> m Library
 updateLibrary Library {..} = do
   newDependencies <- traverse updateDependencies dependencies
   pure $ Library {dependencies = newDependencies, ..}

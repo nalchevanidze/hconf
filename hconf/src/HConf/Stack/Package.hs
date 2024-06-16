@@ -25,6 +25,7 @@ import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
 import Relude hiding (Undefined, length, replicate)
+import HConf.Core.Bounds (ReadBounds)
 
 data Package = Package
   { name :: Name,
@@ -52,7 +53,7 @@ toPath = (<> "/package.yaml") . unpack
 resolvePackages :: (ReadConf m, Log m) => m [(Name, Package)]
 resolvePackages = packages >>= traverse (tupled (readYaml . toPath))
 
-updateLibraries :: Maybe Libraries -> ConfigT (Maybe Libraries)
+updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
 updatePackage :: Package -> ConfigT Package

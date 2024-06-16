@@ -17,7 +17,8 @@ module HConf.Config.ConfigT
 where
 
 import Control.Exception (tryJust)
-import HConf.Config.Config (Config, getPackages)
+import HConf.Config.Config (Config, getPackages, getRule)
+import HConf.Core.Bounds (ReadBounds (readBounds))
 import HConf.Core.Env (Env (..))
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class (Check (..), HConfIO (..), ReadConf (..))
@@ -63,6 +64,9 @@ instance HConfIO ConfigT where
 
 instance ReadConf ConfigT where
   packages = getPackages <$> asks config
+
+instance ReadBounds ConfigT where
+  readBounds name = asks config >>= getRule name
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
