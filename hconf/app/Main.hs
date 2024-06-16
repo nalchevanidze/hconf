@@ -91,4 +91,4 @@ main = do
   (cmd, ops) <- run ((,) <$> cliType <*> cliType)
   if optVersion ops
     then putStrLn currentVersion
-    else exec defaultConfig cmd
+    else exec cmd defaultConfig
