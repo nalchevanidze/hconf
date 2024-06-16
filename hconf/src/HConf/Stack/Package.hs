@@ -14,8 +14,8 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import Data.Text (unpack)
-import qualified HConf.Config.Config as C
-import HConf.Config.ConfigT (ConfigT, HCEnv (config), packages)
+import HConf.Config.ConfigT (ConfigT, packages)
+import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
@@ -25,7 +25,6 @@ import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
 import Relude hiding (Undefined, length, replicate)
-import HConf.Core.Bounds (ReadBounds)
 
 data Package = Package
   { name :: Name,
@@ -56,17 +55,17 @@ resolvePackages = packages >>= traverse (tupled (readYaml . toPath))
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: Package -> ConfigT Package
+updatePackage :: (ReadBounds m) => Package -> m Package
 updatePackage Package {..} = do
-  cfg <- asks config
   newLibrary <- traverse updateLibrary library
   newTests <- updateLibraries tests
   newExecutables <- updateLibraries executables
   newBenchmarks <- updateLibraries benchmarks
   newDependencies <- updateDependencies dependencies
+  newVersion <- readVersion
   pure
     $ Package
-      { version = C.version cfg,
+      { version = newVersion,
         library = newLibrary,
         tests = newTests,
         executables = newExecutables,
@@ -75,18 +74,18 @@ updatePackage Package {..} = do
         ..
       }
 
-rewritePackage :: Name -> ConfigT Package
+rewritePackage :: (ReadBounds m) => Name -> m Package
 rewritePackage path =
   subTask "package"
     $ rewriteYaml (toPath path) updatePackage
 
-checkPackage :: Name -> ConfigT ()
+checkPackage :: (ReadBounds m) => Name -> m ()
 checkPackage path =
   task path $ do
     Package {..} <- rewritePackage path
     checkCabal path name version
 
-checkPackages :: ConfigT ()
+checkPackages :: (ReadBounds m) => m ()
 checkPackages =
   label "packages"
     $ packages

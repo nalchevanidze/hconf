@@ -134,3 +134,4 @@ updateUpperBound name bounds = do
 
 class (ReadConf m, Log  m) => ReadBounds m where
   readBounds :: Name -> m Bounds
+  readVersion :: m Version
