@@ -40,10 +40,11 @@ currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
 exec About = const $ putStrLn $ "Stack Config CLI, version " <> currentVersion
-exec Setup {tag} = runTask "setup" $ do
-  setupStack (fromMaybe Latest tag)
-  genHie
-  checkPackages
+exec Setup {tag} =
+  runTask "setup" $ do
+    setupStack (fromMaybe Latest tag)
+    genHie
+    checkPackages
 exec Next {isBreaking} =
   runTask "next"
     $ (asks config <&> updateConfig isBreaking)
@@ -54,4 +55,6 @@ exec Update =
     >>= updateConfigUpperBounds
     >>= save
 exec Version = run (Just . version <$> asks config)
-exec Format {check} = runTask "format" $ formatWith check
+exec Format {check} =
+  runTask "format"
+    $ formatWith check
