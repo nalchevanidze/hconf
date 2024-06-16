@@ -1,5 +1,6 @@
 module HConf.Core.Env
   ( Env (..),
+    defaultConfig,
   )
 where
 
@@ -9,3 +10,12 @@ data Env = Env
     stack :: FilePath,
     silence :: Bool
   }
+
+defaultConfig :: Env
+defaultConfig =
+  Env
+    { hconf = "./hconf.yaml",
+      hie = "./hie.yaml",
+      stack = "./stack.yaml",
+      silence = False
+    }

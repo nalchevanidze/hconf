@@ -17,7 +17,7 @@ import Data.Version (showVersion)
 import HConf.Config.Config (Config (..), updateConfig, updateConfigUpperBounds)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
 import HConf.Config.Tag (Tag (Latest))
-import HConf.Core.Env (Env (..))
+import HConf.Core.Env (Env (..), defaultConfig)
 import HConf.Format (formatWith)
 import HConf.Hie (genHie)
 import HConf.Stack.Config (setupStack)
@@ -67,12 +67,3 @@ exec e Next {isBreaking} = updateVersion isBreaking e
 exec e UpperBounds = upperBounds e
 exec e Version = getVersion e
 exec e Format {check} = format check e
-
-defaultConfig :: Env
-defaultConfig =
-  Env
-    { hconf = "./hconf.yaml",
-      hie = "./hie.yaml",
-      stack = "./stack.yaml",
-      silence = False
-    }
