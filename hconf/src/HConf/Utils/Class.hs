@@ -17,7 +17,7 @@ class Parse a where
   parse :: (MonadFail m) => String -> m a
   parseText :: (MonadFail m) => Text -> m a
 
-class ReadConf m where
+class (Monad m, MonadFail m, HConfIO m) => ReadConf m where
   packages :: m [Name]
 
 class Check a where

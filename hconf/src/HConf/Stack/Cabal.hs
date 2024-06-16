@@ -13,11 +13,10 @@ import qualified Data.ByteString.Char8 as BS (unpack)
 import Data.Map (lookup)
 import qualified Data.Text as T
 import GHC.IO.Exception (ExitCode (..))
-import HConf.Config.ConfigT (ConfigT)
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (HConfIO (..), Parse (..))
+import HConf.Utils.Class (HConfIO (..), Parse (..), ReadConf)
 import HConf.Utils.Core (Name)
-import HConf.Utils.Log (alert, field, subTask, task, warn)
+import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Yaml (removeIfExists)
 import Relude
 import System.Process
@@ -40,7 +39,7 @@ getField k = maybe (fail $ "missing field" <> T.unpack k) pure . lookup k
 cabalPath :: String -> Text -> String
 cabalPath path pkgName = path <> "/" <> T.unpack pkgName <> ".cabal"
 
-getCabalFields :: FilePath -> Name -> ConfigT (Name, Version)
+getCabalFields :: (ReadConf m, Log m) => FilePath -> Name -> m (Name, Version)
 getCabalFields path pkgName = do
   bs <- read (cabalPath path pkgName)
   let fields = parseFields bs
@@ -53,14 +52,14 @@ noNewLine :: Char -> String
 noNewLine '\n' = "          \n"
 noNewLine x = [x]
 
-stack :: String -> String -> [String] -> ConfigT ()
+stack :: (ReadConf m, Log m) => String -> String -> [String] -> m ()
 stack l name options = do
   (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (name : map ("--" <>) options)) "")
   case code of
     ExitFailure {} -> alert (l <> ": " <> concatMap noNewLine (T.unpack $ T.strip $ T.pack out))
     ExitSuccess {} -> printWarnings l (parseWarnings out)
 
-printWarnings :: String -> [(Text, [Text])] -> ConfigT ()
+printWarnings :: (ReadConf m, Log m) => String -> [(Text, [Text])] -> m ()
 printWarnings name [] = field name "ok"
 printWarnings name xs = task (T.pack name) $ traverse_ subWarn xs
   where
@@ -84,12 +83,12 @@ toWarning (x : xs)
   | T.isPrefixOf "warning" (T.toLower x) = [(x, takeWhile (\p -> T.head p == ' ') xs)]
 toWarning _ = []
 
-buildCabal :: String -> ConfigT ()
+buildCabal :: (ReadConf m, Log m) => String -> m ()
 buildCabal name = do
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
 
-checkCabal :: Name -> Name -> Version -> ConfigT ()
+checkCabal :: (ReadConf m, Log m) => Name -> Name -> Version -> m ()
 checkCabal path name version = subTask "cabal" $ do
   liftIO (removeIfExists (cabalPath (T.unpack path) name))
   buildCabal (T.unpack path)
