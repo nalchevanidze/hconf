@@ -26,28 +26,6 @@ import HConf.Utils.Class (Parse (..))
 import qualified Paths_hconf as CLI
 import Relude hiding (fix)
 
-format :: Bool -> Env -> IO ()
-format check = runTask "format" $ formatWith check
-
-upperBounds :: Env -> IO ()
-upperBounds =
-  runTask "upper-bounds"
-    $ asks config
-    >>= updateConfigUpperBounds
-    >>= save
-
-setup :: Maybe Tag -> Env -> IO ()
-setup v = runTask "setup" $ do
-  setupStack (fromMaybe Latest v)
-  genHie
-  checkPackages
-
-updateVersion :: Bool -> Env -> IO ()
-updateVersion isBreaking = runTask "next" $ (asks config <&> updateConfig isBreaking) >>= save
-
-getVersion :: Env -> IO ()
-getVersion = run (Just . version <$> asks config)
-
 data Command
   = Setup {tag :: Maybe Tag}
   | Next {isBreaking :: Bool}
@@ -60,10 +38,20 @@ data Command
 currentVersion :: String
 currentVersion = showVersion CLI.version
 
-exec :: Env -> Command -> IO ()
-exec _ About = putStrLn $ "Stack Config CLI, version " <> currentVersion
-exec e Setup {tag} = setup tag e
-exec e Next {isBreaking} = updateVersion isBreaking e
-exec e Update = upperBounds e
-exec e Version = getVersion e
-exec e Format {check} = format check e
+exec :: Command -> Env -> IO ()
+exec About = const $ putStrLn $ "Stack Config CLI, version " <> currentVersion
+exec Setup {tag} = runTask "setup" $ do
+  setupStack (fromMaybe Latest tag)
+  genHie
+  checkPackages
+exec Next {isBreaking} =
+  runTask "next"
+    $ (asks config <&> updateConfig isBreaking)
+    >>= save
+exec Update =
+  runTask "update"
+    $ asks config
+    >>= updateConfigUpperBounds
+    >>= save
+exec Version = run (Just . version <$> asks config)
+exec Format {check} = runTask "format" $ formatWith check
