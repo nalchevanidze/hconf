@@ -18,7 +18,7 @@ class Parse a where
   parseText :: (MonadFail m) => Text -> m a
 
 class (Monad m, MonadFail m, HConfIO m) => ReadConf m where
-  packages :: m [Name]
+  readPackages :: m [Name]
 
 class Check a where
   check :: (MonadFail m, ReadConf m, MonadIO m) => a -> m ()

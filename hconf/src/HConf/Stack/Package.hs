@@ -19,7 +19,7 @@ import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (ReadConf, packages)
+import HConf.Utils.Class (ReadConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
@@ -49,7 +49,7 @@ toPath :: Name -> FilePath
 toPath = (<> "/package.yaml") . unpack
 
 resolvePackages :: (ReadConf m, Log m) => m [(Name, Package)]
-resolvePackages = packages >>= traverse (tupled (readYaml . toPath))
+resolvePackages = readPackages >>= traverse (tupled (readYaml . toPath))
 
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
@@ -87,5 +87,5 @@ checkPackage path =
 checkPackages :: (ReadBounds m) => m ()
 checkPackages =
   label "packages"
-    $ packages
+    $ readPackages
     >>= traverse_ checkPackage

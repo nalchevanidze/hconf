@@ -8,7 +8,7 @@
 
 module HConf.Config.ConfigT
   ( ConfigT (..),
-    packages,
+    readPackages,
     HCEnv (..),
     save,
     run,
@@ -63,7 +63,7 @@ instance HConfIO ConfigT where
   write f = liftIO . write f
 
 instance ReadConf ConfigT where
-  packages = getPackages <$> asks config
+  readPackages = getPackages <$> asks config
 
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name
