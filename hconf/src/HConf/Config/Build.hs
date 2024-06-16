@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -7,7 +8,7 @@
 module HConf.Config.Build
   ( Build (..),
     Builds,
-    findBuild,
+    getBuild,
     getExtras,
   )
 where
@@ -26,7 +27,7 @@ import qualified Data.Map as M
 import Data.Text (unpack)
 import HConf.Config.Tag (Tag)
 import HConf.Core.Version (Version, checkVersion)
-import HConf.Utils.Class (Check (..), ReadConf (..))
+import HConf.Utils.Class (Check (..), FromConf (fromConf), ReadConf (..))
 import HConf.Utils.Core (Name, notElemError)
 import Relude hiding
   ( Undefined,
@@ -76,8 +77,10 @@ checkExtraDeps extra =
 
 type Builds = [Build]
 
-findBuild :: (MonadFail m) => Tag -> Builds -> m Build
-findBuild v builds = maybe (notElemError "build" (show v) (map ghc builds)) pure (find ((== v) . ghc) builds)
+getBuild :: (FromConf m Builds) => Tag -> m Build
+getBuild v = do
+  builds <- fromConf
+  maybe (notElemError "build" (show v) (map ghc builds)) pure (find ((== v) . ghc) builds)
 
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)

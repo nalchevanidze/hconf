@@ -1,4 +1,5 @@
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -17,11 +18,12 @@ module HConf.Config.ConfigT
 where
 
 import Control.Exception (tryJust)
+import HConf.Config.Build (Builds)
 import HConf.Config.Config (Config (..), getPackages, getRule)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Env (Env (..))
 import HConf.Utils.Chalk (Color (Green), chalk)
-import HConf.Utils.Class (Check (..), HConfIO (..), ReadConf (..))
+import HConf.Utils.Class (Check (..), FromConf (..), HConfIO (..), ReadConf (..))
 import HConf.Utils.Log (Log (..), alert, label, task)
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
@@ -88,3 +90,6 @@ save :: Config -> ConfigT ()
 save cfg = label "save" $ task "hconf.yaml" $ do
   ctx <- asks id
   writeYaml (hconf $ env ctx) cfg
+
+instance FromConf ConfigT Builds where
+  fromConf = asks (builds . config)

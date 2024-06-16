@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Class
@@ -5,6 +6,7 @@ module HConf.Utils.Class
     Check (..),
     HConfIO (..),
     ReadConf (..),
+    FromConf (..),
   )
 where
 
@@ -16,6 +18,9 @@ import Relude
 class Parse a where
   parse :: (MonadFail m) => String -> m a
   parseText :: (MonadFail m) => Text -> m a
+
+class (MonadFail m, ReadConf m) => FromConf m a where
+  fromConf :: m a
 
 class (Monad m, MonadFail m, HConfIO m) => ReadConf m where
   readPackages :: m [Name]

@@ -7,7 +7,6 @@
 module HConf.Config.Config
   ( Config (..),
     getPackages,
-    getBuild,
     getRule,
     updateConfig,
     updateConfigUpperBounds,
@@ -21,9 +20,8 @@ import Data.Aeson
     genericToJSON,
   )
 import Data.Aeson.Types (defaultOptions)
-import HConf.Config.Build (Build, Builds, findBuild)
+import HConf.Config.Build (Builds)
 import HConf.Config.PkgGroup (PkgGroup, isMember, toPackageName)
-import HConf.Config.Tag (Tag)
 import HConf.Core.Bounds (Bounds, updateUpperBound, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
@@ -56,9 +54,6 @@ getRule name Config {..}
 
 getPackages :: Config -> [Text]
 getPackages Config {..} = concatMap toPackageName groups
-
-getBuild :: (MonadFail m) => Tag -> Config -> m Build
-getBuild key = findBuild key . builds
 
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}

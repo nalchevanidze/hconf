@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -15,16 +16,14 @@ where
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import Data.List ((\\))
 import qualified Data.Map as M
-import HConf.Config.Build (Build (..), getExtras)
-import HConf.Config.Config (Config (builds), getBuild)
-import HConf.Config.ConfigT (ConfigT, HCEnv (..))
+import HConf.Config.Build (Build (..), Builds, getBuild, getExtras)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Bounds (ReadBounds (readEnv))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (ReadConf (..))
+import HConf.Utils.Class (FromConf (fromConf), ReadConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions, maybeList)
-import HConf.Utils.Log (label, task)
+import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (rewriteYaml)
 import Relude
 
@@ -46,15 +45,15 @@ instance FromJSON Stack where
 instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
-setupStack :: Tag -> ConfigT ()
+setupStack :: (FromConf m Builds, Log m, ReadBounds m) => Tag -> m ()
 setupStack version = label ("stack(" <> show version <> ")") $ task "stack.yaml" $ do
   p <- stack <$> readEnv
   rewriteYaml p (updateStack version) $> ()
 
-updateStack :: Tag -> Stack -> ConfigT Stack
+updateStack :: (FromConf m Builds) => Tag -> Stack -> m Stack
 updateStack version _ = do
-  config <- asks config
-  Build {..} <- getBuild version config
+  Build {..} <- getBuild version
+  builds <- fromConf
   pkgs <- readPackages
   let packages = (pkgs <> maybeList include) \\ maybeList exclude
   pure
@@ -63,7 +62,7 @@ updateStack version _ = do
         resolver,
         allowNewer = Just (Latest == version),
         saveHackageCreds = Just False,
-        extraDeps = sort $ map printExtra $ M.toList $ getExtras version $ builds config
+        extraDeps = sort $ map printExtra $ M.toList $ getExtras version builds
       }
 
 printExtra :: (Text, Version) -> Text
