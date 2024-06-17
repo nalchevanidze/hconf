@@ -19,6 +19,7 @@ import HConf.Core.Env (Env (..))
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FromConf (fromConf))
+import HConf.Utils.Core (PkgName)
 import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
@@ -51,7 +52,7 @@ packHie value = object [("cradle", object [("stack", toJSON value)])]
 (<:>) :: (Semigroup a, IsString a) => a -> a -> a
 (<:>) name tag = name <> ":" <> tag
 
-toLib :: (Text, Package) -> [Component]
+toLib :: (PkgName, Package) -> [Component]
 toLib (path, Package {..}) =
   comp "lib" library
     <> compGroup "test" tests
@@ -65,13 +66,13 @@ toLib (path, Package {..}) =
     comp :: Text -> Maybe Library -> [Component]
     comp tag (Just Library {sourceDirs}) =
       [ Component
-          { path = "./" <> path <> "/" <> sourceDirs,
+          { path = "./" <> toText path <> "/" <> sourceDirs,
             component = name <:> tag
           }
       ]
     comp _ _ = []
 
-genHie :: (FromConf m Env, Log m) => m ()
+genHie :: (FromConf m Env, Log m, FromConf m [PkgName]) => m ()
 genHie = label "hie"
   $ task "hie.yaml"
   $ do

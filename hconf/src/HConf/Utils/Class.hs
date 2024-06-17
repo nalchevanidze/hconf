@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -5,28 +6,28 @@ module HConf.Utils.Class
   ( Parse (..),
     Check (..),
     HConfIO (..),
-    ReadConf (..),
     FromConf (..),
+    readPackages,
   )
 where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
-import HConf.Utils.Core (Name)
+import HConf.Utils.Core (Name, PkgName (..))
 import Relude
 
 class Parse a where
   parse :: (MonadFail m) => String -> m a
   parseText :: (MonadFail m) => Text -> m a
 
-class (MonadFail m, ReadConf m) => FromConf m a where
+readPackages :: (FromConf m [PkgName]) => m [Name]
+readPackages = map unpackPkgName <$> fromConf
+
+class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
 
-class (Monad m, MonadFail m, HConfIO m) => ReadConf m where
-  readPackages :: m [Name]
-
 class Check a where
-  check :: (MonadFail m, ReadConf m, MonadIO m) => a -> m ()
+  check :: (MonadFail m, MonadIO m, FromConf m [PkgName]) => a -> m ()
 
 class (MonadIO m, MonadFail m) => HConfIO m where
   eitherRead :: FilePath -> m (Either String ByteString)

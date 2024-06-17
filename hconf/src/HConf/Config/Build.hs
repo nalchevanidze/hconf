@@ -30,9 +30,9 @@ import HConf.Core.Version (Version, checkVersion)
 import HConf.Utils.Class
   ( Check (..),
     FromConf (..),
-    ReadConf (..),
+    readPackages,
   )
-import HConf.Utils.Core (Name, notElemError)
+import HConf.Utils.Core (Name, PkgName, notElemError)
 import Relude hiding
   ( Undefined,
     group,
@@ -66,7 +66,7 @@ instance Check Build where
         checkPackageNames exclude
       ]
 
-checkPackageNames :: (ReadConf m) => Maybe [Name] -> m ()
+checkPackageNames :: (FromConf m [PkgName]) => Maybe [Name] -> m ()
 checkPackageNames i = do
   known <- readPackages
   let unknown = fromMaybe [] i \\ known

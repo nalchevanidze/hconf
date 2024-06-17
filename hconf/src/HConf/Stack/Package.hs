@@ -20,7 +20,7 @@ import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (FromConf (..), ReadConf (..))
+import HConf.Utils.Class (FromConf (..), readPackages)
 import HConf.Utils.Core (Name, PkgName (..), aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
@@ -74,18 +74,18 @@ updatePackage Package {..} = do
         ..
       }
 
-rewritePackage :: (ReadBounds m, FromConf m Version) => Name -> m Package
+rewritePackage :: (ReadBounds m, FromConf m Version) => PkgName -> m Package
 rewritePackage path =
   subTask "package"
     $ rewriteYaml (toPath path) updatePackage
 
 checkPackage :: (ReadBounds m, FromConf m Version) => Name -> m ()
 checkPackage path =
-  task path $ do
-    Package {..} <- rewritePackage path
-    checkCabal path name version
+  task (toText path) $ do
+    Package {..} <- rewritePackage (PkgName path)
+    checkCabal (toText path) name version
 
-checkPackages :: (ReadBounds m, FromConf m Version) => m ()
+checkPackages :: (ReadBounds m, FromConf m Version, FromConf m [PkgName]) => m ()
 checkPackages =
   label "packages"
     $ readPackages

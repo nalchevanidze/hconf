@@ -9,7 +9,6 @@
 
 module HConf.Config.ConfigT
   ( ConfigT (..),
-    readPackages,
     HCEnv (..),
     save,
     run,
@@ -28,7 +27,6 @@ import HConf.Utils.Class
   ( Check (..),
     FromConf (..),
     HConfIO (..),
-    ReadConf (..),
   )
 import HConf.Utils.Log
   ( Log (..),
@@ -38,6 +36,7 @@ import HConf.Utils.Log
   )
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
+import HConf.Utils.Core (PkgName (..))
 
 data HCEnv = HCEnv
   { config :: Config,
@@ -75,8 +74,8 @@ instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
 
-instance ReadConf ConfigT where
-  readPackages = getPackages <$> asks config
+instance FromConf ConfigT [PkgName] where
+  fromConf = map PkgName . getPackages <$> asks config
 
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name

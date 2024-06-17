@@ -1,11 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HConf.Format (formatWith) where
 
 import Data.Text (unpack)
 import qualified Data.Text.IO.Utf8 as T
-import HConf.Utils.Class (ReadConf (..))
+import HConf.Utils.Class (FromConf, readPackages)
+import HConf.Utils.Core (PkgName)
 import HConf.Utils.Log (Log, label)
 import Ormolu
   ( ColorMode (..),
@@ -25,7 +27,7 @@ import System.FilePath.Glob (glob)
 explore :: (Log m, MonadIO m) => Text -> m [String]
 explore x = map normalise <$> liftIO (glob (unpack x <> "/**/*.hs"))
 
-formatWith :: (Log m, ReadConf m) => Bool -> m ()
+formatWith :: (Log m, FromConf m [PkgName]) => Bool -> m ()
 formatWith check = label "ormolu" $ do
   files <- sort . concat <$> (readPackages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files

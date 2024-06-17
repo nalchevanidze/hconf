@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -- | GQL Types
 module HConf.Utils.Core
@@ -28,7 +30,8 @@ import Relude hiding (Undefined, intercalate)
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
-newtype PkgName = PkgName Text
+newtype PkgName = PkgName {unpackPkgName :: Text}
+  deriving newtype (ToString, ToText)
 
 type Name = Text
 

@@ -19,8 +19,8 @@ import HConf.Config.Build (Build (..), Builds, getBuild, getExtras)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (FromConf (..), ReadConf (..))
-import HConf.Utils.Core (Name, aesonYAMLOptions, maybeList)
+import HConf.Utils.Class (FromConf (..), readPackages)
+import HConf.Utils.Core (Name, aesonYAMLOptions, maybeList, PkgName)
 import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (rewriteYaml)
 import Relude
@@ -46,6 +46,7 @@ instance ToJSON Stack where
 setupStack ::
   ( FromConf m Builds,
     FromConf m Env,
+    FromConf m [PkgName],
     Log m
   ) =>
   Tag ->
@@ -57,7 +58,7 @@ setupStack version =
       p <- stack <$> fromConf
       rewriteYaml p (updateStack version) $> ()
 
-updateStack :: (FromConf m Builds) => Tag -> Stack -> m Stack
+updateStack :: (FromConf m Builds, FromConf m [PkgName]) => Tag -> Stack -> m Stack
 updateStack version _ = do
   Build {..} <- getBuild version
   extras <- getExtras version
