@@ -34,7 +34,6 @@ import Data.Aeson.Types
 import GHC.Generics (Generic (..))
 import HConf.Core.Bounds (Bounds, ReadBounds (..), diff)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
-import HConf.Utils.Class (ReadConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (Log, field)
 import Relude hiding
@@ -75,7 +74,7 @@ toObject :: Value -> Object
 toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
-withRule :: (ReadConf m, Log m) => Text -> Bounds -> Bounds -> m Bounds
+withRule :: (MonadIO m, Log m) => Text -> Bounds -> Bounds -> m Bounds
 withRule name oldBounds bounds =
   when (oldBounds /= bounds) (field (toString name) (diff oldBounds bounds))
     $> bounds
