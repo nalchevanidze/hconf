@@ -49,7 +49,7 @@ import Relude hiding
 type Libraries = Map Name Library
 
 data Library = Library
-  { sourceDirs :: Text,
+  { sourceDirs :: Name,
     dependencies :: Maybe Dependencies,
     __unknownFields :: Maybe Object
   }
@@ -74,7 +74,7 @@ toObject :: Value -> Object
 toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
-withRule :: (MonadIO m, Log m) => Text -> Bounds -> Bounds -> m Bounds
+withRule :: (MonadIO m, Log m) => Name -> Bounds -> Bounds -> m Bounds
 withRule name oldBounds bounds =
   when (oldBounds /= bounds) (field (toString name) (diff oldBounds bounds))
     $> bounds
