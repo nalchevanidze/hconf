@@ -21,7 +21,7 @@ import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (FromConf (..), ReadConf (..))
-import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
+import HConf.Utils.Core (Name, PkgName (..), aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
 import Relude hiding (Undefined, length, replicate)
@@ -46,11 +46,11 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-toPath :: Name -> FilePath
-toPath = (<> "/package.yaml") . unpack
+toPath :: PkgName -> FilePath
+toPath (PkgName name) = unpack name <> "/package.yaml"
 
-resolvePackages :: (ReadConf m, Log m) => m [(Name, Package)]
-resolvePackages = readPackages >>= traverse (tupled (readYaml . toPath))
+resolvePackages :: (FromConf m [PkgName], Log m) => m [(PkgName, Package)]
+resolvePackages = fromConf >>= traverse (tupled (readYaml . toPath))
 
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)

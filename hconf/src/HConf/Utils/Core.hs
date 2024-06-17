@@ -12,6 +12,7 @@ module HConf.Utils.Core
     aesonYAMLOptions,
     checkElem,
     notElemError,
+    PkgName (..),
   )
 where
 
@@ -26,6 +27,8 @@ import Relude hiding (Undefined, intercalate)
 
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
+
+newtype PkgName = PkgName Text
 
 type Name = Text
 
