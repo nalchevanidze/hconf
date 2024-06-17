@@ -15,7 +15,7 @@ import Data.Map (lookup)
 import qualified Data.Text as T
 import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (HConfIO (..), Parse (..), ReadConf (..))
+import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Yaml (removeIfExists)
@@ -25,7 +25,7 @@ import System.Process
 toLines :: Text -> [Text]
 toLines = T.split (== '\n')
 
-type Con m = (ReadConf m, Log m)
+type Con m = (HConfIO m, Log m)
 
 parseFields :: ByteString -> Map Text Text
 parseFields =
