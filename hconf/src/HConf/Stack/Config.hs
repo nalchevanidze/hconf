@@ -63,10 +63,9 @@ updateStack version _ = do
   Build {..} <- getBuild version
   extras <- getExtras version
   pkgs <- readPackages
-  let packages = (pkgs <> maybeList include) \\ maybeList exclude
   pure
     Stack
-      { packages,
+      { packages = (pkgs <> maybeList include) \\ maybeList exclude,
         resolver,
         allowNewer = Just (Latest == version),
         saveHackageCreds = Just False,
