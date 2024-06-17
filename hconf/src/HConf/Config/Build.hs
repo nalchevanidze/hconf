@@ -27,7 +27,11 @@ import qualified Data.Map as M
 import Data.Text (unpack)
 import HConf.Config.Tag (Tag)
 import HConf.Core.Version (Version, checkVersion)
-import HConf.Utils.Class (Check (..), FromConf (fromConf), ReadConf (..))
+import HConf.Utils.Class
+  ( Check (..),
+    FromConf (..),
+    ReadConf (..),
+  )
 import HConf.Utils.Core (Name, notElemError)
 import Relude hiding
   ( Undefined,
