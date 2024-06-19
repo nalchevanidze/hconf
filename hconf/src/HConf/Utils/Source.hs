@@ -35,16 +35,17 @@ import Relude hiding
     uncons,
   )
 
-
+-- terms
 
 parseField :: Text -> (Text, Text)
 parseField = breakAt ( == ':')
 
-parseLines :: Text -> [Text]
-parseLines = split (== '\n')
-
 firstWord :: Text -> (Text, Text)
 firstWord = breakAt isSeparator
+
+-- lexer
+parseLines :: Text -> [Text]
+parseLines = split (== '\n')
 
 ignoreEmpty :: [(Text, b)] -> [(Text, b)]
 ignoreEmpty = filter (not . null . fst)
