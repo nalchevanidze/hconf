@@ -72,9 +72,10 @@ printBoundPart Bound {..} = (toText restriction <> if orEquals then "=" else "")
 instance Parse Bound where
   parse txt = do
     (char, str) <- unconsM "unsorted bound type" txt
-    res <- parseRestriction char
-    let (isStrict, value) = removeHead '=' str
-    Bound res isStrict <$> parse value
+    restriction <- parseRestriction char
+    let (orEquals, value) = removeHead '=' str
+    version <- parse value
+    pure Bound {..}
 
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
