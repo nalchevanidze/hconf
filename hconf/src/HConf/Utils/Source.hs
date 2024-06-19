@@ -38,7 +38,7 @@ import Relude hiding
 -- terms
 
 parseField :: Text -> (Text, Text)
-parseField = breakAt ( == ':')
+parseField = breakAt (== ':')
 
 firstWord :: Text -> (Text, Text)
 firstWord = breakAt isSeparator
