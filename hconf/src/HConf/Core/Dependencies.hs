@@ -16,7 +16,7 @@ import Data.Aeson
 import Data.Map (fromList, toList)
 import qualified Data.Map as M
 import Data.Map.Strict (traverseWithKey)
-import Data.Text (pack, unpack)
+import Data.Text (unpack)
 import HConf.Core.Bounds (Bounds, printBoundParts)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
