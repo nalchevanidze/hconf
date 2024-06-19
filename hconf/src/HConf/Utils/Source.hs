@@ -7,19 +7,22 @@ module HConf.Utils.Source
     parseLines,
     ignoreEmpty,
     fromByteString,
+    breakOnSpace,
   )
 where
 
 import qualified Data.ByteString.Char8 as BS
+import Data.Char (isSeparator)
 import Data.Text
-  ( breakOn,
+  ( break,
+    breakOn,
     drop,
     null,
     pack,
     split,
     strip,
   )
-import Relude hiding (drop, null)
+import Relude hiding (break, drop, null)
 
 trimBimap :: (Bifunctor f) => f Text Text -> f Text Text
 trimBimap = bimap strip strip
@@ -35,3 +38,6 @@ ignoreEmpty = filter (not . null . fst)
 
 fromByteString :: BS.ByteString -> Text
 fromByteString = pack . BS.unpack
+
+breakOnSpace :: Text -> (Text, Text)
+breakOnSpace = trimBimap . break isSeparator

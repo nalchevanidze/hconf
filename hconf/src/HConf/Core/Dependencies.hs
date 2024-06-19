@@ -13,15 +13,15 @@ import Data.Aeson
   ( FromJSON (..),
     ToJSON (toJSON),
   )
-import Data.Char (isSeparator)
 import Data.Map (fromList, toList)
 import qualified Data.Map as M
 import Data.Map.Strict (traverseWithKey)
-import Data.Text (break, pack, strip, unpack)
+import Data.Text ( pack, unpack)
 import HConf.Core.Bounds (Bounds, printBoundParts)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Format (formatTable)
+import HConf.Utils.Source (breakOnSpace)
 import Relude hiding
   ( Undefined,
     break,
@@ -40,8 +40,7 @@ instance Parse Dependency where
   parse = parseText . pack
   parseText =
     (\(name, txt) -> Dependency name <$> parseText txt)
-      . bimap strip strip
-      . break isSeparator
+      . breakOnSpace
 
 newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
   deriving (Show)
