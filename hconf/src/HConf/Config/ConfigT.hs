@@ -18,7 +18,8 @@ where
 
 import Control.Exception (tryJust)
 import HConf.Config.Build (Builds)
-import HConf.Config.Config (Config (..), getPackages, getRule)
+import HConf.Config.Config (Config (..), getRule)
+import HConf.Config.PkgGroup (toPackageName)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
@@ -75,7 +76,7 @@ instance HConfIO ConfigT where
   write f = liftIO . write f
 
 instance FromConf ConfigT [PkgName] where
-  fromConf = map PkgName . getPackages <$> asks config
+  fromConf = concatMap toPackageName <$> asks (groups . config)
 
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name

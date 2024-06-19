@@ -6,7 +6,6 @@
 -- | GQL Types
 module HConf.Config.Config
   ( Config (..),
-    getPackages,
     getRule,
     updateConfig,
     updateConfigUpperBounds,
@@ -21,7 +20,7 @@ import Data.Aeson
   )
 import Data.Aeson.Types (defaultOptions)
 import HConf.Config.Build (Builds)
-import HConf.Config.PkgGroup (PkgGroup, isMember, toPackageName)
+import HConf.Config.PkgGroup (PkgGroup, isMember)
 import HConf.Core.Bounds (Bounds, updateUpperBound, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
@@ -51,9 +50,6 @@ getRule :: (MonadFail m) => Text -> Config -> m Bounds
 getRule name Config {..}
   | any (isMember name) groups = pure bounds
   | otherwise = getBounds name dependencies
-
-getPackages :: Config -> [Text]
-getPackages Config {..} = concatMap toPackageName groups
 
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}

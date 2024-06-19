@@ -31,7 +31,7 @@ aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
 newtype PkgName = PkgName {unpackPkgName :: Text}
-  deriving newtype (ToString, ToText)
+  deriving newtype (ToString, ToText, IsString)
 
 type Name = Text
 
