@@ -20,16 +20,12 @@ import Data.Aeson
   )
 import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
-import Data.Text
-  ( pack,
-    split,
-    unpack,
-  )
+import Data.Text (pack)
 import GHC.Show (Show (show))
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (checkElem)
 import HConf.Utils.Http (hackage)
-import HConf.Utils.Source (parseSepBy)
+import HConf.Utils.Source (sepBy, toError)
 import Relude hiding
   ( Undefined,
     break,
@@ -72,10 +68,10 @@ compareSeries (x : xs) (y : ys)
   | otherwise = compare x y
 
 instance Parse Version where
-  parse s = parseSepBy "invalid version" '.' s >>= fromSeries
+  parse s = toError "invalid version" (sepBy '.' s >>= fromSeries)
 
 fromSeries :: (MonadFail m) => [Int] -> m Version
-fromSeries [] = fail "invalid version: version should have at least one number!"
+fromSeries [] = fail "version should have at least one number!"
 fromSeries [major] = pure Version {major, minor = 0, revision = []}
 fromSeries (major : (minor : revision)) = pure Version {..}
 

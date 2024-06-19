@@ -10,7 +10,8 @@ module HConf.Utils.Source
     sepByAnd,
     removeHead,
     unconsM,
-    parseSepBy,
+    sepBy,
+    toError,
   )
 where
 
@@ -56,10 +57,10 @@ breakOnSpace = trimBimap . break isSeparator
 sepByAnd :: Text -> [Text]
 sepByAnd = T.splitOn "&&" . T.filter (not . isSeparator)
 
-parseSepBy :: (MonadFail m, Read b) => String -> Char -> Text -> m [b]
-parseSepBy err char s =
+sepBy :: (MonadFail m, Read b) => Char -> Text -> m [b]
+sepBy char s =
   maybe
-    (fail $ err <> ": '" <> toString s <> "'!")
+    (fail $ "could not parse" <> toString s <> "'!")
     pure
     $ traverse (readMaybe . unpack)
     $ split (== char) s
@@ -77,3 +78,7 @@ unconsM msg x =
     (fail (msg <> "<>: " <> toString x))
     pure
     (uncons x)
+
+toError :: (MonadFail m) => String -> Either String a -> m a
+toError label (Left s) = fail $ label <> ": " <> s
+toError _ (Right a) = pure a
