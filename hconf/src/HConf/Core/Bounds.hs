@@ -19,14 +19,14 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum)
-import Data.Text (pack, unpack)
+import Data.Text ( unpack)
 import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
-import HConf.Utils.Source (removeHead, sepByAnd, unconsM)
+import HConf.Utils.Source (removeHead, sepByAnd, unconsM, fromToString)
 import Relude hiding
   ( Undefined,
     break,
@@ -51,7 +51,7 @@ instance ToString Restriction where
   toString Max = "<" -- <  1.0.0
 
 instance ToText Restriction where
-  toText = pack . toString
+  toText = fromToString
 
 data Bound = Bound
   { restriction :: Restriction,
@@ -92,7 +92,7 @@ instance FromJSON Bounds where
   parseJSON v = fail $ "version should be either true or string" <> show v
 
 instance ToJSON Bounds where
-  toJSON = String . pack . toString
+  toJSON = String . fromToString
 
 versionBounds :: Version -> Bounds
 versionBounds version =
