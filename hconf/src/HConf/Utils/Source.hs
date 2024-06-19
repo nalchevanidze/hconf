@@ -37,11 +37,11 @@ import Relude hiding
     uncons,
   )
 
-trimBimap :: (Bifunctor f) => f Text Text -> f Text Text
-trimBimap = bimap strip strip
+trim :: (Bifunctor f) => f Text Text -> f Text Text
+trim = bimap strip strip
 
 parseField :: Text -> (Text, Text)
-parseField = trimBimap . (second (drop 1) . breakOn ":") . strip
+parseField = trim . (second (drop 1) . breakOn ":") . strip
 
 parseLines :: Text -> [Text]
 parseLines = split (== '\n')
@@ -53,7 +53,7 @@ fromByteString :: BS.ByteString -> Text
 fromByteString = pack . BS.unpack
 
 breakOnSpace :: Text -> (Text, Text)
-breakOnSpace = trimBimap . break isSeparator
+breakOnSpace = trim . break isSeparator
 
 ignoreSpaces :: Text -> Text
 ignoreSpaces = T.filter (not . isSeparator)
