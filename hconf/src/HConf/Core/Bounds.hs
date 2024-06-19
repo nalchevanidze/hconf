@@ -66,32 +66,28 @@ instance Ord Bound where
       <> compare (restriction a) (restriction b)
       <> compare (orEquals a) (orEquals b)
 
-parseOrEquals :: Maybe Char -> Bool
-parseOrEquals (Just '=') = True
-parseOrEquals _ = False
-
 printBoundPart :: Bound -> [Text]
 printBoundPart Bound {..} = pack (toString restriction <> if orEquals then "=" else "") : [toText version]
 
 instance Parse Bound where
-  parseText txt = do
+  parse txt = do
     (char, str) <- unconsM "unsorted bound type" txt
     res <- parseRestriction char
-    let (isStrict, value) = first parseOrEquals (getHead str)
-    Bound res isStrict <$> parseText value
+    let (isStrict, value) = first (Just '=' ==) (getHead str)
+    Bound res isStrict <$> parse value
 
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
 
 instance Parse Bounds where
-  parseText "" = pure $ Bounds []
-  parseText str = Bounds <$> traverse parseText (sepByAnd str)
+  parse "" = pure $ Bounds []
+  parse str = Bounds <$> traverse parse (sepByAnd str)
 
 instance ToString Bounds where
   toString = intercalate "  " . map toString . printBoundParts
 
 instance FromJSON Bounds where
-  parseJSON (String s) = parseText s
+  parseJSON (String s) = parse s
   parseJSON v = fail $ "version should be either true or string" <> show v
 
 instance ToJSON Bounds where

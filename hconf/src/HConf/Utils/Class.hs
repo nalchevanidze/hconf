@@ -13,14 +13,11 @@ where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
-import Data.Text (pack)
 import HConf.Utils.Core (Name, PkgName (..))
 import Relude
 
 class Parse a where
-  parse :: (MonadFail m) => String -> m a
-  parse = parseText . pack
-  parseText :: (MonadFail m) => Text -> m a
+  parse :: (MonadFail m) => Text -> m a
 
 readPackages :: (FromConf m [PkgName]) => m [Name]
 readPackages = map unpackPkgName <$> fromConf

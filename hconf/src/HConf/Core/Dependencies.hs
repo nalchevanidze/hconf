@@ -37,8 +37,8 @@ import Relude hiding
 data Dependency = Dependency Name Bounds
 
 instance Parse Dependency where
-  parseText =
-    (\(name, txt) -> Dependency name <$> parseText txt)
+  parse =
+    (\(name, txt) -> Dependency name <$> parse txt)
       . breakOnSpace
 
 newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
@@ -56,7 +56,7 @@ initDependencies = Dependencies . fromList . map toDuple
     toDuple (Dependency a b) = (a, b)
 
 instance FromJSON Dependencies where
-  parseJSON v = initDependencies <$> (parseJSON v >>= traverse parseText . sort)
+  parseJSON v = initDependencies <$> (parseJSON v >>= traverse parse . sort)
 
 instance ToJSON Dependencies where
   toJSON (Dependencies m) = toJSON $ formatTable $ map (\(name, b) -> name : printBoundParts b) (toList m)

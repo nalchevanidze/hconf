@@ -27,8 +27,8 @@ data Tag
     )
 
 instance Parse Tag where
-  parseText "latest" = pure Latest
-  parseText s = Version <$> parseText s
+  parse "latest" = pure Latest
+  parse s = Version <$> parse s
 
 instance ToString Tag where
   toString Latest = "latest"
@@ -41,7 +41,7 @@ instance ToText Tag where
   toText = pack . toString
 
 instance FromJSON Tag where
-  parseJSON (String s) = parseText s
+  parseJSON (String s) = parse s
   parseJSON v = Version <$> parseJSON v
 
 instance ToJSON Tag where

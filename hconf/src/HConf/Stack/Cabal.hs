@@ -50,7 +50,7 @@ getCabalFields path pkgName = do
   bs <- read (cabalPath path pkgName)
   let fields = parseFields bs
   name <- getField "name" fields
-  version <- getField "version" fields >>= parseText
+  version <- getField "version" fields >>= parse
   field (unpack name) (show version)
   pure (name, version)
 

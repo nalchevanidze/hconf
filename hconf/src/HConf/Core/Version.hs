@@ -71,7 +71,7 @@ compareSeries (x : xs) (y : ys)
   | otherwise = compare x y
 
 instance Parse Version where
-  parseText s = toMonad fromSeries (parseSeries s)
+  parse s = toMonad fromSeries (parseSeries s)
     where
       toMonad = maybe (fail $ "invalid version: '" <> toString s <> "'!")
 
@@ -99,8 +99,8 @@ instance ToText Version where
   toText = pack . toString
 
 instance FromJSON Version where
-  parseJSON (String s) = parseText s
-  parseJSON (Number n) = parse (show n)
+  parseJSON (String s) = parse s
+  parseJSON (Number n) = parse (pack $ show n)
   parseJSON v = fail $ "version should be either true or string" <> show v
 
 instance ToJSON Version where
