@@ -20,12 +20,11 @@ import Data.Aeson
   )
 import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
-import Data.Text (pack)
 import GHC.Show (Show (show))
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (checkElem)
 import HConf.Utils.Http (hackage)
-import HConf.Utils.Source (sepBy, toError)
+import HConf.Utils.Source (sepBy, toError, fromToString)
 import Relude hiding
   ( Undefined,
     break,
@@ -88,11 +87,11 @@ instance Show Version where
   show = toString
 
 instance ToText Version where
-  toText = pack . toString
+  toText = fromToString
 
 instance FromJSON Version where
   parseJSON (String s) = parse s
-  parseJSON (Number n) = parse (pack $ show n)
+  parseJSON (Number n) = parse (fromToString $ show n)
   parseJSON v = fail $ "version should be either true or string" <> show v
 
 instance ToJSON Version where

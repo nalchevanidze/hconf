@@ -19,14 +19,14 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum)
-import Data.Text ( unpack)
+import Data.Text (unpack)
 import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
-import HConf.Utils.Source (removeHead, sepByAnd, unconsM, fromToString)
+import HConf.Utils.Source (fromToString, removeHead, sepByAnd, unconsM)
 import Relude hiding
   ( Undefined,
     break,
