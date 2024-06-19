@@ -12,6 +12,7 @@ module HConf.Utils.Source
     unconsM,
     sepBy,
     toError,
+    fromToString,
   )
 where
 
@@ -82,3 +83,6 @@ unconsM msg x =
 toError :: (MonadFail m) => String -> Either String a -> m a
 toError label (Left s) = fail $ label <> ": " <> s
 toError _ (Right a) = pure a
+
+fromToString :: (ToString a) => a -> Text
+fromToString = pack . toString

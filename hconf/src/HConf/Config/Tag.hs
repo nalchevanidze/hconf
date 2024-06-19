@@ -12,10 +12,10 @@ import Data.Aeson
     ToJSON (toJSON),
     Value (..),
   )
-import Data.Text (pack)
 import GHC.Show (Show (show))
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Parse (..))
+import HConf.Utils.Source (fromToString)
 import Relude hiding (show)
 
 data Tag
@@ -38,7 +38,7 @@ instance Show Tag where
   show = toString
 
 instance ToText Tag where
-  toText = pack . toString
+  toText = fromToString
 
 instance FromJSON Tag where
   parseJSON (String s) = parse s
