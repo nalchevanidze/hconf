@@ -20,7 +20,7 @@ import Data.Aeson
   )
 import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
-import GHC.Show (Show (show))
+import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (checkElem)
 import HConf.Utils.Http (hackage)
