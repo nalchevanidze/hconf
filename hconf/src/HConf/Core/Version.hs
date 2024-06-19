@@ -29,6 +29,7 @@ import GHC.Show (Show (show))
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (checkElem)
 import HConf.Utils.Http (hackage)
+import HConf.Utils.Source (parseSepBy)
 import Relude hiding
   ( Undefined,
     break,
@@ -71,12 +72,7 @@ compareSeries (x : xs) (y : ys)
   | otherwise = compare x y
 
 instance Parse Version where
-  parse s = toMonad fromSeries (parseSeries s)
-    where
-      toMonad = maybe (fail $ "invalid version: '" <> toString s <> "'!")
-
-parseSeries :: Text -> Maybe [Int]
-parseSeries = traverse (readMaybe . unpack) . split (== '.')
+  parse s = parseSepBy "invalid version" '.' s >>= fromSeries
 
 fromSeries :: (MonadFail m) => [Int] -> m Version
 fromSeries [] = fail "invalid version: version should have at least one number!"

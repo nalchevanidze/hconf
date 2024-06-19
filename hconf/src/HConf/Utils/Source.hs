@@ -10,6 +10,7 @@ module HConf.Utils.Source
     sepByAnd,
     removeHead,
     unconsM,
+    parseSepBy,
   )
 where
 
@@ -24,6 +25,7 @@ import Data.Text
     split,
     strip,
     uncons,
+    unpack,
   )
 import qualified Data.Text as T
 import Relude hiding
@@ -53,6 +55,14 @@ breakOnSpace = trimBimap . break isSeparator
 
 sepByAnd :: Text -> [Text]
 sepByAnd = T.splitOn "&&" . T.filter (not . isSeparator)
+
+parseSepBy :: (MonadFail m, Read b) => String -> Char -> Text -> m [b]
+parseSepBy err char s =
+  maybe
+    (fail $ err <> ": '" <> toString s <> "'!")
+    pure
+    $ traverse (readMaybe . unpack)
+    $ split (== char) s
 
 removeHead :: Char -> Text -> (Bool, Text)
 removeHead should txt = maybe (False, txt) has (uncons txt)
