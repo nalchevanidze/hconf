@@ -7,6 +7,7 @@ module HConf.Utils.Source
     ignoreEmpty,
     fromByteString,
     breakOnSpace,
+    sepByAnd,
   )
 where
 
@@ -21,6 +22,7 @@ import Data.Text
     split,
     strip,
   )
+import qualified Data.Text as T
 import Relude hiding (break, drop, null)
 
 trimBimap :: (Bifunctor f) => f Text Text -> f Text Text
@@ -40,3 +42,6 @@ fromByteString = pack . BS.unpack
 
 breakOnSpace :: Text -> (Text, Text)
 breakOnSpace = trimBimap . break isSeparator
+
+sepByAnd :: Text -> [Text]
+sepByAnd = T.splitOn "&&" . T.filter (not . isSeparator)

@@ -41,6 +41,7 @@ import Relude hiding
     show,
     toList,
   )
+import HConf.Utils.Source (sepByAnd)
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
@@ -90,7 +91,7 @@ newtype Bounds = Bounds [Bound]
 instance Parse Bounds where
   parse = parseText . pack
   parseText "" = pure $ Bounds []
-  parseText str = Bounds <$> traverse parseText (T.splitOn "&&" $ T.filter (not . isSeparator) str)
+  parseText str = Bounds <$> traverse parseText (sepByAnd str)
 
 instance ToString Bounds where
   toString = intercalate "  " . map toString . printBoundParts
