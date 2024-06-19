@@ -27,7 +27,6 @@ data Tag
     )
 
 instance Parse Tag where
-  parse = parseText . pack
   parseText "latest" = pure Latest
   parseText s = Version <$> parseText s
 

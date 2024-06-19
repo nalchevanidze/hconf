@@ -37,7 +37,6 @@ import Relude hiding
 data Dependency = Dependency Name Bounds
 
 instance Parse Dependency where
-  parse = parseText . pack
   parseText =
     (\(name, txt) -> Dependency name <$> parseText txt)
       . breakOnSpace

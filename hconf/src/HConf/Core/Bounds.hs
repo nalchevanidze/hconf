@@ -85,7 +85,6 @@ newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
 
 instance Parse Bounds where
-  parse = parseText . pack
   parseText "" = pure $ Bounds []
   parseText str = Bounds <$> traverse parseText (sepByAnd str)
 

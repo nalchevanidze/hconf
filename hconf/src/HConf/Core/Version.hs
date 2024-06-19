@@ -71,7 +71,6 @@ compareSeries (x : xs) (y : ys)
   | otherwise = compare x y
 
 instance Parse Version where
-  parse = parseText . pack
   parseText s = toMonad fromSeries (parseSeries s)
     where
       toMonad = maybe (fail $ "invalid version: '" <> toString s <> "'!")
