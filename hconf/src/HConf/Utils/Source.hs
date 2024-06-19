@@ -2,8 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Source
-  ( trimBimap,
-    parseField,
+  ( parseField,
     parseLines,
     ignoreEmpty,
     fromByteString,
