@@ -21,8 +21,7 @@ import Data.Aeson
 import Data.Char (isSeparator)
 import Data.List (maximum)
 import Data.Text
-  ( null,
-    pack,
+  ( pack,
   )
 import qualified Data.Text as T
 import GHC.Show (Show (show))
@@ -90,9 +89,8 @@ newtype Bounds = Bounds [Bound]
 
 instance Parse Bounds where
   parse = parseText . pack
-  parseText str
-    | null str = pure $ Bounds []
-    | otherwise = Bounds <$> traverse parseText (T.splitOn "&&" $ T.filter (not . isSeparator) str)
+  parseText "" = pure $ Bounds []
+  parseText str = Bounds <$> traverse parseText (T.splitOn "&&" $ T.filter (not . isSeparator) str)
 
 instance ToString Bounds where
   toString = intercalate "  " . map toString . printBoundParts
