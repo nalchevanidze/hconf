@@ -25,11 +25,12 @@ import Data.Text
     null,
     pack,
     split,
+    splitOn,
     strip,
     uncons,
-    unpack, splitOn,
   )
 import qualified Data.Text as T
+import HConf.Utils.Class (Parse (..))
 import Relude hiding
   ( break,
     drop,
@@ -61,13 +62,8 @@ ignoreSpaces = T.filter (not . isSeparator)
 sepByAnd :: Text -> [Text]
 sepByAnd = splitOn "&&" . ignoreSpaces
 
-sepBy :: (MonadFail m, Read b) => Char -> Text -> m [b]
-sepBy char s =
-  maybe
-    (fail $ "could not parse" <> toString s <> "'!")
-    pure
-    $ traverse (readMaybe . unpack)
-    $ split (== char) s
+sepBy :: (MonadFail m, Parse a) => Char -> Text -> m [a]
+sepBy char = traverse parse . split (== char)
 
 removeHead :: Char -> Text -> (Bool, Text)
 removeHead should txt = maybe (False, txt) has (uncons txt)
