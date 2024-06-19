@@ -26,7 +26,7 @@ import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
-import HConf.Utils.Source (fromToString, removeHead, sepByAnd, unconsM)
+import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
 import Relude hiding
   ( Undefined,
     break,
@@ -82,7 +82,7 @@ newtype Bounds = Bounds [Bound]
 
 instance Parse Bounds where
   parse "" = pure $ Bounds []
-  parse str = Bounds <$> traverse parse (sepByAnd str)
+  parse str = Bounds <$> sepBy "&&" str
 
 instance ToString Bounds where
   toString = intercalate "  " . map toString . printBoundParts

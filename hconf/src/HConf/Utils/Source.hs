@@ -7,7 +7,6 @@ module HConf.Utils.Source
     ignoreEmpty,
     fromByteString,
     breakOnSpace,
-    sepByAnd,
     removeHead,
     unconsM,
     sepBy,
@@ -59,11 +58,8 @@ breakOnSpace = trimBimap . break isSeparator
 ignoreSpaces :: Text -> Text
 ignoreSpaces = T.filter (not . isSeparator)
 
-sepByAnd :: Text -> [Text]
-sepByAnd = splitOn "&&" . ignoreSpaces
-
-sepBy :: (MonadFail m, Parse a) => Char -> Text -> m [a]
-sepBy char = traverse parse . split (== char)
+sepBy :: (MonadFail m, Parse a) => Text -> Text -> m [a]
+sepBy sep = traverse parse . splitOn sep . ignoreSpaces
 
 removeHead :: Char -> Text -> (Bool, Text)
 removeHead should txt = maybe (False, txt) has (uncons txt)

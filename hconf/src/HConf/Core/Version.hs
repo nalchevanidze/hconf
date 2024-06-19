@@ -67,7 +67,7 @@ compareSeries (x : xs) (y : ys)
   | otherwise = compare x y
 
 instance Parse Version where
-  parse s = toError "invalid version" (sepBy '.' s >>= fromSeries)
+  parse s = toError "invalid version" (sepBy "." s >>= fromSeries)
 
 fromSeries :: (MonadFail m) => [Int] -> m Version
 fromSeries [] = fail "version should have at least one number!"
