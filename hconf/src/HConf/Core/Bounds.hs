@@ -18,18 +18,15 @@ import Data.Aeson
     ToJSON (toJSON),
     Value (..),
   )
-import Data.Char (isSeparator)
 import Data.List (maximum)
-import Data.Text
-  ( pack,
-  )
-import qualified Data.Text as T
+import Data.Text (pack, unpack)
 import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
+import HConf.Utils.Source (sepByAnd)
 import Relude hiding
   ( Undefined,
     break,
@@ -41,7 +38,6 @@ import Relude hiding
     show,
     toList,
   )
-import HConf.Utils.Source (sepByAnd)
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
@@ -78,7 +74,7 @@ printBoundPart :: Bound -> [Text]
 printBoundPart Bound {..} = pack (toString restriction <> if orEquals then "=" else "") : [toText version]
 
 instance Parse Bound where
-  parseText = parse . T.unpack
+  parseText = parse . unpack
   parse (char : str) = do
     res <- parseRestriction char
     let (isStrict, value) = parseOrEquals str
@@ -120,7 +116,7 @@ getBound :: Restriction -> Bounds -> Maybe Bound
 getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs
 
 getLatestBound :: (MonadFail m, MonadIO m) => Name -> m Bound
-getLatestBound = fmap (Bound Max True . head) . fetchVersions . T.unpack
+getLatestBound = fmap (Bound Max True . head) . fetchVersions . unpack
 
 updateUpperBound :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
 updateUpperBound name bounds = do
@@ -128,7 +124,7 @@ updateUpperBound name bounds = do
   let ma = getBound Max bounds
   let mi = maybeToList (getBound Min bounds)
   let newVersion = maximum (latest : maybeToList ma)
-  if ma == Just newVersion then pure () else field (T.unpack name) (show newVersion)
+  if ma == Just newVersion then pure () else field (unpack name) (show newVersion)
   pure (Bounds (mi <> [newVersion]))
 
 class (MonadFail m, MonadIO m, Log m) => ReadBounds m where
