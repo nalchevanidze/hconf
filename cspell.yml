@@ -33,3 +33,4 @@ words:
   - subparser
   - tupled
   - uncons
+  - uncurry

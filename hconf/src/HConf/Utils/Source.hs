@@ -6,7 +6,7 @@ module HConf.Utils.Source
     parseLines,
     ignoreEmpty,
     fromByteString,
-    breakOnSpace,
+    firstWord,
     removeHead,
     unconsM,
     sepBy,
@@ -46,14 +46,14 @@ parseField = trim . (second (drop 1) . breakOn ":") . strip
 parseLines :: Text -> [Text]
 parseLines = split (== '\n')
 
+firstWord :: Text -> (Text, Text)
+firstWord = trim . break isSeparator
+
 ignoreEmpty :: [(Text, b)] -> [(Text, b)]
 ignoreEmpty = filter (not . null . fst)
 
 fromByteString :: BS.ByteString -> Text
 fromByteString = pack . BS.unpack
-
-breakOnSpace :: Text -> (Text, Text)
-breakOnSpace = trim . break isSeparator
 
 ignoreSpaces :: Text -> Text
 ignoreSpaces = T.filter (not . isSeparator)

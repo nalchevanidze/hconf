@@ -21,7 +21,7 @@ import HConf.Core.Bounds (Bounds, printBoundParts)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Format (formatTable)
-import HConf.Utils.Source (breakOnSpace)
+import HConf.Utils.Source (firstWord)
 import Relude hiding
   ( Undefined,
     break,
@@ -39,7 +39,7 @@ data Dependency = Dependency Name Bounds
 instance Parse Dependency where
   parse =
     (\(name, txt) -> Dependency name <$> parse txt)
-      . breakOnSpace
+      . firstWord
 
 newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
   deriving (Show)
