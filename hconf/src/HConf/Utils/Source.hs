@@ -8,7 +8,7 @@ module HConf.Utils.Source
     fromByteString,
     breakOnSpace,
     sepByAnd,
-    getHead,
+    removeHead,
     unconsM,
   )
 where
@@ -54,8 +54,12 @@ breakOnSpace = trimBimap . break isSeparator
 sepByAnd :: Text -> [Text]
 sepByAnd = T.splitOn "&&" . T.filter (not . isSeparator)
 
-getHead :: Text -> (Maybe Char, Text)
-getHead txt = maybe (Nothing, txt) (first Just) (uncons txt)
+removeHead :: Char -> Text -> (Bool, Text)
+removeHead should txt = maybe (False, txt) has (uncons txt)
+  where
+    has (x, xs)
+      | x == should = (True, xs)
+      | otherwise = (False, txt)
 
 unconsM :: (MonadFail m) => String -> Text -> m (Char, Text)
 unconsM msg x =

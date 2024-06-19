@@ -26,7 +26,7 @@ import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
-import HConf.Utils.Source (getHead, sepByAnd, unconsM)
+import HConf.Utils.Source (removeHead, sepByAnd, unconsM)
 import Relude hiding
   ( Undefined,
     break,
@@ -73,7 +73,7 @@ instance Parse Bound where
   parse txt = do
     (char, str) <- unconsM "unsorted bound type" txt
     res <- parseRestriction char
-    let (isStrict, value) = first (Just '=' ==) (getHead str)
+    let (isStrict, value) = removeHead '=' str
     Bound res isStrict <$> parse value
 
 newtype Bounds = Bounds [Bound]
