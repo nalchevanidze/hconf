@@ -79,7 +79,7 @@ parseSeries :: Text -> Maybe [Int]
 parseSeries = traverse (readMaybe . unpack) . split (== '.')
 
 fromSeries :: (MonadFail m) => [Int] -> m Version
-fromSeries [] = fail "invalid version: version should have at least one number !"
+fromSeries [] = fail "invalid version: version should have at least one number!"
 fromSeries [major] = pure Version {major, minor = 0, revision = []}
 fromSeries (major : (minor : revision)) = pure Version {..}
 

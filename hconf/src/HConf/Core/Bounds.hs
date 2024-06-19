@@ -26,7 +26,7 @@ import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, field)
-import HConf.Utils.Source (sepByAnd)
+import HConf.Utils.Source (getHead, sepByAnd, unconsM)
 import Relude hiding
   ( Undefined,
     break,
@@ -66,20 +66,19 @@ instance Ord Bound where
       <> compare (restriction a) (restriction b)
       <> compare (orEquals a) (orEquals b)
 
-parseOrEquals :: [Char] -> (Bool, [Char])
-parseOrEquals ('=' : ver) = (True, ver)
-parseOrEquals ver = (False, ver)
+parseOrEquals :: Maybe Char -> Bool
+parseOrEquals (Just '=') = True
+parseOrEquals _ = False
 
 printBoundPart :: Bound -> [Text]
 printBoundPart Bound {..} = pack (toString restriction <> if orEquals then "=" else "") : [toText version]
 
 instance Parse Bound where
-  parseText = parse . unpack
-  parse (char : str) = do
+  parseText txt = do
+    (char, str) <- unconsM "unsorted bound type" txt
     res <- parseRestriction char
-    let (isStrict, value) = parseOrEquals str
-    Bound res isStrict <$> parse value
-  parse x = fail ("unsorted bound type" <> toString x)
+    let (isStrict, value) = first parseOrEquals (getHead str)
+    Bound res isStrict <$> parseText value
 
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)

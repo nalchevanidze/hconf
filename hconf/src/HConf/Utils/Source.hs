@@ -8,6 +8,8 @@ module HConf.Utils.Source
     fromByteString,
     breakOnSpace,
     sepByAnd,
+    getHead,
+    unconsM,
   )
 where
 
@@ -21,9 +23,15 @@ import Data.Text
     pack,
     split,
     strip,
+    uncons,
   )
 import qualified Data.Text as T
-import Relude hiding (break, drop, null)
+import Relude hiding
+  ( break,
+    drop,
+    null,
+    uncons,
+  )
 
 trimBimap :: (Bifunctor f) => f Text Text -> f Text Text
 trimBimap = bimap strip strip
@@ -45,3 +53,13 @@ breakOnSpace = trimBimap . break isSeparator
 
 sepByAnd :: Text -> [Text]
 sepByAnd = T.splitOn "&&" . T.filter (not . isSeparator)
+
+getHead :: Text -> (Maybe Char, Text)
+getHead txt = maybe (Nothing, txt) (first Just) (uncons txt)
+
+unconsM :: (MonadFail m) => String -> Text -> m (Char, Text)
+unconsM msg x =
+  maybe
+    (fail (msg <> "<>: " <> toString x))
+    pure
+    (uncons x)
