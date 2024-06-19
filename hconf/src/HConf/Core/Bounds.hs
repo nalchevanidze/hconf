@@ -67,7 +67,7 @@ instance Ord Bound where
       <> compare (orEquals a) (orEquals b)
 
 printBoundPart :: Bound -> [Text]
-printBoundPart Bound {..} = pack (toString restriction <> if orEquals then "=" else "") : [toText version]
+printBoundPart Bound {..} = (toText restriction <> if orEquals then "=" else "") : [toText version]
 
 instance Parse Bound where
   parse txt = do
