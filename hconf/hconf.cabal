@@ -49,6 +49,7 @@ library
       HConf.Utils.Format
       HConf.Utils.Http
       HConf.Utils.Log
+      HConf.Utils.Source
       HConf.Utils.Yaml
       Paths_hconf
   hs-source-dirs:

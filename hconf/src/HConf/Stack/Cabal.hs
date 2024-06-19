@@ -10,7 +10,6 @@ module HConf.Stack.Cabal
   )
 where
 
-import qualified Data.ByteString.Char8 as BS (unpack)
 import Data.Map (lookup)
 import qualified Data.Text as T
 import GHC.IO.Exception (ExitCode (..))
@@ -18,23 +17,20 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
+import HConf.Utils.Source (fromByteString, ignoreEmpty, parseField, parseLines)
 import HConf.Utils.Yaml (removeIfExists)
 import Relude
 import System.Process
-
-toLines :: Text -> [Text]
-toLines = T.split (== '\n')
 
 type Con m = (HConfIO m, Log m)
 
 parseFields :: ByteString -> Map Text Text
 parseFields =
   fromList
-    . filter (not . T.null . fst)
-    . map (bimap T.strip T.strip . (second (T.drop 1) . T.breakOn ":") . T.strip)
-    . toLines
-    . T.pack
-    . BS.unpack
+    . ignoreEmpty
+    . map parseField
+    . parseLines
+    . fromByteString
 
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField k = maybe (fail $ "missing field" <> T.unpack k) pure . lookup k
@@ -71,7 +67,7 @@ printWarnings name xs = task (T.pack name) $ traverse_ subWarn xs
         >> traverse_ (warn . T.unpack) ls
 
 parseWarnings :: String -> [(Text, [Text])]
-parseWarnings = concatMap toWarning . groupTopics . toLines . T.pack
+parseWarnings = concatMap toWarning . groupTopics . parseLines . T.pack
 
 groupTopics :: [Text] -> [[Text]]
 groupTopics = regroup . break emptyLine
