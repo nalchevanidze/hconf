@@ -27,7 +27,7 @@ import Data.Text
     split,
     strip,
     uncons,
-    unpack,
+    unpack, splitOn,
   )
 import qualified Data.Text as T
 import Relude hiding
@@ -55,8 +55,11 @@ fromByteString = pack . BS.unpack
 breakOnSpace :: Text -> (Text, Text)
 breakOnSpace = trimBimap . break isSeparator
 
+ignoreSpaces :: Text -> Text
+ignoreSpaces = T.filter (not . isSeparator)
+
 sepByAnd :: Text -> [Text]
-sepByAnd = T.splitOn "&&" . T.filter (not . isSeparator)
+sepByAnd = splitOn "&&" . ignoreSpaces
 
 sepBy :: (MonadFail m, Read b) => Char -> Text -> m [b]
 sepBy char s =

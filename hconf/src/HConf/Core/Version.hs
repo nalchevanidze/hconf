@@ -24,7 +24,7 @@ import GHC.Show (Show (show))
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (checkElem)
 import HConf.Utils.Http (hackage)
-import HConf.Utils.Source (sepBy, toError, fromToString)
+import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
   ( Undefined,
     break,
