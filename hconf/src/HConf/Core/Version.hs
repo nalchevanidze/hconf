@@ -22,7 +22,7 @@ import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (checkElem)
+import HConf.Utils.Core (Name, checkElem)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
@@ -36,6 +36,7 @@ import Relude hiding
     show,
     toList,
   )
+import Data.Text (unpack)
 
 data Version = Version
   { major :: Int,
@@ -97,15 +98,15 @@ instance FromJSON Version where
 instance ToJSON Version where
   toJSON = String . toText
 
-fetchVersionResponse :: (MonadIO m, MonadFail m) => String -> m (Either String (Map Text (NonEmpty Version)))
+fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Either String (Map Text (NonEmpty Version)))
 fetchVersionResponse name = hackage ["package", name, "preferred"]
 
 lookupVersions :: (MonadFail m) => Either String (Map Text (NonEmpty Version)) -> m (NonEmpty Version)
 lookupVersions (Right x) = maybe (fail "field normal-version not found") pure (lookup "normal-version" x)
 lookupVersions (Left x) = fail x
 
-fetchVersions :: (MonadFail m, MonadIO m) => String -> m (NonEmpty Version)
+fetchVersions :: (MonadFail m, MonadIO m) => Name -> m (NonEmpty Version)
 fetchVersions name = fetchVersionResponse name >>= lookupVersions
 
-checkVersion :: (MonadFail m, MonadIO m) => (String, Version) -> m ()
-checkVersion (name, version) = fetchVersions name >>= checkElem "version" name version . toList
+checkVersion :: (MonadFail m, MonadIO m) => (Name, Version) -> m ()
+checkVersion (name, version) = fetchVersions name >>= checkElem "version" (unpack name) version . toList
