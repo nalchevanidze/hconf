@@ -32,4 +32,4 @@ instance ToText PkgDir where
   toText = pack . toString
 
 explore :: (MonadIO m) => PkgDir -> m [String]
-explore x = map normalise <$> liftIO (glob (toString x <> "/**/*.hs"))
+explore x = map normalise <$> liftIO (glob (pkgFile "/**/*.hs" x))
