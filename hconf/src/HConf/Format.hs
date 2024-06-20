@@ -6,7 +6,7 @@ module HConf.Format (formatWith) where
 
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Utils.Class (FromConf, readPackages)
-import HConf.Utils.Core (PkgName, Name)
+import HConf.Utils.Core (Name, PkgName)
 import HConf.Utils.Log (Log, label)
 import Ormolu
   ( ColorMode (..),

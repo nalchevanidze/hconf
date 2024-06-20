@@ -15,6 +15,8 @@ module HConf.Utils.Core
     checkElem,
     notElemError,
     PkgName (..),
+    maybeToError,
+    maybeMapToList,
   )
 where
 
@@ -24,6 +26,7 @@ import Data.Aeson
   )
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, intercalate)
+import qualified Data.Map as M
 import Data.Text (toTitle)
 import Relude hiding (Undefined, intercalate)
 
@@ -111,6 +114,9 @@ toKebabCase = concatMap toKebab
 tupled :: (Functor f) => (t -> f a) -> t -> f (t, a)
 tupled f p = (p,) <$> f p
 
+maybeToError :: (MonadFail m, ToString s) => s -> Maybe a -> m a
+maybeToError msg = maybe (fail $ toString msg) pure
+
 notElemError :: (MonadFail m, Eq t, ToString t) => Name -> Name -> [t] -> m a
 notElemError name listName xs =
   fail
@@ -127,3 +133,6 @@ checkElem name listName x xs =
   if x `elem` xs
     then pure ()
     else notElemError name listName xs
+
+maybeMapToList :: Maybe (Map k a) -> [(k, a)]
+maybeMapToList = maybe [] M.toList

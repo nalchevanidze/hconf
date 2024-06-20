@@ -22,7 +22,7 @@ import Data.Text
 import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
-import HConf.Utils.Core (Name)
+import HConf.Utils.Core (Name, maybeToError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, parseField, parseLines)
 import HConf.Utils.Yaml (removeIfExists)
@@ -40,7 +40,7 @@ parseFields =
     . fromByteString
 
 getField :: (MonadFail m) => Name -> Map Name a -> m a
-getField k = maybe (fail $ "missing field" <> unpack k) pure . lookup k
+getField k = maybeToError ("missing field" <> toString k) . lookup k
 
 cabalPath :: String -> Text -> String
 cabalPath path pkgName = path <> "/" <> unpack pkgName <> ".cabal"

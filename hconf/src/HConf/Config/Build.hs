@@ -31,7 +31,7 @@ import HConf.Utils.Class
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, PkgName, notElemError)
+import HConf.Utils.Core (Name, PkgName, notElemError, maybeMapToList)
 import Relude hiding
   ( Undefined,
     group,
@@ -73,7 +73,7 @@ checkPackageNames i = do
 
 -- TODO: check if they are used?
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
-checkExtraDeps extra = traverse_ checkVersion (maybe [] M.toList extra)
+checkExtraDeps extra = traverse_ checkVersion (maybeMapToList extra)
 
 type Builds = [Build]
 
@@ -89,4 +89,4 @@ getExtras :: (FromConf m Builds) => Tag -> m [(Text, Version)]
 getExtras tag = M.toList . M.fromList . concatMap getExtra . selectBuilds tag <$> fromConf
 
 getExtra :: Build -> [(Text, Version)]
-getExtra b = maybe [] M.toList (extra b)
+getExtra = maybeMapToList . extra 
