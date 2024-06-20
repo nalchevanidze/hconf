@@ -80,10 +80,10 @@ rewritePackage path =
     $ rewriteYaml (toPath path) updatePackage
 
 checkPackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m ()
-checkPackage path =
-  task (toText path) $ do
-    Package {..} <- rewritePackage path
-    checkCabal (toText path) name version
+checkPackage dir =
+  task (toText dir) $ do
+    Package {..} <- rewritePackage dir
+    checkCabal dir name version
 
 checkPackages :: (ReadBounds m, FromConf m Version, FromConf m [PkgDir]) => m ()
 checkPackages =

@@ -21,6 +21,7 @@ import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLi
 import HConf.Utils.Yaml (removeIfExists)
 import Relude hiding (isPrefixOf)
 import System.Process
+import HConf.Core.PkgDir (PkgDir)
 
 type Con m = (HConfIO m, Log m)
 
@@ -82,7 +83,7 @@ buildCabal name = do
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
 
-checkCabal :: (Con m) => Name -> Name -> Version -> m ()
+checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
 checkCabal path name version = subTask "cabal" $ do
   liftIO (removeIfExists (cabalPath (unpack path) name))
   buildCabal (unpack path)
