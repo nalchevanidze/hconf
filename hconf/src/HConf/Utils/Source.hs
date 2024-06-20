@@ -12,6 +12,7 @@ module HConf.Utils.Source
     sepBy,
     toError,
     fromToString,
+    isIndentedLine,
   )
 where
 
@@ -19,6 +20,7 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Char (isSeparator)
 import Data.Text
   ( break,
+    head,
     null,
     pack,
     singleton,
@@ -33,6 +35,7 @@ import HConf.Utils.Core (maybeToError)
 import Relude hiding
   ( break,
     drop,
+    head,
     null,
     uncons,
   )
@@ -54,6 +57,9 @@ ignoreEmpty = filter (not . null . fst)
 
 fromByteString :: BS.ByteString -> Text
 fromByteString = pack . BS.unpack
+
+isIndentedLine :: Text -> Bool
+isIndentedLine line = head line == ' '
 
 ignoreSpaces :: Text -> Text
 ignoreSpaces = T.filter (not . isSeparator)
