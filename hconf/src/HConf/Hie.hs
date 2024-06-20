@@ -19,10 +19,10 @@ import HConf.Core.Env (Env (..))
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FromConf (fromConf))
-import HConf.Utils.Core (PkgDir)
 import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
+import HConf.Core.PkgDir (PkgDir)
 
 data Component = Component
   { path :: Text,

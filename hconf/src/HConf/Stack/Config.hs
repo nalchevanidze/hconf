@@ -20,10 +20,11 @@ import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (FromConf (..), readPackages)
-import HConf.Utils.Core (Name, PkgDir, aesonYAMLOptions, maybeList)
+import HConf.Utils.Core (Name,  aesonYAMLOptions, maybeList)
 import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (rewriteYaml)
 import Relude
+import HConf.Core.PkgDir (PkgDir)
 
 data Stack = Stack
   { packages :: [Name],

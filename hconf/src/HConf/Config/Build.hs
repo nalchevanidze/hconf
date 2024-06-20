@@ -25,13 +25,14 @@ import Data.Aeson.Types
 import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
+import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version, checkVersion)
 import HConf.Utils.Class
   ( Check (..),
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, PkgDir, maybeMapToList, notElemError)
+import HConf.Utils.Core (Name, maybeMapToList, notElemError)
 import Relude hiding
   ( Undefined,
     group,

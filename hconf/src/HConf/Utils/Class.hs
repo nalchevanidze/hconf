@@ -14,7 +14,8 @@ where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
-import HConf.Utils.Core (Name, PkgDir (..), maybeToError)
+import HConf.Core.PkgDir (PkgDir)
+import HConf.Utils.Core (maybeToError)
 import Relude
 
 class Parse a where

@@ -29,7 +29,6 @@ import HConf.Utils.Class
     FromConf (..),
     HConfIO (..),
   )
-import HConf.Utils.Core (PkgDir (..))
 import HConf.Utils.Log
   ( Log (..),
     alert,
@@ -38,6 +37,7 @@ import HConf.Utils.Log
   )
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
+import HConf.Core.PkgDir (PkgDir)
 
 data HCEnv = HCEnv
   { config :: Config,

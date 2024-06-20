@@ -21,7 +21,8 @@ import Data.Aeson.Types
   ( defaultOptions,
   )
 import Data.Text (intercalate, isPrefixOf)
-import HConf.Utils.Core (Name, PkgDir (..))
+import HConf.Core.PkgDir (PkgDir, toPkgName)
+import HConf.Utils.Core (Name)
 import Relude hiding
   ( Undefined,
     group,
@@ -48,8 +49,8 @@ toPackageName :: PkgGroup -> [PkgDir]
 toPackageName PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg =
-      let pkgName = intercalate "-" ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
-       in PkgDir dir pkgName
+      toPkgName dir
+        $ intercalate "-" ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
 
 --  in normalise (joinPath (maybeToList dir <> [unpack pkgName]))
 

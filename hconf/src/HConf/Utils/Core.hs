@@ -13,11 +13,8 @@ module HConf.Utils.Core
     aesonYAMLOptions,
     checkElem,
     notElemError,
-    PkgDir (..),
     maybeToError,
     maybeMapToList,
-    toPkgName,
-    pkgFile,
   )
 where
 
@@ -28,26 +25,12 @@ import Data.Aeson
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, intercalate)
 import qualified Data.Map as M
-import Data.Text (pack, toTitle)
+import Data.Text (toTitle)
 import Relude hiding (Undefined, intercalate)
-import System.FilePath.Posix (joinPath, normalise)
 
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
-data PkgDir = PkgDir {pkgRoot :: Maybe FilePath, pkgName :: Text}
-
-toPkgName :: Maybe FilePath -> Text -> PkgDir
-toPkgName = PkgDir
-
-instance ToString PkgDir where
-  toString (PkgDir d n) = normalise (joinPath (maybeToList d <> [toString n]))
-
-instance ToText PkgDir where
-  toText = pack . toString
-
-pkgFile :: PkgDir -> FilePath -> FilePath
-pkgFile (PkgDir d n) f = normalise (joinPath (maybeToList d <> [toString n, f]))
 
 type Name = Text
 
