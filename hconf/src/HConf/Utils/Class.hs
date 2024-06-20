@@ -20,9 +20,7 @@ import HConf.Utils.Core (maybeToError)
 import Relude
 
 class Parse a where
-  type Src a :: Type
-  type Src a = Text
-  parse :: (MonadFail m) => Src a -> m a
+  parse :: (MonadFail m) => Text -> m a
 
 instance Parse Int where
   parse t =
