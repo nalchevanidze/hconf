@@ -13,6 +13,7 @@ module HConf.Utils.Source
     toError,
     fromToString,
     isIndentedLine,
+    indentText,
   )
 where
 
@@ -20,6 +21,7 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Char (isSeparator)
 import Data.Text
   ( break,
+    concatMap,
     head,
     null,
     pack,
@@ -34,6 +36,7 @@ import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (maybeToError)
 import Relude hiding
   ( break,
+    concatMap,
     drop,
     head,
     null,
@@ -41,6 +44,13 @@ import Relude hiding
   )
 
 -- terms
+
+noNewLine :: Char -> Text
+noNewLine '\n' = "          \n"
+noNewLine x = singleton x
+
+indentText :: Text -> Text
+indentText = concatMap noNewLine
 
 parseField :: Text -> (Text, Text)
 parseField = breakAt (== ':')

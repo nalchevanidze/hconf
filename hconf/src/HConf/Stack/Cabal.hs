@@ -23,7 +23,7 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name, maybeToError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
-import HConf.Utils.Source (fromByteString, ignoreEmpty, isIndentedLine, parseField, parseLines)
+import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines)
 import HConf.Utils.Yaml (removeIfExists)
 import Relude hiding (isPrefixOf)
 import System.Process
@@ -53,15 +53,11 @@ getCabalFields path pkgName = do
   field name (show version)
   pure (name, version)
 
-noNewLine :: Char -> String
-noNewLine '\n' = "          \n"
-noNewLine x = [x]
-
 stack :: (Con m) => String -> String -> [String] -> m ()
 stack l name options = do
   (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (name : map ("--" <>) options)) "")
   case code of
-    ExitFailure {} -> alert (l <> ": " <> concatMap noNewLine (unpack $ strip $ pack out))
+    ExitFailure {} -> alert $ l <> ": " <> unpack (indentText $ pack out)
     ExitSuccess {} -> printWarnings (pack l) (parseWarnings out)
 
 printWarnings :: (Con m) => Name -> [(Text, [Text])] -> m ()
