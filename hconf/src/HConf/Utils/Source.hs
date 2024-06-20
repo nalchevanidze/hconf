@@ -45,12 +45,12 @@ import Relude hiding
 
 -- terms
 
-noNewLine :: Char -> Text
-noNewLine '\n' = "          \n"
-noNewLine x = singleton x
+replaceNewLine :: Char -> Text
+replaceNewLine '\n' = "          \n"
+replaceNewLine x = singleton x
 
 indentText :: Text -> Text
-indentText = concatMap noNewLine
+indentText = concatMap replaceNewLine
 
 parseField :: Text -> (Text, Text)
 parseField = breakAt (== ':')
