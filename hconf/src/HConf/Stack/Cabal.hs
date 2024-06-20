@@ -66,7 +66,7 @@ printWarnings name xs = task name $ traverse_ subWarn xs
         >> traverse_ (warn . unpack) ls
 
 parseWarnings :: String -> [(Text, [Text])]
-parseWarnings = concatMap toWarning . groupTopics . parseLines . pack
+parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
 
 groupTopics :: [Text] -> [[Text]]
 groupTopics = regroup . break emptyLine
@@ -76,9 +76,9 @@ groupTopics = regroup . break emptyLine
       | null t = [h]
       | otherwise = h : groupTopics (dropWhile emptyLine t)
 
-toWarning :: [Text] -> [(Text, [Text])]
-toWarning (h : lns) | startsLike "warning" h = [(h, takeWhile isIndentedLine lns)]
-toWarning _ = []
+toWarning :: [Text] -> Maybe (Text, [Text])
+toWarning (h : lns) | startsLike "warning" h = Just (h, takeWhile isIndentedLine lns)
+toWarning _ = Nothing
 
 buildCabal :: (Con m) => String -> m ()
 buildCabal name = do
