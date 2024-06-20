@@ -20,15 +20,14 @@ import Data.Aeson
 import Data.Aeson.Types
   ( defaultOptions,
   )
-import Data.Text (intercalate, isPrefixOf, unpack)
-import HConf.Utils.Core (Name, PkgName (..), toPkgName)
+import Data.Text (intercalate, isPrefixOf)
+import HConf.Utils.Core (Name, PkgName (..))
 import Relude hiding
   ( Undefined,
     group,
     intercalate,
     isPrefixOf,
   )
-import System.FilePath.Posix (joinPath, normalise)
 
 data PkgGroup = PkgGroup
   { name :: Name,
