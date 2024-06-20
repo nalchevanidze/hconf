@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Class
@@ -13,7 +14,7 @@ where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
-import HConf.Utils.Core (Name, PkgName (..))
+import HConf.Utils.Core (Name, PkgName (..), maybeToError)
 import Relude
 
 class Parse a where
@@ -21,9 +22,8 @@ class Parse a where
 
 instance Parse Int where
   parse t =
-    maybe
-      (fail $ "could not parse Int: " <> toString t <> "'!")
-      pure
+    maybeToError ("could not parse Int: " <> t <> "'!")
+
       (readMaybe $ toString t)
 
 readPackages :: (FromConf m [PkgName]) => m [Name]
