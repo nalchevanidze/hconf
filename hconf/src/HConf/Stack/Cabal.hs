@@ -48,9 +48,9 @@ getCabalFields pkgDir pkgName = do
   field name (show version)
   pure (name, version)
 
-stack :: (Con m) => String -> String -> [String] -> m ()
+stack :: (Con m) => String -> Name -> [String] -> m ()
 stack l name options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (name : map ("--" <>) options)) "")
+  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (unpack name : map ("--" <>) options)) "")
   case code of
     ExitFailure {} -> alert $ l <> ": " <> unpack (indentText $ pack out)
     ExitSuccess {} -> printWarnings (pack l) (parseWarnings out)
@@ -78,7 +78,7 @@ toWarning :: [Text] -> Maybe (Text, [Text])
 toWarning (h : lns) | startsLike "warning" h = Just (h, takeWhile isIndentedLine lns)
 toWarning _ = Nothing
 
-buildCabal :: (Con m) => String -> m ()
+buildCabal :: (Con m) => Name -> m ()
 buildCabal name = do
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
