@@ -14,7 +14,7 @@ where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
-import HConf.Utils.Core (Name, PkgName (..), maybeToError)
+import HConf.Utils.Core (Name, PkgDir (..), maybeToError)
 import Relude
 
 class Parse a where
@@ -26,14 +26,14 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-readPackages :: (FromConf m [PkgName]) => m [PkgName]
+readPackages :: (FromConf m [PkgDir]) => m [PkgDir]
 readPackages = fromConf
 
 class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
 
 class Check a where
-  check :: (MonadFail m, MonadIO m, FromConf m [PkgName]) => a -> m ()
+  check :: (MonadFail m, MonadIO m, FromConf m [PkgDir]) => a -> m ()
 
 class (MonadIO m, MonadFail m) => HConfIO m where
   eitherRead :: FilePath -> m (Either String ByteString)

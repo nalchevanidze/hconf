@@ -21,7 +21,7 @@ import Data.Aeson.Types
   ( defaultOptions,
   )
 import Data.Text (intercalate, isPrefixOf)
-import HConf.Utils.Core (Name, PkgName (..))
+import HConf.Utils.Core (Name, PkgDir (..))
 import Relude hiding
   ( Undefined,
     group,
@@ -44,12 +44,12 @@ data PkgGroup = PkgGroup
 instance ToJSON PkgGroup where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-toPackageName :: PkgGroup -> [PkgName]
+toPackageName :: PkgGroup -> [PkgDir]
 toPackageName PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg =
       let pkgName = intercalate "-" ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
-       in PkgName dir pkgName
+       in PkgDir dir pkgName
 
 --  in normalise (joinPath (maybeToList dir <> [unpack pkgName]))
 

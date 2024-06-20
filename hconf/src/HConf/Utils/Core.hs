@@ -13,7 +13,7 @@ module HConf.Utils.Core
     aesonYAMLOptions,
     checkElem,
     notElemError,
-    PkgName (..),
+    PkgDir (..),
     maybeToError,
     maybeMapToList,
     toPkgName,
@@ -35,19 +35,19 @@ import System.FilePath.Posix (joinPath, normalise)
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
-data PkgName = PkgName {pkgRoot :: Maybe FilePath, pkgName :: Text}
+data PkgDir = PkgDir {pkgRoot :: Maybe FilePath, pkgName :: Text}
 
-toPkgName :: Maybe FilePath -> Text -> PkgName
-toPkgName = PkgName
+toPkgName :: Maybe FilePath -> Text -> PkgDir
+toPkgName = PkgDir
 
-instance ToString PkgName where
-  toString (PkgName d n) = normalise (joinPath (maybeToList d <> [toString n]))
+instance ToString PkgDir where
+  toString (PkgDir d n) = normalise (joinPath (maybeToList d <> [toString n]))
 
-instance ToText PkgName where
+instance ToText PkgDir where
   toText = pack . toString
 
-pkgFile :: PkgName -> FilePath -> FilePath
-pkgFile (PkgName d n) f = normalise (joinPath (maybeToList d <> [toString n, f]))
+pkgFile :: PkgDir -> FilePath -> FilePath
+pkgFile (PkgDir d n) f = normalise (joinPath (maybeToList d <> [toString n, f]))
 
 type Name = Text
 

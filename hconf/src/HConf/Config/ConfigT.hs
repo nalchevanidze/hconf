@@ -29,7 +29,7 @@ import HConf.Utils.Class
     FromConf (..),
     HConfIO (..),
   )
-import HConf.Utils.Core (PkgName (..))
+import HConf.Utils.Core (PkgDir (..))
 import HConf.Utils.Log
   ( Log (..),
     alert,
@@ -75,7 +75,7 @@ instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
 
-instance FromConf ConfigT [PkgName] where
+instance FromConf ConfigT [PkgDir] where
   fromConf = concatMap toPackageName <$> asks (groups . config)
 
 instance ReadBounds ConfigT where

@@ -31,7 +31,7 @@ import HConf.Utils.Class
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, PkgName, maybeMapToList, notElemError)
+import HConf.Utils.Core (Name, PkgDir, maybeMapToList, notElemError)
 import Relude hiding
   ( Undefined,
     group,
@@ -65,7 +65,7 @@ instance Check Build where
         checkPackageNames exclude
       ]
 
-checkPackageNames :: (FromConf m [PkgName]) => Maybe [Name] -> m ()
+checkPackageNames :: (FromConf m [PkgDir]) => Maybe [Name] -> m ()
 checkPackageNames i = do
   known <- map toText <$> readPackages
   let unknown = fromMaybe [] i \\ known
