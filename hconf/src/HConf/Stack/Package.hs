@@ -14,7 +14,6 @@ module HConf.Stack.Package
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import Data.Text (unpack)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.Version (Version)
@@ -47,7 +46,7 @@ instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
 toPath :: PkgName -> FilePath
-toPath (PkgName name) = unpack name <> "/package.yaml"
+toPath (PkgName name) = toString name <> "/package.yaml"
 
 resolvePackages :: (FromConf m [PkgName], Log m) => m [(PkgName, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . toPath))

@@ -8,7 +8,6 @@ module HConf.Utils.Http
 where
 
 import Data.Aeson (FromJSON, eitherDecode)
-import Data.Text (pack, unpack)
 import HConf.Utils.Core (Name)
 import Network.HTTP.Req
   ( GET (..),
@@ -30,7 +29,7 @@ httpRequest uri = case useURI uri of
   (Just (Right (u, o))) -> liftIO (eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
 
 parseURI :: (MonadFail m) => String -> m URI
-parseURI url = maybe (fail ("Invalid Endpoint: " <> show url <> "!")) pure (mkURI (pack url))
+parseURI url = maybe (fail ("Invalid Endpoint: " <> show url <> "!")) pure (mkURI (fromString url))
 
 hackage :: (MonadIO m, MonadFail m, FromJSON a) => [Name] -> m (Either String a)
-hackage path = parseURI ("https://hackage.haskell.org/" <> intercalate "/" (map unpack path) <> ".json") >>= httpRequest
+hackage path = parseURI ("https://hackage.haskell.org/" <> intercalate "/" (map toString path) <> ".json") >>= httpRequest
