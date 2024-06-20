@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Log
@@ -40,8 +41,8 @@ task name m = log (chalk Magenta (li name)) >> inside m
 subTask :: (Log m, Monad m) => Name -> m a -> m a
 subTask name m = log (chalk Cyan (li name)) >> inside m
 
-field :: (Log m) => String -> String -> m ()
-field name = log . ((name <> ": ") <>)
+field :: (Log m) => Name -> String -> m ()
+field name = log . ((toString name <> ": ") <>)
 
 logFileChange :: (Log m) => String -> Bool -> m ()
 logFileChange path noChange

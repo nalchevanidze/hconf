@@ -51,7 +51,7 @@ getCabalFields path pkgName = do
   let fields = parseFields bs
   name <- getField "name" fields
   version <- getField "version" fields >>= parse
-  field (unpack name) (show version)
+  field name (show version)
   pure (name, version)
 
 noNewLine :: Char -> String
@@ -63,11 +63,11 @@ stack l name options = do
   (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (name : map ("--" <>) options)) "")
   case code of
     ExitFailure {} -> alert (l <> ": " <> concatMap noNewLine (unpack $ strip $ pack out))
-    ExitSuccess {} -> printWarnings l (parseWarnings out)
+    ExitSuccess {} -> printWarnings (pack l) (parseWarnings out)
 
-printWarnings :: (Con m) => String -> [(Text, [Text])] -> m ()
+printWarnings :: (Con m) => Name -> [(Text, [Text])] -> m ()
 printWarnings name [] = field name "ok"
-printWarnings name xs = task (pack name) $ traverse_ subWarn xs
+printWarnings name xs = task name $ traverse_ subWarn xs
   where
     subWarn (x, ls) =
       warn (unpack x)

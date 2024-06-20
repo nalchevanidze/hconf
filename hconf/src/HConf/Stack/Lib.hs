@@ -76,7 +76,7 @@ toObject _ = mempty
 
 withRule :: (MonadIO m, Log m) => Name -> Bounds -> Bounds -> m Bounds
 withRule name oldBounds bounds =
-  when (oldBounds /= bounds) (field (toString name) (diff oldBounds bounds))
+  when (oldBounds /= bounds) (field name (diff oldBounds bounds))
     $> bounds
 
 updateDependency :: (ReadBounds m) => Name -> Bounds -> m Bounds

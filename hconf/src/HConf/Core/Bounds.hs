@@ -111,7 +111,7 @@ getBound :: Restriction -> Bounds -> Maybe Bound
 getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs
 
 getLatestBound :: (MonadFail m, MonadIO m) => Name -> m Bound
-getLatestBound = fmap (Bound Max True . head) . fetchVersions 
+getLatestBound = fmap (Bound Max True . head) . fetchVersions
 
 updateUpperBound :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
 updateUpperBound name bounds = do
@@ -119,7 +119,7 @@ updateUpperBound name bounds = do
   let ma = getBound Max bounds
   let mi = maybeToList (getBound Min bounds)
   let newVersion = maximum (latest : maybeToList ma)
-  if ma == Just newVersion then pure () else field (unpack name) (show newVersion)
+  if ma == Just newVersion then pure () else field name (show newVersion)
   pure (Bounds (mi <> [newVersion]))
 
 class (MonadFail m, MonadIO m, Log m) => ReadBounds m where

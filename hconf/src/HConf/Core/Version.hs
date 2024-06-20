@@ -20,6 +20,7 @@ import Data.Aeson
   )
 import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
+import Data.Text (unpack)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name, checkElem)
@@ -36,7 +37,6 @@ import Relude hiding
     show,
     toList,
   )
-import Data.Text (unpack)
 
 data Version = Version
   { major :: Int,
