@@ -22,8 +22,8 @@ class Parse a where
 
 instance Parse Int where
   parse t =
-    maybeToError ("could not parse Int: " <> t <> "'!")
-
+    maybeToError
+      ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
 readPackages :: (FromConf m [PkgName]) => m [Name]
