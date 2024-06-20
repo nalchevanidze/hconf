@@ -4,8 +4,8 @@
 module HConf.Utils.Format (formatTable) where
 
 import Data.List (maximum)
-import qualified Data.Text as T
-import Relude
+import Data.Text (intercalate, justifyLeft, length, strip)
+import Relude hiding (intercalate, length)
 
 type Table = [[Text]]
 
@@ -13,13 +13,13 @@ getSizes :: Table -> [Int]
 getSizes xs = map size (transpose xs)
   where
     size :: [Text] -> Int
-    size = maximum . map T.length
+    size = maximum . map length
 
 printRow :: [Int] -> [Text] -> Text
 printRow sizes ls =
-  T.strip
-    $ T.intercalate "  "
-    $ zipWith (\item s -> T.justifyLeft s ' ' item) ls sizes
+  strip
+    $ intercalate "  "
+    $ zipWith (\item s -> justifyLeft s ' ' item) ls sizes
 
 formatTable :: Table -> [Text]
 formatTable deps = sort $ map (printRow (getSizes deps)) deps
