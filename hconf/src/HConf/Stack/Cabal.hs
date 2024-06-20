@@ -85,8 +85,8 @@ buildCabal name = do
 
 checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
 checkCabal path name version = subTask "cabal" $ do
-  liftIO (removeIfExists (cabalPath path name))
-  buildCabal (toString path)
+  liftIO (removeIfExists (cabalPath  name path))
+  buildCabal (toText path)
   (pkgName, pkgVersion) <- getCabalFields path name
   if pkgVersion == version && pkgName == name
     then pure ()
