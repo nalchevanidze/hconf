@@ -40,8 +40,8 @@ cabalPath :: Text -> PkgDir -> String
 cabalPath pkgName = pkgFile (unpack pkgName <> ".cabal")
 
 getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
-getCabalFields path pkgName = do
-  bs <- read (cabalPath pkgName path)
+getCabalFields pkgDir pkgName = do
+  bs <- read (cabalPath pkgName pkgDir)
   let fields = parseFields bs
   name <- getField "name" fields
   version <- getField "version" fields >>= parse
