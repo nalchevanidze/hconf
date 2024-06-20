@@ -4,10 +4,9 @@
 
 module HConf.Format (formatWith) where
 
-import Data.Text (unpack)
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Utils.Class (FromConf, readPackages)
-import HConf.Utils.Core (PkgName)
+import HConf.Utils.Core (PkgName, Name)
 import HConf.Utils.Log (Log, label)
 import Ormolu
   ( ColorMode (..),
@@ -24,8 +23,8 @@ import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
 
-explore :: (Log m, MonadIO m) => Text -> m [String]
-explore x = map normalise <$> liftIO (glob (unpack x <> "/**/*.hs"))
+explore :: (Log m, MonadIO m) => Name -> m [String]
+explore x = map normalise <$> liftIO (glob (toString x <> "/**/*.hs"))
 
 formatWith :: (Log m, FromConf m [PkgName]) => Bool -> m ()
 formatWith check = label "ormolu" $ do
