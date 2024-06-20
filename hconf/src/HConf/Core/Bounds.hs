@@ -19,7 +19,6 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum)
-import Data.Text (unpack)
 import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)

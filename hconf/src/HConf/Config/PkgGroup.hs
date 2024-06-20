@@ -20,8 +20,7 @@ import Data.Aeson
 import Data.Aeson.Types
   ( defaultOptions,
   )
-import Data.List (intercalate)
-import Data.Text (isPrefixOf, unpack)
+import Data.Text (intercalate, isPrefixOf, unpack)
 import HConf.Utils.Core (Name, PkgName (..))
 import Relude hiding
   ( Undefined,
@@ -50,8 +49,8 @@ toPackageName :: PkgGroup -> [PkgName]
 toPackageName PkgGroup {..} = map (fromString . pkgPath) packages
   where
     pkgPath pkg =
-      let pkgName = intercalate "-" ([unpack name | fromMaybe False prefix] <> [unpack pkg | pkg /= "."])
-       in normalise (joinPath (maybeToList dir <> [pkgName]))
+      let pkgName = intercalate "-" ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
+       in normalise (joinPath (maybeToList dir <> [unpack pkgName]))
 
 isMember :: Name -> PkgGroup -> Bool
 isMember pkgName = (`isPrefixOf` pkgName) . name
