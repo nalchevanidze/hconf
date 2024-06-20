@@ -47,7 +47,7 @@ instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
 toPath :: PkgDir -> FilePath
-toPath name = pkgFile name "package.yaml"
+toPath = pkgFile "package.yaml"
 
 resolvePackages :: (FromConf m [PkgDir], Log m) => m [(PkgDir, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . toPath))

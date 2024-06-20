@@ -19,14 +19,14 @@ data PkgDir = PkgDir {pkgRoot :: Maybe FilePath, pkgName :: Text}
 toPkgName :: Maybe FilePath -> Text -> PkgDir
 toPkgName = PkgDir
 
-resolve :: PkgDir -> [FilePath] -> FilePath
-resolve (PkgDir d n) xs = normalise (joinPath (maybeToList d <> (toString n : xs)))
+resolve :: [FilePath] -> PkgDir -> FilePath
+resolve xs (PkgDir d n) = normalise (joinPath (maybeToList d <> (toString n : xs)))
 
-pkgFile :: PkgDir -> FilePath -> FilePath
-pkgFile pkg f = resolve pkg [f]
+pkgFile :: FilePath -> PkgDir -> FilePath
+pkgFile f = resolve [f]
 
 instance ToString PkgDir where
-  toString (PkgDir d n) = normalise (joinPath (maybeToList d <> [toString n]))
+  toString = resolve []
 
 instance ToText PkgDir where
   toText = pack . toString
