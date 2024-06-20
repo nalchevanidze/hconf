@@ -73,7 +73,7 @@ checkPackageNames i = do
 
 -- TODO: check if they are used?
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
-checkExtraDeps extra = traverse_ checkVersion (maybeMapToList extra)
+checkExtraDeps = traverse_ checkVersion . maybeMapToList 
 
 type Builds = [Build]
 
