@@ -84,8 +84,7 @@ groupTopics = regroup . break emptyLine
       | otherwise = h : groupTopics (dropWhile emptyLine t)
 
 toWarning :: [Text] -> [(Text, [Text])]
-toWarning (hd : lns)
-  | "warning" `isPrefixOf` toLower hd = [(hd, takeWhile isIndentedLine lns)]
+toWarning (h : lns) | "warning" `isPrefixOf` toLower h = [(h, takeWhile isIndentedLine lns)]
 toWarning _ = []
 
 buildCabal :: (Con m) => String -> m ()
