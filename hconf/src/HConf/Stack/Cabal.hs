@@ -13,6 +13,7 @@ where
 import Data.Map (lookup)
 import Data.Text (pack, unpack)
 import GHC.IO.Exception (ExitCode (..))
+import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name, maybeToError)
@@ -21,7 +22,6 @@ import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLi
 import HConf.Utils.Yaml (removeIfExists)
 import Relude hiding (isPrefixOf)
 import System.Process
-import HConf.Core.PkgDir (PkgDir)
 
 type Con m = (HConfIO m, Log m)
 
@@ -36,10 +36,10 @@ parseFields =
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField k = maybeToError ("missing field" <> toString k) . lookup k
 
-cabalPath :: String -> Text -> String
+cabalPath :: PkgDir -> Text -> String
 cabalPath path pkgName = path <> "/" <> unpack pkgName <> ".cabal"
 
-getCabalFields :: (Con m) => FilePath -> Name -> m (Name, Version)
+getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
 getCabalFields path pkgName = do
   bs <- read (cabalPath path pkgName)
   let fields = parseFields bs
@@ -85,9 +85,9 @@ buildCabal name = do
 
 checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
 checkCabal path name version = subTask "cabal" $ do
-  liftIO (removeIfExists (cabalPath (unpack path) name))
+  liftIO (removeIfExists (cabalPath path name))
   buildCabal (toString path)
-  (pkgName, pkgVersion) <- getCabalFields (unpack path) name
+  (pkgName, pkgVersion) <- getCabalFields path name
   if pkgVersion == version && pkgName == name
     then pure ()
     else fail (toString path <> "mismatching version or name")
