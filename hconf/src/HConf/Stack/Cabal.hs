@@ -87,4 +87,6 @@ checkCabal path name version = subTask "cabal" $ do
   liftIO (removeIfExists (cabalPath (unpack path) name))
   buildCabal (unpack path)
   (pkgName, pkgVersion) <- getCabalFields (unpack path) name
-  if pkgVersion == version && pkgName == name then pure () else fail (unpack path <> "mismatching version or name")
+  if pkgVersion == version && pkgName == name
+    then pure ()
+    else fail (unpack path <> "mismatching version or name")
