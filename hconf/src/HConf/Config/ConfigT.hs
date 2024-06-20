@@ -22,6 +22,7 @@ import HConf.Config.Config (Config (..), getRule)
 import HConf.Config.PkgGroup (toPackageName)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Env (Env (..))
+import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
@@ -37,7 +38,6 @@ import HConf.Utils.Log
   )
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
-import HConf.Core.PkgDir (PkgDir)
 
 data HCEnv = HCEnv
   { config :: Config,

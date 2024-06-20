@@ -16,13 +16,13 @@ where
 import Data.Aeson (FromJSON (..), ToJSON (..), Value (..), object)
 import qualified Data.Map as M
 import HConf.Core.Env (Env (..))
+import HConf.Core.PkgDir (PkgDir)
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FromConf (fromConf))
 import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
-import HConf.Core.PkgDir (PkgDir)
 
 data Component = Component
   { path :: Text,

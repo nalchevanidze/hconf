@@ -31,7 +31,6 @@ import Relude hiding (Undefined, intercalate)
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
-
 type Name = Text
 
 fields :: [Text]
