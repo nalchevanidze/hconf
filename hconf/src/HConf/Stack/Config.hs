@@ -65,7 +65,7 @@ updateStack version _ = do
   pkgs <- readPackages
   pure
     Stack
-      { packages = (pkgs <> maybeList include) \\ maybeList exclude,
+      { packages = (map toText pkgs <> maybeList include) \\ maybeList exclude,
         resolver,
         allowNewer = Just (Latest == version),
         saveHackageCreds = Just False,

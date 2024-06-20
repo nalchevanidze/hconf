@@ -20,7 +20,7 @@ import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (FromConf (..), readPackages)
-import HConf.Utils.Core (Name, PkgName (..), aesonYAMLOptions, tupled)
+import HConf.Utils.Core (Name, PkgName (..), aesonYAMLOptions, pkgFile, tupled)
 import HConf.Utils.Log (Log, label, subTask, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
 import Relude hiding (Undefined, length, replicate)
@@ -46,7 +46,7 @@ instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
 toPath :: PkgName -> FilePath
-toPath (PkgName name) = toString name <> "/package.yaml"
+toPath name = pkgFile name "package.yaml"
 
 resolvePackages :: (FromConf m [PkgName], Log m) => m [(PkgName, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . toPath))
@@ -78,10 +78,10 @@ rewritePackage path =
   subTask "package"
     $ rewriteYaml (toPath path) updatePackage
 
-checkPackage :: (ReadBounds m, FromConf m Version) => Name -> m ()
+checkPackage :: (ReadBounds m, FromConf m Version) => PkgName -> m ()
 checkPackage path =
   task (toText path) $ do
-    Package {..} <- rewritePackage (PkgName path)
+    Package {..} <- rewritePackage path
     checkCabal (toText path) name version
 
 checkPackages :: (ReadBounds m, FromConf m Version, FromConf m [PkgName]) => m ()

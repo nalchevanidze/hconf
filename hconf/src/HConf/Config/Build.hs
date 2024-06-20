@@ -67,13 +67,13 @@ instance Check Build where
 
 checkPackageNames :: (FromConf m [PkgName]) => Maybe [Name] -> m ()
 checkPackageNames i = do
-  known <- readPackages
+  known <- map toText <$> readPackages
   let unknown = fromMaybe [] i \\ known
   unless (null unknown) (fail ("unknown packages: " <> show unknown))
 
 -- TODO: check if they are used?
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
-checkExtraDeps = traverse_ checkVersion . maybeMapToList 
+checkExtraDeps = traverse_ checkVersion . maybeMapToList
 
 type Builds = [Build]
 

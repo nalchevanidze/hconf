@@ -1,5 +1,4 @@
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -17,6 +16,8 @@ module HConf.Utils.Core
     PkgName (..),
     maybeToError,
     maybeMapToList,
+    toPkgName,
+    pkgFile,
   )
 where
 
@@ -27,14 +28,26 @@ import Data.Aeson
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, intercalate)
 import qualified Data.Map as M
-import Data.Text (toTitle)
+import Data.Text (pack, toTitle)
 import Relude hiding (Undefined, intercalate)
+import System.FilePath.Posix (joinPath, normalise)
 
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
-newtype PkgName = PkgName {unpackPkgName :: Text}
-  deriving newtype (ToString, ToText, IsString)
+data PkgName = PkgName {pkgRoot :: Maybe FilePath, pkgName :: Text}
+
+toPkgName :: Maybe FilePath -> Text -> PkgName
+toPkgName = PkgName
+
+instance ToString PkgName where
+  toString (PkgName d n) = normalise (joinPath (maybeToList d <> [toString n]))
+
+instance ToText PkgName where
+  toText = pack . toString
+
+pkgFile :: PkgName -> FilePath -> FilePath
+pkgFile (PkgName d n) f = normalise (joinPath (maybeToList d <> [toString n, f]))
 
 type Name = Text
 

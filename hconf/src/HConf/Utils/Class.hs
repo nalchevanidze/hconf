@@ -26,8 +26,8 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-readPackages :: (FromConf m [PkgName]) => m [Name]
-readPackages = map unpackPkgName <$> fromConf
+readPackages :: (FromConf m [PkgName]) => m [PkgName]
+readPackages = fromConf
 
 class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a

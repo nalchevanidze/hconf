@@ -23,7 +23,7 @@ import System.Exit (ExitCode (..))
 import System.FilePath (normalise)
 import System.FilePath.Glob (glob)
 
-explore :: (Log m, MonadIO m) => Name -> m [String]
+explore :: (Log m, MonadIO m) => PkgName -> m [String]
 explore x = map normalise <$> liftIO (glob (toString x <> "/**/*.hs"))
 
 formatWith :: (Log m, FromConf m [PkgName]) => Bool -> m ()

@@ -21,7 +21,7 @@ import Data.Aeson.Types
   ( defaultOptions,
   )
 import Data.Text (intercalate, isPrefixOf, unpack)
-import HConf.Utils.Core (Name, PkgName (..))
+import HConf.Utils.Core (Name, PkgName (..), toPkgName)
 import Relude hiding
   ( Undefined,
     group,
@@ -46,11 +46,13 @@ instance ToJSON PkgGroup where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
 toPackageName :: PkgGroup -> [PkgName]
-toPackageName PkgGroup {..} = map (fromString . pkgPath) packages
+toPackageName PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg =
       let pkgName = intercalate "-" ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
-       in normalise (joinPath (maybeToList dir <> [unpack pkgName]))
+       in PkgName dir pkgName
+
+--  in normalise (joinPath (maybeToList dir <> [unpack pkgName]))
 
 isMember :: Name -> PkgGroup -> Bool
 isMember pkgName = (`isPrefixOf` pkgName) . name
