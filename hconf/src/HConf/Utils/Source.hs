@@ -14,6 +14,7 @@ module HConf.Utils.Source
     fromToString,
     isIndentedLine,
     indentText,
+    startsLike,
   )
 where
 
@@ -23,12 +24,14 @@ import Data.Text
   ( break,
     concatMap,
     head,
+    isPrefixOf,
     null,
     pack,
     singleton,
     split,
     splitOn,
     strip,
+    toLower,
     uncons,
   )
 import qualified Data.Text as T
@@ -39,11 +42,15 @@ import Relude hiding
     concatMap,
     drop,
     head,
+    isPrefixOf,
     null,
     uncons,
   )
 
 -- terms
+
+startsLike :: Text -> Text -> Bool
+startsLike x y = toLower x `isPrefixOf` toLower y
 
 replaceNewLine :: Char -> Text
 replaceNewLine '\n' = "          \n"

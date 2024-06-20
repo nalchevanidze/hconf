@@ -12,9 +12,7 @@ where
 
 import Data.Map (lookup)
 import Data.Text
-  ( isPrefixOf,
-    pack,
-    toLower,
+  ( pack,
     unpack,
   )
 import GHC.IO.Exception (ExitCode (..))
@@ -22,7 +20,7 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name, maybeToError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
-import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines)
+import HConf.Utils.Source (startsLike, fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines)
 import HConf.Utils.Yaml (removeIfExists)
 import Relude hiding (isPrefixOf)
 import System.Process
@@ -79,7 +77,7 @@ groupTopics = regroup . break emptyLine
       | otherwise = h : groupTopics (dropWhile emptyLine t)
 
 toWarning :: [Text] -> [(Text, [Text])]
-toWarning (h : lns) | "warning" `isPrefixOf` toLower h = [(h, takeWhile isIndentedLine lns)]
+toWarning (h : lns) | startsLike "warning" h = [(h, takeWhile isIndentedLine lns)]
 toWarning _ = []
 
 buildCabal :: (Con m) => String -> m ()
