@@ -1,6 +1,7 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module HConf.Core.PkgDir
   ( PkgDir,
@@ -10,7 +11,7 @@ module HConf.Core.PkgDir
   )
 where
 
-import Data.Text (pack)
+import Data.Text (intercalate, pack)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix (joinPath, normalise)
@@ -20,8 +21,8 @@ data PkgDir = PkgDir
     name :: Text
   }
 
-toPkgName :: Maybe FilePath -> Text -> PkgDir
-toPkgName = PkgDir
+toPkgName :: Maybe FilePath -> [Text] -> PkgDir
+toPkgName dir xs = PkgDir dir (intercalate "-" xs)
 
 resolve :: [FilePath] -> PkgDir -> FilePath
 resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString name : xs)))

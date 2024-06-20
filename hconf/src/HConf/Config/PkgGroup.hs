@@ -20,7 +20,7 @@ import Data.Aeson
 import Data.Aeson.Types
   ( defaultOptions,
   )
-import Data.Text (intercalate, isPrefixOf)
+import Data.Text (isPrefixOf)
 import HConf.Core.PkgDir (PkgDir, toPkgName)
 import HConf.Utils.Core (Name)
 import Relude hiding
@@ -48,9 +48,7 @@ instance ToJSON PkgGroup where
 toPackageName :: PkgGroup -> [PkgDir]
 toPackageName PkgGroup {..} = map pkgPath packages
   where
-    pkgPath pkg =
-      toPkgName dir
-        $ intercalate "-" ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
+    pkgPath pkg = toPkgName dir ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
 
 --  in normalise (joinPath (maybeToList dir <> [unpack pkgName]))
 
