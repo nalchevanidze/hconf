@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module HConf.Utils.Class
   ( Parse (..),
@@ -19,7 +20,9 @@ import HConf.Utils.Core (maybeToError)
 import Relude
 
 class Parse a where
-  parse :: (MonadFail m) => Text -> m a
+  type Src a :: Type
+  type Src a = Text
+  parse :: (MonadFail m) => Src a -> m a
 
 instance Parse Int where
   parse t =

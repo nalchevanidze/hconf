@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module HConf.Core.Bounds
   ( Bounds,
@@ -40,10 +41,11 @@ import Relude hiding
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
-parseRestriction :: (MonadFail f) => Char -> f Restriction
-parseRestriction '>' = pure Min -- > 0.7.0
-parseRestriction '<' = pure Max -- <  1.0.0
-parseRestriction x = fail ("unsorted bound type" <> show x)
+instance Parse Restriction where 
+  type Src Restriction = Char
+  parse '>' = pure Min -- > 0.7.0
+  parse '<' = pure Max -- <  1.0.0
+  parse x = fail ("unsorted bound type" <> show x)
 
 instance ToString Restriction where
   toString Min = ">" -- >  0.7.0
@@ -71,7 +73,7 @@ printBoundPart Bound {..} = (toText restriction <> if orEquals then "=" else "")
 instance Parse Bound where
   parse txt = do
     (char, str) <- unconsM "unsorted bound type" txt
-    restriction <- parseRestriction char
+    restriction <- parse char
     let (orEquals, value) = removeHead '=' str
     version <- parse value
     pure Bound {..}
