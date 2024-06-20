@@ -111,7 +111,7 @@ getBound :: Restriction -> Bounds -> Maybe Bound
 getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs
 
 getLatestBound :: (MonadFail m, MonadIO m) => Name -> m Bound
-getLatestBound = fmap (Bound Max True . head) . fetchVersions . unpack
+getLatestBound = fmap (Bound Max True . head) . fetchVersions 
 
 updateUpperBound :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
 updateUpperBound name bounds = do
