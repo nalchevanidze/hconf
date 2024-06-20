@@ -72,9 +72,9 @@ printBoundPart Bound {..} = (toText restriction <> if orEquals then "=" else "")
 
 instance Parse Bound where
   parse txt = do
-    (char, str) <- unconsM "unsorted bound type" txt
-    restriction <- parse char
+    (ch, str) <- unconsM "unsorted bound type" txt
     let (orEquals, value) = removeHead '=' str
+    restriction <- parse ch
     version <- parse value
     pure Bound {..}
 
