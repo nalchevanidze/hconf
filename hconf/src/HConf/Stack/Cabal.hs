@@ -11,16 +11,13 @@ module HConf.Stack.Cabal
 where
 
 import Data.Map (lookup)
-import Data.Text
-  ( pack,
-    unpack,
-  )
+import Data.Text (pack, unpack)
 import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name, maybeToError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
-import HConf.Utils.Source (startsLike, fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines)
+import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (removeIfExists)
 import Relude hiding (isPrefixOf)
 import System.Process
