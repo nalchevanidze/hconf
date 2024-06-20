@@ -28,6 +28,7 @@ import Data.Text
   )
 import qualified Data.Text as T
 import HConf.Utils.Class (Parse (..))
+import HConf.Utils.Core (maybeToError)
 import Relude hiding
   ( break,
     drop,
@@ -70,11 +71,7 @@ removeHead should txt = maybe (False, txt) has (uncons txt)
       | otherwise = (False, txt)
 
 unconsM :: (MonadFail m) => String -> Text -> m (Char, Text)
-unconsM msg x =
-  maybe
-    (fail (msg <> "<>: " <> toString x))
-    pure
-    (uncons x)
+unconsM msg x = maybeToError (msg <> "<>: " <> toString x) (uncons x)
 
 toError :: (MonadFail m) => String -> Either String a -> m a
 toError label (Left s) = fail $ label <> ": " <> s
