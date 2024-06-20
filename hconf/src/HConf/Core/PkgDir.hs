@@ -1,6 +1,6 @@
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Core.PkgDir
   ( PkgDir,
@@ -24,7 +24,7 @@ toPkgName :: Maybe FilePath -> Text -> PkgDir
 toPkgName = PkgDir
 
 resolve :: [FilePath] -> PkgDir -> FilePath
-resolve xs PkgDir{..} = normalise (joinPath (maybeToList root <> (toString name : xs)))
+resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString name : xs)))
 
 pkgFile :: FilePath -> PkgDir -> FilePath
 pkgFile f = resolve [f]
