@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Core.Bounds
   ( Bounds,
@@ -41,7 +41,7 @@ import Relude hiding
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
-instance Parse Restriction where 
+instance Parse Restriction where
   parse ">" = pure Min -- > 0.7.0
   parse "<" = pure Max -- <  1.0.0
   parse x = fail ("unsorted bound type" <> show x)

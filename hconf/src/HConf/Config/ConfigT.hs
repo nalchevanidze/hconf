@@ -75,7 +75,6 @@ instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
 
-
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name
 
@@ -100,6 +99,7 @@ save cfg = label "save" $ task "hconf.yaml" $ do
 
 instance FromConf ConfigT [PkgDir] where
   fromConf = concatMap toPackageName <$> asks (groups . config)
+
 instance FromConf ConfigT Builds where
   fromConf = asks (builds . config)
 

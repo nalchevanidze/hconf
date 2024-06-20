@@ -19,9 +19,9 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Char (isSeparator)
 import Data.Text
   ( break,
-    singleton,
     null,
     pack,
+    singleton,
     split,
     splitOn,
     strip,
