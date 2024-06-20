@@ -13,7 +13,7 @@ where
 import Data.Map (lookup)
 import Data.Text (pack, unpack)
 import GHC.IO.Exception (ExitCode (..))
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDir, pkgFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name, maybeToError)
@@ -36,8 +36,8 @@ parseFields =
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField k = maybeToError ("missing field" <> toString k) . lookup k
 
-cabalPath :: PkgDir -> Text -> String
-cabalPath path pkgName = path <> "/" <> unpack pkgName <> ".cabal"
+cabalPath :: Text -> PkgDir -> String
+cabalPath pkgName = pkgFile (unpack pkgName <> ".cabal")
 
 getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
 getCabalFields path pkgName = do
