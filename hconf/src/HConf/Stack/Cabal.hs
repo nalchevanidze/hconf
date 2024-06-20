@@ -14,7 +14,6 @@ import Data.Map (lookup)
 import Data.Text
   ( isPrefixOf,
     pack,
-    strip,
     toLower,
     unpack,
   )
