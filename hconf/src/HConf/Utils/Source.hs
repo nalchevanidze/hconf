@@ -19,6 +19,7 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Char (isSeparator)
 import Data.Text
   ( break,
+    singleton,
     null,
     pack,
     split,
@@ -70,8 +71,8 @@ removeHead should txt = maybe (False, txt) has (uncons txt)
       | x == should = (True, xs)
       | otherwise = (False, txt)
 
-unconsM :: (MonadFail m) => String -> Text -> m (Char, Text)
-unconsM msg x = maybeToError (msg <> "<>: " <> toString x) (uncons x)
+unconsM :: (MonadFail m) => String -> Text -> m (Text, Text)
+unconsM msg x = first singleton <$> maybeToError (msg <> "<>: " <> toString x) (uncons x)
 
 toError :: (MonadFail m) => String -> Either String a -> m a
 toError label (Left s) = fail $ label <> ": " <> s

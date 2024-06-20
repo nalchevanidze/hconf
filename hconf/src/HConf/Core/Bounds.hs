@@ -42,9 +42,8 @@ import Relude hiding
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
 instance Parse Restriction where 
-  type Src Restriction = Char
-  parse '>' = pure Min -- > 0.7.0
-  parse '<' = pure Max -- <  1.0.0
+  parse ">" = pure Min -- > 0.7.0
+  parse "<" = pure Max -- <  1.0.0
   parse x = fail ("unsorted bound type" <> show x)
 
 instance ToString Restriction where
