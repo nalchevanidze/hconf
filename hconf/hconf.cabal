@@ -36,6 +36,7 @@ library
       HConf.Core.Bounds
       HConf.Core.Dependencies
       HConf.Core.Env
+      HConf.Core.PkgDir
       HConf.Core.Version
       HConf.Format
       HConf.Hie
