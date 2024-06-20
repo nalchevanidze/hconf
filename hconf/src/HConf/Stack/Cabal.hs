@@ -90,4 +90,4 @@ checkCabal path name version = subTask "cabal" $ do
   (pkgName, pkgVersion) <- getCabalFields path name
   if pkgVersion == version && pkgName == name
     then pure ()
-    else fail (toString path <> "mismatching version or name")
+    else fail (unpack (toText path) <> "mismatching version or name")
