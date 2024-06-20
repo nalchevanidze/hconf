@@ -25,7 +25,7 @@ import HConf.Utils.Core (Name, maybeToError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, isIndentedLine, parseField, parseLines)
 import HConf.Utils.Yaml (removeIfExists)
-import Relude hiding (head, isPrefixOf)
+import Relude hiding (isPrefixOf)
 import System.Process
 
 type Con m = (HConfIO m, Log m)
