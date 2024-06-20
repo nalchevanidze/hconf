@@ -5,7 +5,7 @@
 
 module HConf.Core.PkgDir
   ( PkgDir,
-    toPkgName,
+    pkgDir,
     pkgFile,
     explore,
   )
@@ -21,8 +21,8 @@ data PkgDir = PkgDir
     name :: Text
   }
 
-toPkgName :: Maybe FilePath -> [Text] -> PkgDir
-toPkgName dir xs = PkgDir dir (intercalate "-" xs)
+pkgDir :: Maybe FilePath -> [Text] -> PkgDir
+pkgDir dir xs = PkgDir dir (intercalate "-" xs)
 
 resolve :: [FilePath] -> PkgDir -> FilePath
 resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString name : xs)))
