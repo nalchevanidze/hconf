@@ -5,7 +5,7 @@
 module HConf.Format (formatWith) where
 
 import qualified Data.Text.IO.Utf8 as T
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDir, explore)
 import HConf.Utils.Class (FromConf, readPackages)
 import HConf.Utils.Log (Log, label)
 import Ormolu
@@ -20,11 +20,6 @@ import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
-import System.FilePath (normalise)
-import System.FilePath.Glob (glob)
-
-explore :: (Log m, MonadIO m) => PkgDir -> m [String]
-explore x = map normalise <$> liftIO (glob (toString x <> "/**/*.hs"))
 
 formatWith :: (Log m, FromConf m [PkgDir]) => Bool -> m ()
 formatWith check = label "ormolu" $ do
