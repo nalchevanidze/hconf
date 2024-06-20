@@ -111,18 +111,18 @@ toKebabCase = concatMap toKebab
 tupled :: (Functor f) => (t -> f a) -> t -> f (t, a)
 tupled f p = (p,) <$> f p
 
-notElemError :: (MonadFail m, Eq t, ToString t) => String -> String -> [t] -> m a
+notElemError :: (MonadFail m, Eq t, ToString t) => Name -> Name -> [t] -> m a
 notElemError name listName xs =
   fail
     ( "no matching "
-        <> name
+        <> toString name
         <> " for '"
-        <> listName
+        <> toString listName
         <> "'! try one of: "
         <> intercalate ", " (map toString xs)
     )
 
-checkElem :: (MonadFail m, Eq t, ToString t) => String -> String -> t -> [t] -> m ()
+checkElem :: (MonadFail m, Eq t, ToString t) => Name -> Name -> t -> [t] -> m ()
 checkElem name listName x xs =
   if x `elem` xs
     then pure ()
