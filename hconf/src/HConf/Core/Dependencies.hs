@@ -16,7 +16,6 @@ import Data.Aeson
 import Data.Map (fromList, toList)
 import qualified Data.Map as M
 import Data.Map.Strict (traverseWithKey)
-import Data.Text (unpack)
 import HConf.Core.Bounds (Bounds, printBoundParts)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Core (Name)
@@ -45,7 +44,7 @@ newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
   deriving (Show)
 
 getBounds :: (MonadFail m) => Name -> Dependencies -> m Bounds
-getBounds name = maybe (fail $ "Unknown package: " <> unpack name) pure . M.lookup name . unpackDeps
+getBounds name = maybe (fail $ "Unknown package: " <> toString name) pure . M.lookup name . unpackDeps
 
 traverseDeps :: (Applicative f) => (Name -> Bounds -> f Bounds) -> Dependencies -> f Dependencies
 traverseDeps f (Dependencies xs) = Dependencies <$> traverseWithKey f xs
