@@ -30,6 +30,7 @@ words:
   - prefs
   - Relude
   - sdist
+  - Semigroup
   - subparser
   - tupled
   - uncons
