@@ -24,7 +24,6 @@ import Data.Aeson.Types
   )
 import Data.List ((\\))
 import qualified Data.Map as M
-import Data.Text (unpack)
 import HConf.Config.Tag (Tag)
 import HConf.Core.Version (Version, checkVersion)
 import HConf.Utils.Class
@@ -74,10 +73,7 @@ checkPackageNames i = do
 
 -- TODO: check if they are used?
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
-checkExtraDeps extra =
-  traverse_
-    (checkVersion . first unpack)
-    (maybe [] M.toList extra)
+checkExtraDeps extra = traverse_ checkVersion (maybe [] M.toList extra)
 
 type Builds = [Build]
 
