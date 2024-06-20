@@ -31,7 +31,7 @@ import HConf.Utils.Class
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, PkgName, notElemError, maybeMapToList)
+import HConf.Utils.Core (Name, PkgName, maybeMapToList, notElemError)
 import Relude hiding
   ( Undefined,
     group,
@@ -89,4 +89,4 @@ getExtras :: (FromConf m Builds) => Tag -> m [(Text, Version)]
 getExtras tag = M.toList . M.fromList . concatMap getExtra . selectBuilds tag <$> fromConf
 
 getExtra :: Build -> [(Text, Version)]
-getExtra = maybeMapToList . extra 
+getExtra = maybeMapToList . extra
