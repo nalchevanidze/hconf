@@ -48,9 +48,9 @@ getCabalFields pkgDir pkgName = do
   field name (show version)
   pure (name, version)
 
-stack :: (Con m) => String -> Name -> [String] -> m ()
+stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack l name options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (unpack name : map ("--" <>) options)) "")
+  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (unpack (toText name) : map ("--" <>) options)) "")
   case code of
     ExitFailure {} -> alert $ l <> ": " <> unpack (indentText $ pack out)
     ExitSuccess {} -> printWarnings (pack l) (parseWarnings out)
@@ -78,15 +78,15 @@ toWarning :: [Text] -> Maybe (Text, [Text])
 toWarning (h : lns) | startsLike "warning" h = Just (h, takeWhile isIndentedLine lns)
 toWarning _ = Nothing
 
-buildCabal :: (Con m) => Name -> m ()
+buildCabal :: (Con m) => PkgDir -> m ()
 buildCabal name = do
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
 
 checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
 checkCabal path name version = subTask "cabal" $ do
-  liftIO (removeIfExists (cabalPath  name path))
-  buildCabal (toText path)
+  liftIO (removeIfExists (cabalPath name path))
+  buildCabal path
   (pkgName, pkgVersion) <- getCabalFields path name
   if pkgVersion == version && pkgName == name
     then pure ()
