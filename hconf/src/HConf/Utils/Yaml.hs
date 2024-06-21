@@ -35,7 +35,7 @@ serializeYaml =
     $ setConfCompare compareFields defConfig
 
 readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
-readYaml =  withThrow . read >=> (liftIO . decodeThrow)
+readYaml = withThrow . read >=> (liftIO . decodeThrow)
 
 writeYaml :: (ToJSON a, HConfIO m, Log m) => FilePath -> a -> m ()
 writeYaml path v = checkAndWrite path (serializeYaml v) >>= logFileChange path

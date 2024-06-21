@@ -46,8 +46,6 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-
-
 resolvePackages :: (FromConf m [PkgDir], Log m) => m [(PkgDir, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . packageFile))
 
