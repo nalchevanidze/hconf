@@ -69,10 +69,7 @@ mapYaml :: (Functor m) => (t -> m t) -> Yaml t -> m (Yaml t)
 mapYaml f (Yaml v props) = (`Yaml` props) <$> f v
 
 rewriteYaml :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (t -> m t) -> m t
-rewriteYaml path f = do
-  readYaml path
-    >>= mapYaml f
-    >>= \x -> writeYaml path x >> pure (getData x)
+rewriteYaml pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
 removeIfExists :: FilePath -> IO ()
 removeIfExists name = removeFile name `catch` handleExists
