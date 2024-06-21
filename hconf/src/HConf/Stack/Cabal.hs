@@ -84,10 +84,10 @@ buildCabal name = do
   stack "sdist" name []
 
 checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
-checkCabal path name version = subTask "cabal" $ do
-  liftIO (removeIfExists (cabalPath name path))
-  buildCabal path
-  (pkgName, pkgVersion) <- getCabalFields path name
+checkCabal pkg name version = subTask "cabal" $ do
+  liftIO (removeIfExists (cabalPath name pkg))
+  buildCabal pkg
+  (pkgName, pkgVersion) <- getCabalFields pkg name
   if pkgVersion == version && pkgName == name
     then pure ()
-    else fail (unpack (toText path) <> "mismatching version or name")
+    else fail (unpack (toText pkg) <> "mismatching version or name")
