@@ -43,7 +43,6 @@ class Check a where
 class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
   write :: FilePath -> ByteString -> m (Either String ())
-  throwError :: Text -> m ()
 
 printException :: SomeException -> String
 printException = show
@@ -57,6 +56,5 @@ withThrow :: (HConfIO m) => m (Either String a) -> m a
 withThrow x = x >>= either fail pure
 
 instance HConfIO IO where
-  throwError = fail . unpack
   read = safeIO . L.readFile
   write f = safeIO . L.writeFile f
