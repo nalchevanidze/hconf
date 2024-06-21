@@ -18,6 +18,7 @@ import Control.Exception (tryJust)
 import qualified Data.ByteString as L
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (maybeToError)
+import Data.Text (unpack)
 import Relude
 
 class Parse a where
@@ -41,6 +42,7 @@ class Check a where
 class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
   write :: FilePath -> ByteString -> m (Either String ())
+  throwError :: Text -> m ()
 
 printException :: SomeException -> String
 printException = show
@@ -51,5 +53,6 @@ safeIO = tryJust (Just . printException)
 type ResultT = ExceptT String
 
 instance HConfIO IO where
+  throwError = fail . unpack
   read = safeIO . L.readFile
   write f = safeIO . L.writeFile f
