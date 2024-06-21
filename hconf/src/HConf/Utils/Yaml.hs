@@ -42,7 +42,7 @@ writeYaml path v = checkAndWrite path (serializeYaml v) >>= logFileChange path
 
 checkAndWrite :: (HConfIO m) => FilePath -> ByteString -> m Bool
 checkAndWrite path newFile = do
-  file <- eitherRead path
+  file <- read path
   write path newFile
   return (fromRight "" file == newFile)
 

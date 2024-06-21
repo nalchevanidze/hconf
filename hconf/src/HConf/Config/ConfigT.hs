@@ -71,7 +71,6 @@ instance Log ConfigT where
   inside = local (\c -> c {indention = indention c + 1})
 
 instance HConfIO ConfigT where
-  eitherRead = liftIO . eitherRead
   read = liftIO . read
   write f = liftIO . write f
 

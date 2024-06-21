@@ -38,7 +38,7 @@ getField k = maybeToError ("missing field" <> toString k) . lookup k
 
 
 
-getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
+getCabalFields :: (Con m) => PkgDir -> Name -> ExceptT String m (Name, Version)
 getCabalFields pkg pkgName = do
   bs <- read (cabalFile pkgName pkg)
   let fields = parseFields bs

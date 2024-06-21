@@ -10,6 +10,7 @@ module HConf.Utils.Class
     HConfIO (..),
     FromConf (..),
     readPackages,
+    ResultT,
   )
 where
 
@@ -38,14 +39,17 @@ class Check a where
   check :: (MonadFail m, MonadIO m, FromConf m [PkgDir]) => a -> m ()
 
 class (MonadIO m, MonadFail m) => HConfIO m where
-  eitherRead :: FilePath -> m (Either String ByteString)
-  read :: FilePath -> m ByteString
-  write :: FilePath -> ByteString -> m ()
+  read :: FilePath -> m (Either String ByteString)
+  write :: FilePath -> ByteString -> m (Either String ())
 
 printException :: SomeException -> String
 printException = show
 
+safeIO :: IO a -> IO (Either String a)
+safeIO = tryJust (Just . printException)
+
+type ResultT = ExceptT String
+
 instance HConfIO IO where
-  eitherRead path = tryJust (Just . printException) (L.readFile path)
-  read = L.readFile
-  write = L.writeFile
+  read = safeIO . L.readFile
+  write f = safeIO . L.writeFile f
