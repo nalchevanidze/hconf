@@ -17,7 +17,6 @@ where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
-import Data.Text (unpack)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (maybeToError)
 import Relude
