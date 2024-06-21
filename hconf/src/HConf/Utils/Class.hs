@@ -11,14 +11,15 @@ module HConf.Utils.Class
     FromConf (..),
     readPackages,
     ResultT,
+    withThrow,
   )
 where
 
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
+import Data.Text (unpack)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (maybeToError)
-import Data.Text (unpack)
 import Relude
 
 class Parse a where
@@ -51,6 +52,9 @@ safeIO :: IO a -> IO (Either String a)
 safeIO = tryJust (Just . printException)
 
 type ResultT = ExceptT String
+
+withThrow :: (HConfIO m) => m (Either String a) -> m a
+withThrow x = x >>= either fail pure
 
 instance HConfIO IO where
   throwError = fail . unpack

@@ -20,7 +20,7 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
-import HConf.Utils.Class (HConfIO (..))
+import HConf.Utils.Class (HConfIO (..), withThrow)
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
 import Relude hiding (Show, Undefined, intercalate, show)
@@ -35,7 +35,7 @@ serializeYaml =
     $ setConfCompare compareFields defConfig
 
 readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
-readYaml = read >=> (liftIO . decodeThrow)
+readYaml =  withThrow . read >=> (liftIO . decodeThrow)
 
 writeYaml :: (ToJSON a, HConfIO m, Log m) => FilePath -> a -> m ()
 writeYaml path v = checkAndWrite path (serializeYaml v) >>= logFileChange path
@@ -43,7 +43,7 @@ writeYaml path v = checkAndWrite path (serializeYaml v) >>= logFileChange path
 checkAndWrite :: (HConfIO m) => FilePath -> ByteString -> m Bool
 checkAndWrite path newFile = do
   file <- read path
-  write path newFile
+  withThrow (write path newFile)
   return (fromRight "" file == newFile)
 
 data Yaml t = Yaml
