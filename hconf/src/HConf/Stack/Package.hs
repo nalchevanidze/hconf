@@ -16,7 +16,7 @@ where
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Dependencies (Dependencies)
-import HConf.Core.PkgDir (PkgDir, pkgFile)
+import HConf.Core.PkgDir (PkgDir, stackPackage)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (checkCabal)
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
@@ -46,11 +46,10 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-toPath :: PkgDir -> FilePath
-toPath = pkgFile "package.yaml"
+
 
 resolvePackages :: (FromConf m [PkgDir], Log m) => m [(PkgDir, Package)]
-resolvePackages = fromConf >>= traverse (tupled (readYaml . toPath))
+resolvePackages = fromConf >>= traverse (tupled (readYaml . stackPackage))
 
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
@@ -77,7 +76,7 @@ updatePackage Package {..} = do
 rewritePackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m Package
 rewritePackage path =
   subTask "package"
-    $ rewriteYaml (toPath path) updatePackage
+    $ rewriteYaml (stackPackage path) updatePackage
 
 checkPackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m ()
 checkPackage dir =

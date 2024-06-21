@@ -8,6 +8,7 @@ module HConf.Core.PkgDir
     pkgDir,
     pkgFile,
     explore,
+    stackPackage,
   )
 where
 
@@ -35,3 +36,6 @@ instance ToText PkgDir where
 
 explore :: (MonadIO m) => PkgDir -> m [String]
 explore x = map normalise <$> liftIO (glob (resolve [] x <> "/**/*.hs"))
+
+stackPackage :: PkgDir -> FilePath
+stackPackage = pkgFile "package.yaml"
