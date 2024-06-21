@@ -11,7 +11,7 @@ module HConf.Utils.Yaml
   )
 where
 
-import Control.Exception
+import Control.Exception (catch, throwIO)
 import Data.Aeson
   ( FromJSON (..),
     Object,
