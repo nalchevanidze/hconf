@@ -13,7 +13,7 @@ where
 import Data.Map (lookup)
 import Data.Text (pack, unpack)
 import GHC.IO.Exception (ExitCode (..))
-import HConf.Core.PkgDir (PkgDir, pkgFile)
+import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..))
 import HConf.Utils.Core (Name, maybeToError)
@@ -36,12 +36,11 @@ parseFields =
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField k = maybeToError ("missing field" <> toString k) . lookup k
 
-cabal :: Text -> PkgDir -> String
-cabal pkgName = pkgFile (unpack pkgName <> ".cabal")
+
 
 getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
 getCabalFields pkg pkgName = do
-  bs <- read (cabal pkgName pkg)
+  bs <- read (cabalFile pkgName pkg)
   let fields = parseFields bs
   name <- getField "name" fields
   version <- getField "version" fields >>= parse
@@ -85,7 +84,7 @@ buildCabal name = do
 
 checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
 checkCabal pkg name version = subTask "cabal" $ do
-  liftIO (removeIfExists (cabal name pkg))
+  liftIO (removeIfExists (cabalFile name pkg))
   buildCabal pkg
   (pkgName, pkgVersion) <- getCabalFields pkg name
   if pkgVersion == version && pkgName == name

@@ -6,13 +6,13 @@
 module HConf.Core.PkgDir
   ( PkgDir,
     pkgDir,
-    pkgFile,
     explore,
-    packageYaml,
+    packageFile,
+    cabalFile,
   )
 where
 
-import Data.Text (intercalate, pack)
+import Data.Text (intercalate, pack, unpack)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix (joinPath, normalise)
@@ -37,5 +37,8 @@ instance ToText PkgDir where
 explore :: (MonadIO m) => PkgDir -> m [String]
 explore x = map normalise <$> liftIO (glob (resolve [] x <> "/**/*.hs"))
 
-packageYaml :: PkgDir -> FilePath
-packageYaml = pkgFile "package.yaml"
+packageFile :: PkgDir -> FilePath
+packageFile = pkgFile "package.yaml"
+
+cabalFile :: Text -> PkgDir -> String
+cabalFile pkgName = pkgFile (unpack pkgName <> ".cabal")
