@@ -62,12 +62,12 @@ instance Check Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
-        checkPackageNames include,
-        checkPackageNames exclude
+        checkPkgNames include,
+        checkPkgNames exclude
       ]
 
-checkPackageNames :: (FromConf m [PkgDir]) => Maybe [Name] -> m ()
-checkPackageNames i = do
+checkPkgNames :: (FromConf m [PkgDir]) => Maybe [Name] -> m ()
+checkPkgNames i = do
   known <- map toText <$> readPackages
   let unknown = fromMaybe [] i \\ known
   unless (null unknown) (fail ("unknown packages: " <> show unknown))
