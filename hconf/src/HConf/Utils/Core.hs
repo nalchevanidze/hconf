@@ -112,14 +112,14 @@ tupled :: (Functor f) => (t -> f a) -> t -> f (t, a)
 tupled f p = (p,) <$> f p
 
 throwError :: (MonadFail m, ToString a1) => a1 -> m a2
-throwError = fail . toString
+throwError = throwError . toString
 
 maybeToError :: (MonadFail m, ToString s) => s -> Maybe a -> m a
 maybeToError msg = maybe (throwError msg) pure
 
 notElemError :: (MonadFail m, Eq t, ToString t) => Name -> Name -> [t] -> m a
 notElemError name listName xs =
-  fail
+  throwError
     ( "no matching "
         <> toString name
         <> " for '"

@@ -33,7 +33,7 @@ import HConf.Utils.Class
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, maybeList, maybeMapToList, notElemError)
+import HConf.Utils.Core (Name, maybeList, maybeMapToList, notElemError, throwError)
 import Relude hiding
   ( Undefined,
     group,
@@ -71,7 +71,7 @@ checkPkgNames :: (FromConf m [PkgDir]) => Maybe [Name] -> m ()
 checkPkgNames i = do
   known <- map toText <$> readPackages
   let unknown = fromMaybe [] i \\ known
-  unless (null unknown) (fail ("unknown packages: " <> show unknown))
+  unless (null unknown) (throwError ("unknown packages: " <> show unknown :: String))
 
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
 checkExtraDeps = traverse_ checkVersion . maybeMapToList
