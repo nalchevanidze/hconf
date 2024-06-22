@@ -22,7 +22,7 @@ import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Name, checkElem, maybeToError, throwError)
+import HConf.Utils.Core (Name, checkElem, maybeToError, throwError, Msg (..))
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
@@ -70,7 +70,7 @@ instance Parse Version where
   parse s = toError "invalid version" (sepBy "." s >>= fromSeries)
 
 fromSeries :: (MonadFail m) => [Int] -> m Version
-fromSeries [] = throwError ("version should have at least one number!" :: String)
+fromSeries [] = throwError "version should have at least one number!"
 fromSeries [major] = pure Version {major, minor = 0, revision = []}
 fromSeries (major : (minor : revision)) = pure Version {..}
 
@@ -92,7 +92,7 @@ instance ToText Version where
 instance FromJSON Version where
   parseJSON (String s) = parse s
   parseJSON (Number n) = parse (fromToString $ show n)
-  parseJSON v = throwError $ "version should be either true or string" <> show v
+  parseJSON v = throwError $ "version should be either true or string" <> msg v
 
 instance ToJSON Version where
   toJSON = String . toText

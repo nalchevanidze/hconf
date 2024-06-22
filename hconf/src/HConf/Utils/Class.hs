@@ -18,7 +18,7 @@ where
 import Control.Exception (tryJust)
 import qualified Data.ByteString as L
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Core (maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude
 
 class Parse a where
@@ -51,8 +51,8 @@ safeIO = tryJust (Just . printException)
 
 type ResultT = ExceptT String
 
-withThrow :: (HConfIO m, ToString e) => m (Either e a) -> m a
-withThrow x = x >>= either throwError pure
+withThrow :: (HConfIO m) => m (Either String a) -> m a
+withThrow x = x >>= either (throwError . msg) pure
 
 instance HConfIO IO where
   read = safeIO . L.readFile

@@ -1,7 +1,10 @@
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 -- | GQL Types
 module HConf.Utils.Core
@@ -17,6 +20,7 @@ module HConf.Utils.Core
     maybeMapToList,
     maybeBool,
     throwError,
+    Msg (..),
   )
 where
 
@@ -111,21 +115,35 @@ toKebabCase = concatMap toKebab
 tupled :: (Functor f) => (t -> f a) -> t -> f (t, a)
 tupled f p = (p,) <$> f p
 
-throwError :: (MonadFail m, ToString a1) => a1 -> m a2
+newtype ErrorMsg = ErrorMsg String deriving (Semigroup, IsString, ToString)
+
+class Msg a where
+  msg :: a -> ErrorMsg
+
+instance Msg Text where
+  msg = ErrorMsg . toString
+
+instance Msg String where
+  msg = ErrorMsg
+  
+oneOfMsg :: (ToString a) => [a] -> ErrorMsg
+oneOfMsg xs = ErrorMsg $ "one of:" <> intercalate ", " (map toString xs)
+
+throwError :: (MonadFail m) => ErrorMsg -> m a2
 throwError = fail . toString
 
-maybeToError :: (MonadFail m, ToString s) => s -> Maybe a -> m a
-maybeToError msg = maybe (throwError msg) pure
+maybeToError :: (MonadFail m, Msg s) => s -> Maybe a -> m a
+maybeToError m = maybe (throwError (msg m)) pure
 
 notElemError :: (MonadFail m, Eq t, ToString t) => Name -> Name -> [t] -> m a
 notElemError name listName xs =
   throwError
     ( "no matching "
-        <> toString name
+        <> msg name
         <> " for '"
-        <> toString listName
-        <> "'! try one of: "
-        <> intercalate ", " (map toString xs)
+        <> msg listName
+        <> "'! try "
+        <> oneOfMsg xs
     )
 
 checkElem :: (MonadFail m, Eq t, ToString t) => Name -> Name -> t -> [t] -> m ()
