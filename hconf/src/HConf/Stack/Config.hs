@@ -15,7 +15,7 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import Data.List ((\\))
-import HConf.Config.Build (Build (..), Builds, getBuild, getExtras, getPkgs)
+import HConf.Config.Build (Build (..), Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
@@ -61,16 +61,16 @@ setupStack version =
 
 updateStack :: (FromConf m Builds, FromConf m [PkgDir]) => Tag -> Stack -> m Stack
 updateStack version _ = do
-  build@Build {resolver} <- getBuild version
-  extras <- getExtras version
-  packages <- getPkgs build
+  resolver <- getResolver version
+  extraDeps <- sort . map printExtra <$> getExtras version
+  packages <- getPkgs version
   pure
     Stack
       { packages,
         resolver,
+        extraDeps ,
         allowNewer = Just (Latest == version),
-        saveHackageCreds = Just False,
-        extraDeps = sort $ map printExtra extras
+        saveHackageCreds = Just False
       }
 
 printExtra :: (Text, Version) -> Text

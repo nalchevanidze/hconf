@@ -6,11 +6,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Config.Build
-  ( Build (..),
+  ( Build,
     Builds,
-    getBuild,
     getExtras,
     getPkgs,
+    getResolver,
   )
 where
 
@@ -94,7 +94,11 @@ getExtras tag =
     . selectBuilds tag
     <$> fromConf
 
-getPkgs :: (FromConf m [PkgDir]) => Build -> m [Text]
-getPkgs Build {..} = do
+getPkgs :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m [Text]
+getPkgs version = do
+  Build {..} <- getBuild version
   pkgs <- readPackages
   pure $ (map toText pkgs <> maybeList include) \\ maybeList exclude
+
+getResolver :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m Text
+getResolver version = resolver <$> getBuild version
