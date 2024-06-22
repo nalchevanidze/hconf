@@ -1,10 +1,10 @@
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 -- | GQL Types
 module HConf.Utils.Core
@@ -21,20 +21,22 @@ module HConf.Utils.Core
     maybeBool,
     throwError,
     Msg (..),
+    ErrorMsg (..),
   )
 where
 
 import Data.Aeson
   ( Options (..),
-    defaultOptions, encode,
+    defaultOptions,
+    encode,
   )
+import Data.Aeson.Types (Value)
+import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, intercalate)
 import qualified Data.Map as M
 import Data.Text (toTitle)
 import Relude hiding (Undefined, intercalate)
-import Data.Aeson.Types (Value)
-import Data.ByteString.Lazy.Char8 (unpack)
 import Text.URI (URI)
 
 aesonYAMLOptions :: Options
@@ -129,10 +131,10 @@ instance Msg Text where
 instance Msg String where
   msg = ErrorMsg
 
-instance Msg Value where 
+instance Msg Value where
   msg = ErrorMsg . unpack . encode
 
-instance Msg URI where 
+instance Msg URI where
   msg = ErrorMsg . show
 
 oneOfMsg :: (ToString a) => [a] -> ErrorMsg
@@ -166,5 +168,3 @@ maybeMapToList = maybe [] M.toList
 
 maybeBool :: Maybe Bool -> Bool
 maybeBool = fromMaybe False
-
-

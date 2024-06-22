@@ -9,7 +9,7 @@ where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.Text as T
-import HConf.Utils.Core (Msg (..), Name, maybeToError, throwError)
+import HConf.Utils.Core (ErrorMsg, Msg (..), Name, maybeToError, throwError)
 import Network.HTTP.Req
   ( GET (..),
     NoReqBody (..),
@@ -23,14 +23,14 @@ import Network.HTTP.Req
 import Relude hiding (ByteString)
 import Text.URI (URI, mkURI)
 
-httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either String a)
+httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either ErrorMsg a)
 httpRequest uri = case useURI uri of
   Nothing -> throwError ("Invalid Endpoint: " <> msg uri <> "!")
-  (Just (Left (u, o))) -> liftIO (eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
-  (Just (Right (u, o))) -> liftIO (eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
+  (Just (Left (u, o))) -> liftIO (first msg . eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
+  (Just (Right (u, o))) -> liftIO (first msg . eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
 
 parseURI :: (MonadFail m) => Name -> m URI
 parseURI url = maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url)
 
-hackage :: (MonadIO m, MonadFail m, FromJSON a) => [Name] -> m (Either String a)
+hackage :: (MonadIO m, MonadFail m, FromJSON a) => [Name] -> m (Either ErrorMsg a)
 hackage path = parseURI ("https://hackage.haskell.org/" <> T.intercalate "/" path <> ".json") >>= httpRequest

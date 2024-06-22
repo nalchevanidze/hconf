@@ -13,6 +13,7 @@ module HConf.Core.PkgDir
 where
 
 import Data.Text (intercalate, pack, unpack)
+import HConf.Utils.Core (Msg (..))
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix (joinPath, normalise)
@@ -21,6 +22,9 @@ data PkgDir = PkgDir
   { root :: Maybe FilePath,
     dirName :: Text
   }
+
+instance Msg PkgDir where
+  msg = msg . resolve []
 
 pkgDir :: Maybe FilePath -> [Text] -> PkgDir
 pkgDir dir xs = PkgDir dir (intercalate "-" xs)

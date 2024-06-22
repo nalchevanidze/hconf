@@ -22,7 +22,7 @@ import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Name, checkElem, maybeToError, throwError, Msg (..))
+import HConf.Utils.Core (ErrorMsg, Msg (..), Name, checkElem, maybeToError, throwError)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
@@ -97,10 +97,10 @@ instance FromJSON Version where
 instance ToJSON Version where
   toJSON = String . toText
 
-fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Either String (Map Text (NonEmpty Version)))
+fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Either ErrorMsg (Map Text (NonEmpty Version)))
 fetchVersionResponse name = hackage ["package", name, "preferred"]
 
-lookupVersions :: (MonadFail m) => Either String (Map Text (NonEmpty Version)) -> m (NonEmpty Version)
+lookupVersions :: (MonadFail m) => Either ErrorMsg (Map Text (NonEmpty Version)) -> m (NonEmpty Version)
 lookupVersions (Right x) = maybeToError ("field normal-version not found" :: String) (lookup "normal-version" x)
 lookupVersions (Left x) = throwError x
 

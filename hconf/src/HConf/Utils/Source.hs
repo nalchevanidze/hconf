@@ -36,7 +36,11 @@ import Data.Text
   )
 import qualified Data.Text as T
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (maybeToError, throwError)
+import HConf.Utils.Core
+  ( ErrorMsg,
+    maybeToError,
+    throwError,
+  )
 import Relude hiding
   ( break,
     concatMap,
@@ -95,9 +99,9 @@ removeHead should txt = maybe (False, txt) has (uncons txt)
       | otherwise = (False, txt)
 
 unconsM :: (MonadFail m) => String -> Text -> m (Text, Text)
-unconsM msg x = first singleton <$> maybeToError (msg <> "<>: " <> toString x) (uncons x)
+unconsM m x = first singleton <$> maybeToError (m <> "<>: " <> toString x) (uncons x)
 
-toError :: (MonadFail m) => String -> Either String a -> m a
+toError :: (MonadFail m) => ErrorMsg -> Either ErrorMsg a -> m a
 toError label (Left s) = throwError $ label <> ": " <> s
 toError _ (Right a) = pure a
 

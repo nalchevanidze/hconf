@@ -16,7 +16,7 @@ import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..), withThrow)
-import HConf.Utils.Core (Name, maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), Name, maybeToError, throwError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (removeIfExists)
@@ -87,4 +87,4 @@ checkCabal pkg name version = subTask "cabal" $ do
   (pkgName, pkgVersion) <- getCabalFields pkg name
   if pkgVersion == version && pkgName == name
     then pure ()
-    else throwError $ toText pkg <> "mismatching version or name"
+    else throwError $ "mismatching version or name" <> msg pkg
