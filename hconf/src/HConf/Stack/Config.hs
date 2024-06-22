@@ -68,7 +68,7 @@ updateStack version _ = do
     Stack
       { packages,
         resolver,
-        extraDeps ,
+        extraDeps,
         allowNewer = Just (Latest == version),
         saveHackageCreds = Just False
       }
