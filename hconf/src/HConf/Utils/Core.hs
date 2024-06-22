@@ -16,6 +16,7 @@ module HConf.Utils.Core
     maybeToError,
     maybeMapToList,
     maybeBool,
+    throwError,
   )
 where
 
@@ -110,8 +111,11 @@ toKebabCase = concatMap toKebab
 tupled :: (Functor f) => (t -> f a) -> t -> f (t, a)
 tupled f p = (p,) <$> f p
 
+throwError :: (MonadFail m, ToString a1) => a1 -> m a2
+throwError = fail . toString
+
 maybeToError :: (MonadFail m, ToString s) => s -> Maybe a -> m a
-maybeToError msg = maybe (fail $ toString msg) pure
+maybeToError msg = maybe (throwError msg) pure
 
 notElemError :: (MonadFail m, Eq t, ToString t) => Name -> Name -> [t] -> m a
 notElemError name listName xs =
