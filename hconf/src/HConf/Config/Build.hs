@@ -10,6 +10,7 @@ module HConf.Config.Build
     Builds,
     getBuild,
     getExtras,
+    getPkgs,
   )
 where
 
@@ -32,7 +33,7 @@ import HConf.Utils.Class
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, maybeMapToList, notElemError)
+import HConf.Utils.Core (Name, maybeList, maybeMapToList, notElemError)
 import Relude hiding
   ( Undefined,
     group,
@@ -92,3 +93,8 @@ getExtras tag =
     . concatMap (maybeMapToList . extra)
     . selectBuilds tag
     <$> fromConf
+
+getPkgs :: (FromConf m [PkgDir]) => Build -> m [Text]
+getPkgs Build {..} = do
+  pkgs <- readPackages
+  pure $ (map toText pkgs <> maybeList include) \\ maybeList exclude
