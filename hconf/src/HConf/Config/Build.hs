@@ -33,7 +33,7 @@ import HConf.Utils.Class
     FromConf (..),
     readPackages,
   )
-import HConf.Utils.Core (Name, maybeList, maybeMapToList, notElemError, throwError)
+import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError)
 import Relude hiding
   ( Undefined,
     group,
@@ -47,8 +47,8 @@ data Build = Build
   { ghc :: Tag,
     resolver :: Text,
     extra :: Maybe Extras,
-    include :: Maybe [Name],
-    exclude :: Maybe [Name]
+    include :: Maybe [PkgDir],
+    exclude :: Maybe [PkgDir]
   }
   deriving
     ( Generic,
@@ -67,9 +67,9 @@ instance Check Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (FromConf m [PkgDir]) => Maybe [Name] -> m ()
+checkPkgNames :: (FromConf m [PkgDir]) => Maybe [PkgDir] -> m ()
 checkPkgNames i = do
-  known <- map toText <$> readPackages
+  known <- readPackages
   let unknown = fromMaybe [] i \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
@@ -94,11 +94,11 @@ getExtras tag =
     . selectBuilds tag
     <$> fromConf
 
-getPkgs :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m [Text]
+getPkgs :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m [PkgDir]
 getPkgs version = do
   Build {..} <- getBuild version
   pkgs <- readPackages
-  pure $ (map toText pkgs <> maybeList include) \\ maybeList exclude
+  pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
 getResolver :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m Text
 getResolver version = resolver <$> getBuild version

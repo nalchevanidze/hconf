@@ -25,7 +25,7 @@ import HConf.Utils.Yaml (rewriteYaml)
 import Relude
 
 data Stack = Stack
-  { packages :: [Name],
+  { packages :: [PkgDir],
     resolver :: Name,
     allowNewer :: Maybe Bool,
     saveHackageCreds :: Maybe Bool,
