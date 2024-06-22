@@ -14,14 +14,13 @@ module HConf.Stack.Config
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import Data.List ((\\))
-import HConf.Config.Build (Build (..), Builds, getExtras, getPkgs, getResolver)
+import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (FromConf (..), readPackages)
-import HConf.Utils.Core (Name, aesonYAMLOptions, maybeList)
+import HConf.Utils.Class (FromConf (..))
+import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (rewriteYaml)
 import Relude
