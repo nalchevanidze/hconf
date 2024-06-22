@@ -24,7 +24,7 @@ import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Name, throwError)
+import HConf.Utils.Core (Name, throwError, Msg (..))
 import HConf.Utils.Log (Log, field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
 import Relude hiding
@@ -44,7 +44,7 @@ data Restriction = Min | Max deriving (Show, Eq, Ord)
 instance Parse Restriction where
   parse ">" = pure Min -- > 0.7.0
   parse "<" = pure Max -- <  1.0.0
-  parse x = throwError $ "unsorted bound type" <> show x
+  parse x = throwError $ "unsorted bound type" <> msg x
 
 instance ToString Restriction where
   toString Min = ">" -- >  0.7.0
@@ -89,7 +89,7 @@ instance ToString Bounds where
 
 instance FromJSON Bounds where
   parseJSON (String s) = parse s
-  parseJSON v = throwError $ "version should be either true or string" <> show v
+  parseJSON v = throwError $ "version should be either true or string" <> msg v
 
 instance ToJSON Bounds where
   toJSON = String . fromToString

@@ -71,7 +71,7 @@ checkPkgNames :: (FromConf m [PkgDir]) => Maybe [Name] -> m ()
 checkPkgNames i = do
   known <- map toText <$> readPackages
   let unknown = fromMaybe [] i \\ known
-  unless (null unknown) (throwError ("unknown packages: " <> show unknown :: String))
+  unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
 checkExtraDeps = traverse_ checkVersion . maybeMapToList
