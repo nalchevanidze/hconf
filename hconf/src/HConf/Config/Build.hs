@@ -68,9 +68,9 @@ instance Check Build where
       ]
 
 checkPkgNames :: (FromConf m [PkgDir]) => Maybe [PkgDir] -> m ()
-checkPkgNames i = do
+checkPkgNames ls = do
   known <- readPackages
-  let unknown = fromMaybe [] i \\ known
+  let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
 checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
