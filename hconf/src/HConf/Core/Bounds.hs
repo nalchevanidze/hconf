@@ -24,7 +24,7 @@ import GHC.Show (Show (show))
 import HConf.Core.Version (Version, dropPatch, fetchVersions, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Name)
+import HConf.Utils.Core (Name, throwError)
 import HConf.Utils.Log (Log, field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
 import Relude hiding
@@ -89,7 +89,7 @@ instance ToString Bounds where
 
 instance FromJSON Bounds where
   parseJSON (String s) = parse s
-  parseJSON v = fail $ "version should be either true or string" <> show v
+  parseJSON v = throwError $ "version should be either true or string" <> show v
 
 instance ToJSON Bounds where
   toJSON = String . fromToString
