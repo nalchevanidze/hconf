@@ -22,7 +22,7 @@ import Data.Aeson.Types
   )
 import Data.Text (isPrefixOf)
 import HConf.Core.PkgDir (PkgDir, pkgDir)
-import HConf.Utils.Core (Name)
+import HConf.Utils.Core (Name, maybeBool)
 import Relude hiding
   ( Undefined,
     group,
@@ -48,7 +48,7 @@ instance ToJSON PkgGroup where
 toPackageName :: PkgGroup -> [PkgDir]
 toPackageName PkgGroup {..} = map pkgPath packages
   where
-    pkgPath pkg = pkgDir dir ([name | fromMaybe False prefix] <> [pkg | pkg /= "."])
+    pkgPath pkg = pkgDir dir ([name | maybeBool prefix] <> [pkg | pkg /= "."])
 
 isMember :: Name -> PkgGroup -> Bool
 isMember pkgName = (`isPrefixOf` pkgName) . name
