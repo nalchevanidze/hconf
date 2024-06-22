@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 -- | GQL Types
@@ -64,11 +65,9 @@ updateStack version _ = do
   packages <- getPkgs version
   pure
     Stack
-      { packages,
-        resolver,
-        extraDeps,
-        allowNewer = Just (Latest == version),
-        saveHackageCreds = Just False
+      { allowNewer = Just (Latest == version),
+        saveHackageCreds = Just False,
+        ..
       }
 
 printExtra :: (Text, Version) -> Text
