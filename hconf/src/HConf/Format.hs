@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Format (formatWith) where
@@ -20,12 +19,13 @@ import Ormolu.Diff.Text (diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
+import HConf.Utils.Core (throwError)
 
 formatWith :: (Log m, FromConf m [PkgDir]) => Bool -> m ()
 formatWith check = label "ormolu" $ do
   files <- sort . concat <$> (readPackages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
-  unless (null errorCodes) (fail "Error")
+  unless (null errorCodes) (throwError "Error")
 
 formatFile :: (MonadIO m) => Bool -> FilePath -> m ExitCode
 formatFile check path = liftIO $ withPrettyOrmoluExceptions colorMode $ do
