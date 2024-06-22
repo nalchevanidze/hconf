@@ -9,7 +9,7 @@ where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.Text as T
-import HConf.Utils.Core (Name, maybeToError)
+import HConf.Utils.Core (Name, maybeToError, throwError)
 import Network.HTTP.Req
   ( GET (..),
     NoReqBody (..),
@@ -25,7 +25,7 @@ import Text.URI (URI, mkURI)
 
 httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either String a)
 httpRequest uri = case useURI uri of
-  Nothing -> fail ("Invalid Endpoint: " <> show uri <> "!")
+  Nothing -> throwError ("Invalid Endpoint: " <> show uri <> "!" :: String)
   (Just (Left (u, o))) -> liftIO (eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
   (Just (Right (u, o))) -> liftIO (eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
 
