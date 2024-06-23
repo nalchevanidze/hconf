@@ -34,8 +34,8 @@ decodeUrl (Right (u, o)) = req GET u NoReqBody lbsResponse o
 parse :: (MonadFail m, MonadHttp p) => Text -> m (p LbsResponse)
 parse url = decodeUrl <$> maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url >>= useURI)
 
-httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => Text -> m (Either ErrorMsg a)
-httpRequest uri = parse uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig
+http :: (FromJSON a, MonadIO m, MonadFail m) => Text -> m (Either ErrorMsg a)
+http uri = parse uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig
 
 hackage :: (MonadIO m, MonadFail m, FromJSON a) => [Name] -> m (Either ErrorMsg a)
-hackage path = httpRequest ("https://hackage.haskell.org/" <> T.intercalate "/" path <> ".json")
+hackage path = http ("https://hackage.haskell.org/" <> T.intercalate "/" path <> ".json")
