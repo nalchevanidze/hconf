@@ -15,6 +15,8 @@ import Network.HTTP.Req
     LbsResponse,
     MonadHttp,
     NoReqBody (..),
+    Option,
+    Url,
     defaultHttpConfig,
     lbsResponse,
     req,
@@ -25,12 +27,14 @@ import Network.HTTP.Req
 import Relude hiding (ByteString)
 import Text.URI (URI, mkURI)
 
+decodeUrl :: (MonadHttp m) => Either (Url s, Option s) (Url s', Option s') -> m LbsResponse
+decodeUrl (Left (u, o)) = req GET u NoReqBody lbsResponse o
+decodeUrl (Right (u, o)) = req GET u NoReqBody lbsResponse o
+
 fromUrl :: (MonadFail m1, MonadHttp p) => URI -> m1 (p LbsResponse)
-fromUrl uri = maybe err (pure . f) (useURI uri)
+fromUrl uri = maybe err (pure . decodeUrl) (useURI uri)
   where
     err = throwError ("Invalid Endpoint: " <> msg uri <> "!")
-    f (Left (u, o)) = req GET u NoReqBody lbsResponse o
-    f (Right (u, o)) = req GET u NoReqBody lbsResponse o
 
 httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either ErrorMsg a)
 httpRequest uri = fromUrl uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig
