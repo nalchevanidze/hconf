@@ -3,7 +3,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 -- | GQL Types
@@ -22,15 +21,11 @@ module HConf.Utils.Core
     throwError,
     Msg (..),
     ErrorMsg (..),
+    jsonString,
   )
 where
 
-import Data.Aeson
-  ( Options (..),
-    defaultOptions,
-    encode,
-  )
-import Data.Aeson.Types (Value)
+import Data.Aeson (Options (..), Value (..), defaultOptions, encode)
 import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, intercalate)
@@ -136,6 +131,10 @@ instance Msg Value where
 
 instance Msg URI where
   msg = ErrorMsg . show
+
+jsonString :: (MonadFail f) => Text -> Value -> f Text
+jsonString _ (String p) = pure p
+jsonString label v = throwError ("cant parse" <> msg label <> "expected string got" <> msg v)
 
 oneOfMsg :: (ToString a) => [a] -> ErrorMsg
 oneOfMsg xs = ErrorMsg $ "one of:" <> intercalate ", " (map toString xs)
