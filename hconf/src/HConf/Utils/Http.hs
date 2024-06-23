@@ -31,7 +31,7 @@ decodeUrl :: (MonadHttp m) => Either (Url s, Option s) (Url s', Option s') -> m 
 decodeUrl (Left (u, o)) = req GET u NoReqBody lbsResponse o
 decodeUrl (Right (u, o)) = req GET u NoReqBody lbsResponse o
 
-fromUrl :: (MonadFail m1, MonadHttp p) => URI -> m1 (p LbsResponse)
+fromUrl :: (MonadFail m, MonadHttp p) => URI -> m (p LbsResponse)
 fromUrl uri = decodeUrl <$> maybeToError ("Invalid Endpoint: " <> msg uri <> "!") (useURI uri)
 
 httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either ErrorMsg a)
