@@ -9,7 +9,7 @@ where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.Text as T
-import HConf.Utils.Core (ErrorMsg, Msg (..), Name, maybeToError, throwError)
+import HConf.Utils.Core (ErrorMsg, Msg (..), Name, maybeToError)
 import Network.HTTP.Req
   ( GET (..),
     LbsResponse,
