@@ -120,6 +120,9 @@ newtype ErrorMsg = ErrorMsg String deriving (Semigroup, IsString, ToString)
 class Msg a where
   msg :: a -> ErrorMsg
 
+instance Msg ErrorMsg where
+  msg = id
+
 instance Msg Text where
   msg = ErrorMsg . toString
 

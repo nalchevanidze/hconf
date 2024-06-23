@@ -32,11 +32,7 @@ decodeUrl (Left (u, o)) = req GET u NoReqBody lbsResponse o
 decodeUrl (Right (u, o)) = req GET u NoReqBody lbsResponse o
 
 fromUrl :: (MonadFail m1, MonadHttp p) => URI -> m1 (p LbsResponse)
-fromUrl uri =
-  maybe
-    (throwError ("Invalid Endpoint: " <> msg uri <> "!"))
-    (pure . decodeUrl)
-    (useURI uri)
+fromUrl uri = decodeUrl <$> maybeToError ("Invalid Endpoint: " <> msg uri <> "!") (useURI uri)
 
 httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either ErrorMsg a)
 httpRequest uri = fromUrl uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig
