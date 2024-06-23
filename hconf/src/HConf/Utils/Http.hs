@@ -25,20 +25,17 @@ import Network.HTTP.Req
     useURI,
   )
 import Relude hiding (ByteString)
-import Text.URI (URI, mkURI)
+import Text.URI (mkURI)
 
 decodeUrl :: (MonadHttp m) => Either (Url s, Option s) (Url s', Option s') -> m LbsResponse
 decodeUrl (Left (u, o)) = req GET u NoReqBody lbsResponse o
 decodeUrl (Right (u, o)) = req GET u NoReqBody lbsResponse o
 
-fromUrl :: (MonadFail m, MonadHttp p) => URI -> m (p LbsResponse)
-fromUrl uri = decodeUrl <$> maybeToError ("Invalid Endpoint: " <> msg uri <> "!") (useURI uri)
+parse :: (MonadFail m, MonadHttp m) => Text -> m (p LbsResponse)
+parse url = decodeUrl <$> maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url >>= useURI)
 
-parseURI :: (MonadFail m, MonadHttp m) => Text -> m LbsResponse
-parseURI url = maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url >>= useURI) >>= decodeUrl
-
-httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => LbsResponse -> m (Either ErrorMsg a)
-httpRequest uri = fromUrl uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig
+httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => Text -> m (Either ErrorMsg a)
+httpRequest uri = parse uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig
 
 hackage :: (MonadIO m, MonadFail m, FromJSON a) => [Name] -> m (Either ErrorMsg a)
 hackage path = parseURI ("https://hackage.haskell.org/" <> T.intercalate "/" path <> ".json") >>= httpRequest
