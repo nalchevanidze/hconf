@@ -21,7 +21,7 @@ module HConf.Utils.Core
     throwError,
     Msg (..),
     ErrorMsg (..),
-    jsonString,
+    withString,
   )
 where
 
@@ -132,9 +132,9 @@ instance Msg Value where
 instance Msg URI where
   msg = ErrorMsg . show
 
-jsonString :: (MonadFail m) => Text -> Value -> m Text
-jsonString _ (String p) = pure p
-jsonString label v = throwError ("cant parse" <> msg label <> "expected string got" <> msg v)
+withString :: (MonadFail m) => Text -> (Text -> m a) -> Value -> m a
+withString _ f (String p) = f p
+withString label _ v = throwError ("cant parse" <> msg label <> "expected string got" <> msg v)
 
 oneOfMsg :: (ToString a) => [a] -> ErrorMsg
 oneOfMsg xs = ErrorMsg $ "one of:" <> intercalate ", " (map toString xs)
