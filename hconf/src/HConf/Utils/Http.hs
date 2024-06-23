@@ -12,6 +12,8 @@ import qualified Data.Text as T
 import HConf.Utils.Core (ErrorMsg, Msg (..), Name, maybeToError, throwError)
 import Network.HTTP.Req
   ( GET (..),
+    LbsResponse,
+    MonadHttp,
     NoReqBody (..),
     defaultHttpConfig,
     lbsResponse,
@@ -23,11 +25,14 @@ import Network.HTTP.Req
 import Relude hiding (ByteString)
 import Text.URI (URI, mkURI)
 
-httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either ErrorMsg a)
-httpRequest uri = case useURI uri of
+fromUrl :: (MonadFail m, MonadIO m) => URI -> m LbsResponse
+fromUrl uri = case useURI uri of
   Nothing -> throwError ("Invalid Endpoint: " <> msg uri <> "!")
-  (Just (Left (u, o))) -> liftIO (first msg . eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
-  (Just (Right (u, o))) -> liftIO (first msg . eitherDecode . responseBody <$> runReq defaultHttpConfig (req GET u NoReqBody lbsResponse o))
+  (Just (Left (u, o))) -> runReq defaultHttpConfig $ req GET u NoReqBody lbsResponse o
+  (Just (Right (u, o))) -> runReq defaultHttpConfig $ req GET u NoReqBody lbsResponse o
+
+httpRequest :: (FromJSON a, MonadIO m, MonadFail m) => URI -> m (Either ErrorMsg a)
+httpRequest = fmap (first msg . eitherDecode . responseBody) . fromUrl
 
 parseURI :: (MonadFail m) => Name -> m URI
 parseURI url = maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url)
