@@ -15,7 +15,7 @@ where
 import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
 import Data.Text (intercalate)
-import HConf.Utils.Core (Msg (..), throwError, withString)
+import HConf.Utils.Core (Msg (..), withString)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix
