@@ -132,7 +132,7 @@ instance Msg Value where
 instance Msg URI where
   msg = ErrorMsg . show
 
-jsonString :: (MonadFail f) => Text -> Value -> f Text
+jsonString :: (MonadFail m) => Text -> Value -> m Text
 jsonString _ (String p) = pure p
 jsonString label v = throwError ("cant parse" <> msg label <> "expected string got" <> msg v)
 

@@ -15,7 +15,7 @@ where
 import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
 import Data.Text (intercalate)
-import HConf.Utils.Core (Msg (..), throwError)
+import HConf.Utils.Core (Msg (..), jsonString, throwError)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix
@@ -61,8 +61,7 @@ parseDir x = case splitFileName x of
     | otherwise -> PkgDir (Just dir) (fromString name)
 
 instance FromJSON PkgDir where
-  parseJSON (String p) = pure $ parseDir $ toString p
-  parseJSON v = throwError (msg v)
+  parseJSON = fmap (parseDir . toString) . jsonString "PkgDir"
 
 instance ToJSON PkgDir where
   toJSON = String . fromString . resolve []
