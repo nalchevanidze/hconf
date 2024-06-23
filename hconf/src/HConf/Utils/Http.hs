@@ -13,7 +13,6 @@ import HConf.Utils.Core (ErrorMsg, Msg (..), Name, maybeToError, throwError)
 import Network.HTTP.Req
   ( GET (..),
     LbsResponse,
-    MonadHttp,
     NoReqBody (..),
     defaultHttpConfig,
     lbsResponse,
