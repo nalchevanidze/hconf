@@ -14,7 +14,7 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
-import Data.Text (intercalate, pack, unpack)
+import Data.Text (intercalate)
 import HConf.Utils.Core (Msg (..), throwError)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
@@ -43,7 +43,7 @@ pkgFile :: FilePath -> PkgDir -> FilePath
 pkgFile f = resolve [f]
 
 instance ToText PkgDir where
-  toText = pack . resolve []
+  toText = fromString . resolve []
 
 explore :: (MonadIO m) => PkgDir -> m [String]
 explore x = map normalise <$> liftIO (glob (resolve [] x <> "/**/*.hs"))
@@ -52,17 +52,17 @@ packageFile :: PkgDir -> FilePath
 packageFile = pkgFile "package.yaml"
 
 cabalFile :: Text -> PkgDir -> String
-cabalFile pkgName = pkgFile (unpack pkgName <> ".cabal")
+cabalFile name = pkgFile (toString name <> ".cabal")
 
 parseDir :: FilePath -> PkgDir
 parseDir x = case splitFileName x of
   (dir, name)
-    | dir == "./" -> PkgDir Nothing (pack name)
-    | otherwise -> PkgDir (Just dir) (pack name)
+    | dir == "./" -> PkgDir Nothing (fromString name)
+    | otherwise -> PkgDir (Just dir) (fromString name)
 
 instance FromJSON PkgDir where
-  parseJSON (String p) = pure $ parseDir $ unpack p
+  parseJSON (String p) = pure $ parseDir $ toString p
   parseJSON v = throwError (msg v)
 
 instance ToJSON PkgDir where
-  toJSON = String . pack . resolve []
+  toJSON = String . fromString . resolve []
