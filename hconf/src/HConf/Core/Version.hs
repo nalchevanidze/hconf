@@ -97,12 +97,11 @@ instance FromJSON Version where
 instance ToJSON Version where
   toJSON = String . toText
 
-fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Either ErrorMsg (Map Text (NonEmpty Version)))
+fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Map Text (NonEmpty Version))
 fetchVersionResponse name = hackage ["package", name, "preferred"]
 
-lookupVersions :: (MonadFail m) => Either ErrorMsg (Map Text (NonEmpty Version)) -> m (NonEmpty Version)
-lookupVersions (Right x) = maybeToError ("field normal-version not found" :: String) (lookup "normal-version" x)
-lookupVersions (Left x) = throwError x
+lookupVersions :: (MonadFail m) => Map Text a -> m a
+lookupVersions = maybeToError ("field normal-version not found" :: String) . lookup "normal-version"
 
 fetchVersions :: (MonadFail m, MonadIO m) => Name -> m (NonEmpty Version)
 fetchVersions name = fetchVersionResponse name >>= lookupVersions
