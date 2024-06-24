@@ -32,13 +32,12 @@ data Cabal = Cabal
   }
   deriving (Eq)
 
-parseFields :: ByteString -> Map Name Name
+parseFields :: Text -> Map Name Name
 parseFields =
   fromList
     . ignoreEmpty
     . map parseField
     . parseLines
-    . fromByteString
 
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
@@ -51,7 +50,7 @@ parseCabal bs = do
   pure $ Cabal {..}
 
 getCabal :: (Con m) => PkgDir -> Name -> m Cabal
-getCabal pkg pkgName = withThrow (read $ cabalFile pkgName pkg) >>= parseCabal
+getCabal pkg pkgName = withThrow (read $ cabalFile pkgName pkg) >>= parseCabal . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack l name options = do
