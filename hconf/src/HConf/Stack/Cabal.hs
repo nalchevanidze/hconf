@@ -50,7 +50,7 @@ instance Parse Cabal where
     pure $ Cabal {..}
 
 getCabal :: (Con m) => PkgDir -> Name -> m Cabal
-getCabal pkg pkgName = withThrow (read $ cabalFile pkgName pkg) >>= parse . fromByteString
+getCabal pkg name = withThrow (read $ cabalFile name pkg) >>= parse . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack l name options = do
