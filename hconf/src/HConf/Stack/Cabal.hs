@@ -1,12 +1,14 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 -- | GQL Types
 module HConf.Stack.Cabal
   ( checkCabal,
+    Cabal (..),
   )
 where
 
@@ -24,7 +26,20 @@ import System.Process
 
 type Con m = (HConfIO m, Log m)
 
-parseFields :: ByteString -> Map Text Text
+data Cabal = Cabal
+  { name :: Name,
+    version :: Version
+  }
+  deriving (Eq)
+
+parseCabal :: (MonadFail m) => ByteString -> m Cabal
+parseCabal bs = do
+  let fields = parseFields bs
+  name <- getField "name" fields
+  version <- getField "version" fields >>= parse
+  pure $ Cabal {..}
+
+parseFields :: ByteString -> Map Name Name
 parseFields =
   fromList
     . ignoreEmpty
@@ -35,14 +50,8 @@ parseFields =
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
-getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
-getCabalFields pkg pkgName = do
-  bs <- withThrow $ read $ cabalFile pkgName pkg
-  let fields = parseFields bs
-  name <- getField "name" fields
-  version <- getField "version" fields >>= parse
-  field name (show version)
-  pure (name, version)
+getCabal :: (Con m) => PkgDir -> Name -> m Cabal
+getCabal pkg pkgName = withThrow (read $ cabalFile pkgName pkg) >>= parseCabal
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack l name options = do
@@ -79,11 +88,10 @@ buildCabal name = do
   stack "build" name ["test", "dry-run"]
   stack "sdist" name []
 
-checkCabal :: (Con m) => PkgDir -> Name -> Version -> m ()
-checkCabal pkg name version = subTask "cabal" $ do
-  liftIO (removeIfExists (cabalFile name pkg))
+checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
+checkCabal pkg target = subTask "cabal" $ do
+  liftIO (removeIfExists (cabalFile (name target) pkg))
   buildCabal pkg
-  (pkgName, pkgVersion) <- getCabalFields pkg name
-  if pkgVersion == version && pkgName == name
-    then pure ()
-    else throwError $ "mismatching version or name" <> msg pkg
+  cabal <- getCabal pkg (name target)
+  field (name cabal) (show (version cabal))
+  unless (cabal == target) (throwError $ "mismatching version or name" <> msg pkg)
