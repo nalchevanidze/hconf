@@ -40,15 +40,15 @@ parseFields =
     . parseLines
     . fromByteString
 
+getField :: (MonadFail m) => Name -> Map Name a -> m a
+getField = select "Field"
+
 parseCabal :: (MonadFail m) => ByteString -> m Cabal
 parseCabal bs = do
   let fields = parseFields bs
   name <- getField "name" fields
   version <- getField "version" fields >>= parse
   pure $ Cabal {..}
-
-getField :: (MonadFail m) => Name -> Map Name a -> m a
-getField = select "Field"
 
 getCabal :: (Con m) => PkgDir -> Name -> m Cabal
 getCabal pkg pkgName = withThrow (read $ cabalFile pkgName pkg) >>= parseCabal
