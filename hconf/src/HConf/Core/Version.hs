@@ -22,7 +22,7 @@ import Data.List.NonEmpty (toList)
 import Data.Map (lookup)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (ErrorMsg, Msg (..), Name, checkElem, maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), Name, checkElem, maybeToError, throwError)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
