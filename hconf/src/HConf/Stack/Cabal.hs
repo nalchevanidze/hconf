@@ -10,13 +10,12 @@ module HConf.Stack.Cabal
   )
 where
 
-import Data.Map (lookup)
 import Data.Text (pack, unpack)
 import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..), withThrow)
-import HConf.Utils.Core (Msg (..), Name, maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), Name, select, throwError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (removeIfExists)
@@ -34,7 +33,7 @@ parseFields =
     . fromByteString
 
 getField :: (MonadFail m) => Name -> Map Name a -> m a
-getField k = maybeToError ("missing field" <> toString k) . lookup k
+getField = select "Field"
 
 getCabalFields :: (Con m) => PkgDir -> Name -> m (Name, Version)
 getCabalFields pkg pkgName = do

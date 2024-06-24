@@ -22,6 +22,7 @@ module HConf.Utils.Core
     Msg (..),
     ErrorMsg (..),
     withString,
+    select,
   )
 where
 
@@ -29,6 +30,7 @@ import Data.Aeson (Options (..), Value (..), defaultOptions, encode)
 import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, intercalate)
+import Data.Map (lookup)
 import qualified Data.Map as M
 import Data.Text (toTitle)
 import Relude hiding (Undefined, intercalate)
@@ -170,3 +172,6 @@ maybeMapToList = maybe [] M.toList
 
 maybeBool :: Maybe Bool -> Bool
 maybeBool = fromMaybe False
+
+select :: (MonadFail m, Msg k, Ord k) => ErrorMsg -> k -> Map k a -> m a
+select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k

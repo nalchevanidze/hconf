@@ -19,10 +19,9 @@ import Data.Aeson
     Value (..),
   )
 import Data.List.NonEmpty (toList)
-import Data.Map (lookup)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Msg (..), Name, checkElem, maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), Name, checkElem, maybeToError, select, throwError)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
@@ -101,7 +100,7 @@ fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Map Text (NonEmpt
 fetchVersionResponse name = hackage ["package", name, "preferred"]
 
 lookupVersions :: (MonadFail m) => Map Text a -> m a
-lookupVersions = maybeToError ("field normal-version not found" :: String) . lookup "normal-version"
+lookupVersions = select "Field" "normal-version"
 
 fetchVersions :: (MonadFail m, MonadIO m) => Name -> m (NonEmpty Version)
 fetchVersions name = fetchVersionResponse name >>= lookupVersions

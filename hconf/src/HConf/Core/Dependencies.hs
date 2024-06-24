@@ -14,11 +14,10 @@ import Data.Aeson
     ToJSON (toJSON),
   )
 import Data.Map (fromList, toList)
-import qualified Data.Map as M
 import Data.Map.Strict (traverseWithKey)
 import HConf.Core.Bounds (Bounds, printBoundParts)
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Name, maybeToError)
+import HConf.Utils.Core (Name, select)
 import HConf.Utils.Format (formatTable)
 import HConf.Utils.Source (firstWord)
 import Relude hiding
@@ -44,7 +43,7 @@ newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
   deriving (Show)
 
 getBounds :: (MonadFail m) => Name -> Dependencies -> m Bounds
-getBounds name = maybeToError ("Unknown package: " <> toString name) . M.lookup name . unpackDeps
+getBounds name = select "Package " name . unpackDeps
 
 traverseDeps :: (Applicative f) => (Name -> Bounds -> f Bounds) -> Dependencies -> f Dependencies
 traverseDeps f (Dependencies xs) = Dependencies <$> traverseWithKey f xs
