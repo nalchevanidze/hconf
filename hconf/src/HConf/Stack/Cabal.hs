@@ -82,15 +82,15 @@ toWarning (h : lns) | startsLike "warning" h = Just (h, takeWhile isIndentedLine
 toWarning _ = Nothing
 
 
-buildCabal :: (Con m) => PkgDir -> m ()
-buildCabal pkg = do
+build :: (Con m) => PkgDir -> m ()
+build pkg = do
   stack "build" pkg ["test", "dry-run"]
   stack "sdist" pkg []
 
 checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
 checkCabal pkg target = subTask "cabal" $ do
   liftIO (removeIfExists (cabalFile (name target) pkg))
-  buildCabal pkg
+  build pkg
   cabal <- getCabal pkg (name target)
   field (name cabal) (show (version cabal))
   unless (cabal == target) (throwError $ "mismatching version or name" <> msg pkg)
