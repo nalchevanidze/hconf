@@ -80,7 +80,7 @@ checkPackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m ()
 checkPackage dir =
   task (toText dir) $ do
     Package {..} <- rewritePackage dir
-    checkCabal dir name version
+    checkCabal dir (Cabal name version)
 
 checkPackages :: (ReadBounds m, FromConf m Version, FromConf m [PkgDir]) => m ()
 checkPackages =
