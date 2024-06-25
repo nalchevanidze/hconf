@@ -70,6 +70,10 @@ printWarnings cmd xs = task cmd $ traverse_ subWarn xs
 parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
 
+toWarning :: [Text] -> Maybe Warning
+toWarning (h : lns) | startsLike "warning" h = Just $ Warning h $ takeWhile isIndentedLine lns
+toWarning _ = Nothing
+
 groupTopics :: [Text] -> [[Text]]
 groupTopics = regroup . break emptyLine
   where
@@ -77,10 +81,6 @@ groupTopics = regroup . break emptyLine
     regroup (h, t)
       | null t = [h]
       | otherwise = h : groupTopics (dropWhile emptyLine t)
-
-toWarning :: [Text] -> Maybe Warning
-toWarning (h : lns) | startsLike "warning" h = Just $ Warning h $ takeWhile isIndentedLine lns
-toWarning _ = Nothing
 
 checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
 checkCabal pkg target@Cabal {..} = subTask "cabal" $ do
