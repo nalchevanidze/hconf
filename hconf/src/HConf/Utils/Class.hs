@@ -9,8 +9,10 @@ module HConf.Utils.Class
     Check (..),
     HConfIO (..),
     FromConf (..),
-    readPackages,
     ResultT,
+    Log (..),
+    FLog (..),
+    readPackages,
     withThrow,
   )
 where
@@ -20,6 +22,20 @@ import qualified Data.ByteString as L
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude
+
+class FLog a where
+  flog :: (Log m, Monad m) => a -> m ()
+
+instance (FLog a) => FLog [a] where
+  flog = traverse_ flog
+
+class Log m where
+  log :: String -> m ()
+  inside :: m a -> m a
+
+instance Log IO where
+  log = putStrLn
+  inside = id
 
 class Parse a where
   parse :: (MonadFail m) => Text -> m a

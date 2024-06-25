@@ -11,21 +11,13 @@ module HConf.Utils.Log
     info,
     field,
     subTask,
-    FLog(..),
   )
 where
 
 import HConf.Utils.Chalk (Color (..), chalk)
+import HConf.Utils.Class (Log (..))
 import HConf.Utils.Core (Name)
 import Relude
-
-class Log m where
-  log :: String -> m ()
-  inside :: m a -> m a
-
-instance Log IO where
-  log = putStrLn
-  inside = id
 
 newLine :: (Log m) => m ()
 newLine = log ""
@@ -59,8 +51,4 @@ warn = log . chalk Yellow
 alert :: (Log m) => String -> m ()
 alert = log . chalk Red
 
-class FLog a where
-  flog :: (Log m, Monad m) => a -> m ()
 
-instance FLog a => FLog [a] where 
-  flog = traverse_ flog
