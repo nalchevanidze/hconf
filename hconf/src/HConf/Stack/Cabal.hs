@@ -18,7 +18,7 @@ import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, select, throwError)
-import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
+import HConf.Utils.Log (Log, alert, field, subTask, task, warn, FLog(..))
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (remove)
 import Relude hiding (isPrefixOf)
@@ -87,8 +87,8 @@ data CabalSource = CabalSource
     target :: Cabal
   }
 
-print ::  Cabal -> m ()
-print Cabal{..} = field name (show version)
+instance FLog Cabal where 
+  flog Cabal{..} = field name (show version)
 
 checkCabal :: (Con m) => CabalSource -> m ()
 checkCabal CabalSource{..} = subTask "cabal" $ do
@@ -96,7 +96,7 @@ checkCabal CabalSource{..} = subTask "cabal" $ do
   remove path
   stack "build" pkgDir ["test", "dry-run"]
   stack "sdist" pkgDir []
-  cabel <- getCabal path
-  if cabel == target
-    then print cabal
+  cabal <- getCabal path
+  if cabal == target
+    then flog cabal
     else throwError $ "mismatching version or name" <> msg pkgDir
