@@ -14,6 +14,7 @@ module HConf.Utils.Class
     FLog (..),
     readPackages,
     withThrow,
+    BaseM,
   )
 where
 
@@ -22,6 +23,8 @@ import qualified Data.ByteString as L
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude
+
+class (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir]) => BaseM m
 
 class FLog a where
   flog :: (Log m, Monad m) => a -> m ()
@@ -53,7 +56,7 @@ class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
 
 class Check a where
-  check :: (MonadFail m, MonadIO m, FromConf m [PkgDir]) => a -> m ()
+  check :: (BaseM m) => a -> m ()
 
 class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
