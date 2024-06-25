@@ -32,19 +32,12 @@ data Cabal = Cabal
   }
   deriving (Eq)
 
-parseFields :: Text -> Map Name Name
-parseFields =
-  fromList
-    . ignoreEmpty
-    . map parseField
-    . parseLines
-
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
 instance Parse Cabal where
   parse bs = do
-    let fields = parseFields bs
+    let fields = fromList $ ignoreEmpty $ map parseField $ parseLines bs
     name <- getField "name" fields
     version <- getField "version" fields >>= parse
     pure $ Cabal {..}
