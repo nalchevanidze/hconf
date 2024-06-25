@@ -89,5 +89,6 @@ checkCabal pkg target@Cabal {..} = subTask "cabal" $ do
   stack "build" pkg ["test", "dry-run"]
   stack "sdist" pkg []
   cabal <- getCabal path
-  field name (show version)
-  unless (cabal == target) (throwError $ "mismatching version or name" <> msg pkg)
+  if cabal == target
+    then field name (show version)
+    else throwError $ "mismatching version or name" <> msg pkg
