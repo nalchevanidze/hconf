@@ -46,19 +46,21 @@ instance Parse Cabal where
           $ map parseField
           $ parseLines bs
 
+
+
 getCabal :: (Con m) => PkgDir -> Name -> m Cabal
-getCabal dir name = withThrow (read $ cabalFile name dir) >>= parse . fromByteString
+getCabal dir pkgName = withThrow (read $ cabalFile pkgName dir) >>= parse . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
-stack l name options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (l : (unpack (toText name) : map ("--" <>) options)) "")
+stack cmd pkg options = do
+  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options)) "")
   case code of
-    ExitFailure {} -> alert $ l <> ": " <> unpack (indentText $ pack out)
-    ExitSuccess {} -> printWarnings (pack l) (parseWarnings out)
+    ExitFailure {} -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
+    ExitSuccess {} -> printWarnings (pack cmd) (parseWarnings out)
 
 printWarnings :: (Con m) => Name -> [(Text, [Text])] -> m ()
-printWarnings name [] = field name "ok"
-printWarnings name xs = task name $ traverse_ subWarn xs
+printWarnings cmd [] = field cmd "ok"
+printWarnings cmd xs = task cmd $ traverse_ subWarn xs
   where
     subWarn (x, ls) =
       warn (unpack x)
@@ -79,10 +81,11 @@ toWarning :: [Text] -> Maybe (Text, [Text])
 toWarning (h : lns) | startsLike "warning" h = Just (h, takeWhile isIndentedLine lns)
 toWarning _ = Nothing
 
+
 buildCabal :: (Con m) => PkgDir -> m ()
-buildCabal name = do
-  stack "build" name ["test", "dry-run"]
-  stack "sdist" name []
+buildCabal pkg = do
+  stack "build" pkg ["test", "dry-run"]
+  stack "sdist" pkg []
 
 checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
 checkCabal pkg target = subTask "cabal" $ do
