@@ -20,7 +20,7 @@ import HConf.Utils.Class (HConfIO (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, select, throwError)
 import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
-import HConf.Utils.Yaml (removeIfExists)
+import HConf.Utils.Yaml (remove)
 import Relude hiding (isPrefixOf)
 import System.Process
 
@@ -85,7 +85,7 @@ groupTopics = regroup . break emptyLine
 checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
 checkCabal pkg target@Cabal {..} = subTask "cabal" $ do
   let path = cabalFile name pkg
-  removeIfExists path
+  remove path
   stack "build" pkg ["test", "dry-run"]
   stack "sdist" pkg []
   cabal <- getCabal path

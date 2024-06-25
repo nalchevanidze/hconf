@@ -7,7 +7,7 @@ module HConf.Utils.Yaml
   ( readYaml,
     writeYaml,
     rewriteYaml,
-    removeIfExists,
+    remove,
   )
 where
 
@@ -71,8 +71,8 @@ mapYaml f (Yaml v props) = (`Yaml` props) <$> f v
 rewriteYaml :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (t -> m t) -> m t
 rewriteYaml pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
-removeIfExists :: MonadIO m => FilePath -> m ()
-removeIfExists name = liftIO $ removeFile name `catch` handleExists
+remove :: MonadIO m => FilePath -> m ()
+remove name = liftIO $ removeFile name `catch` handleExists
   where
     handleExists e
       | isDoesNotExistError e = return ()
