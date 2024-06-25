@@ -7,8 +7,7 @@
 
 -- | GQL Types
 module HConf.Stack.Cabal
-  ( checkCabal,
-    Cabal (..),
+  ( Cabal (..),
     CabalSrc (..),
   )
 where
@@ -17,7 +16,7 @@ import Data.Text (pack, unpack)
 import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (HConfIO (..), Parse (..), withThrow)
+import HConf.Utils.Class (Check (..), HConfIO (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, select, throwError)
 import HConf.Utils.Log (FLog (..), Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
@@ -90,13 +89,13 @@ data CabalSrc = CabalSrc
 instance FLog Cabal where
   flog Cabal {..} = field name (show version)
 
-checkCabal :: (Con m) => CabalSrc -> m ()
-checkCabal CabalSrc {..} = subTask "cabal" $ do
-  let path = cabalFile (name target) pkgDir
-  remove path
-  stack "build" pkgDir ["test", "dry-run"]
-  stack "sdist" pkgDir []
-  cabal <- getCabal path
-  if cabal == target
-    then flog cabal
-    else throwError $ "mismatching version or name" <> msg pkgDir
+instance Check CabalSrc where
+  check CabalSrc {..} = subTask "cabal" $ do
+    let path = cabalFile (name target) pkgDir
+    remove path
+    stack "build" pkgDir ["test", "dry-run"]
+    stack "sdist" pkgDir []
+    cabal <- getCabal path
+    if cabal == target
+      then flog cabal
+      else throwError $ "mismatching version or name" <> msg pkgDir
