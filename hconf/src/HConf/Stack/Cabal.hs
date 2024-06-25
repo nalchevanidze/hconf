@@ -37,10 +37,15 @@ getField = select "Field"
 
 instance Parse Cabal where
   parse bs = do
-    let fields = fromList $ ignoreEmpty $ map parseField $ parseLines bs
     name <- getField "name" fields
     version <- getField "version" fields >>= parse
     pure $ Cabal {..}
+    where
+      fields =
+        fromList
+          $ ignoreEmpty
+          $ map parseField
+          $ parseLines bs
 
 getCabal :: (Con m) => PkgDir -> Name -> m Cabal
 getCabal dir name = withThrow (read $ cabalFile name dir) >>= parse . fromByteString
