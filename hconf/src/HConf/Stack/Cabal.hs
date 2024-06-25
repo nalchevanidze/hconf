@@ -36,10 +36,10 @@ getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
 instance Parse Cabal where
-  parse bs = do
-    name <- getField "name" fields
-    version <- getField "version" fields >>= parse
-    pure $ Cabal {..}
+  parse bs =
+    Cabal
+      <$> getField "name" fields
+      <*> (getField "version" fields >>= parse)
     where
       fields =
         fromList
