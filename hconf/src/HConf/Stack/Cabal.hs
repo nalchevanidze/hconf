@@ -46,7 +46,7 @@ instance Parse Cabal where
           $ map parseField
           $ parseLines bs
 
-
+data Warning = Warning Text [Text]
 
 getCabal :: (Con m) => PkgDir -> Name -> m Cabal
 getCabal dir pkgName = withThrow (read $ cabalFile pkgName dir) >>= parse . fromByteString
@@ -58,15 +58,15 @@ stack cmd pkg options = do
     ExitFailure {} -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
     ExitSuccess {} -> printWarnings (pack cmd) (parseWarnings out)
 
-printWarnings :: (Con m) => Name -> [(Text, [Text])] -> m ()
+printWarnings :: (Con m) => Name -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
 printWarnings cmd xs = task cmd $ traverse_ subWarn xs
   where
-    subWarn (x, ls) =
+    subWarn (Warning x ls) =
       warn (unpack x)
         >> traverse_ (warn . unpack) ls
 
-parseWarnings :: String -> [(Text, [Text])]
+parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
 
 groupTopics :: [Text] -> [[Text]]
@@ -77,10 +77,9 @@ groupTopics = regroup . break emptyLine
       | null t = [h]
       | otherwise = h : groupTopics (dropWhile emptyLine t)
 
-toWarning :: [Text] -> Maybe (Text, [Text])
-toWarning (h : lns) | startsLike "warning" h = Just (h, takeWhile isIndentedLine lns)
+toWarning :: [Text] -> Maybe Warning
+toWarning (h : lns) | startsLike "warning" h = Just $ Warning h $ takeWhile isIndentedLine lns
 toWarning _ = Nothing
-
 
 build :: (Con m) => PkgDir -> m ()
 build pkg = do
