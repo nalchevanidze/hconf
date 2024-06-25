@@ -49,8 +49,8 @@ instance Parse Cabal where
 
 data Warning = Warning Text [Text]
 
-getCabal :: (Con m) => PkgDir -> Name -> m Cabal
-getCabal dir pkgName = withThrow (read $ cabalFile pkgName dir) >>= parse . fromByteString
+getCabal :: (Con m) => FilePath -> m Cabal
+getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
@@ -84,9 +84,10 @@ toWarning _ = Nothing
 
 checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
 checkCabal pkg target@Cabal {..} = subTask "cabal" $ do
-  removeIfExists (cabalFile name pkg)
+  let path = cabalFile name pkg
+  removeIfExists path
   stack "build" pkg ["test", "dry-run"]
   stack "sdist" pkg []
-  cabal <- getCabal pkg name
+  cabal <- getCabal path
   field name (show version)
   unless (cabal == target) (throwError $ "mismatching version or name" <> msg pkg)
