@@ -11,6 +11,7 @@ module HConf.Utils.Log
     info,
     field,
     subTask,
+    FLog,
   )
 where
 
@@ -57,3 +58,6 @@ warn = log . chalk Yellow
 
 alert :: (Log m) => String -> m ()
 alert = log . chalk Red
+
+class FLog a where
+  flog :: (Log m) => a -> m a

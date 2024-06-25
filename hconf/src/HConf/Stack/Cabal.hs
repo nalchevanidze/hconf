@@ -82,13 +82,21 @@ groupTopics = regroup . break emptyLine
       | null t = [h]
       | otherwise = h : groupTopics (dropWhile emptyLine t)
 
-checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
-checkCabal pkg target@Cabal {..} = subTask "cabal" $ do
-  let path = cabalFile name pkg
+data CabalSource = CabalSource
+  { pkgDir :: PkgDir,
+    target :: Cabal
+  }
+
+print ::  Cabal -> m ()
+print Cabal{..} = field name (show version)
+
+checkCabal :: (Con m) => CabalSource -> m ()
+checkCabal CabalSource{..} = subTask "cabal" $ do
+  let path = cabalFile (name target) pkgDir
   remove path
-  stack "build" pkg ["test", "dry-run"]
-  stack "sdist" pkg []
-  cabal <- getCabal path
-  if cabal == target
-    then field name (show version)
-    else throwError $ "mismatching version or name" <> msg pkg
+  stack "build" pkgDir ["test", "dry-run"]
+  stack "sdist" pkgDir []
+  cabel <- getCabal path
+  if cabel == target
+    then print cabal
+    else throwError $ "mismatching version or name" <> msg pkgDir
