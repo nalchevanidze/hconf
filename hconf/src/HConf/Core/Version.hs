@@ -21,7 +21,7 @@ import Data.Aeson
 import Data.List.NonEmpty (toList)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Core (Msg (..), Name, checkElem, maybeToError, select, throwError)
+import HConf.Utils.Core (Msg (..), Name, checkElem, select, throwError)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
