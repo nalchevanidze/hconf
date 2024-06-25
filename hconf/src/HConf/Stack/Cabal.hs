@@ -9,6 +9,7 @@
 module HConf.Stack.Cabal
   ( checkCabal,
     Cabal (..),
+    CabalSrc (..),
   )
 where
 
@@ -18,7 +19,7 @@ import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (HConfIO (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, select, throwError)
-import HConf.Utils.Log (Log, alert, field, subTask, task, warn, FLog(..))
+import HConf.Utils.Log (FLog (..), Log, alert, field, subTask, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (remove)
 import Relude hiding (isPrefixOf)
@@ -59,13 +60,12 @@ stack cmd pkg options = do
     ExitFailure {} -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
     ExitSuccess {} -> printWarnings (pack cmd) (parseWarnings out)
 
-instance FLog Warning where 
-   flog (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
+instance FLog Warning where
+  flog (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
 
 printWarnings :: (Con m) => Name -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
 printWarnings cmd xs = task cmd $ traverse_ flog xs
-
 
 parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
@@ -82,16 +82,16 @@ groupTopics = regroup . break emptyLine
       | null t = [h]
       | otherwise = h : groupTopics (dropWhile emptyLine t)
 
-data CabalSource = CabalSource
+data CabalSrc = CabalSrc
   { pkgDir :: PkgDir,
     target :: Cabal
   }
 
-instance FLog Cabal where 
-  flog Cabal{..} = field name (show version)
+instance FLog Cabal where
+  flog Cabal {..} = field name (show version)
 
-checkCabal :: (Con m) => CabalSource -> m ()
-checkCabal CabalSource{..} = subTask "cabal" $ do
+checkCabal :: (Con m) => CabalSrc -> m ()
+checkCabal CabalSrc {..} = subTask "cabal" $ do
   let path = cabalFile (name target) pkgDir
   remove path
   stack "build" pkgDir ["test", "dry-run"]

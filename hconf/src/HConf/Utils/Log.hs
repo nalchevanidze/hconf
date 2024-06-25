@@ -61,3 +61,6 @@ alert = log . chalk Red
 
 class FLog a where
   flog :: (Log m, Monad m) => a -> m ()
+
+instance FLog a => FLog [a] where 
+  flog = traverse_ flog

@@ -18,7 +18,7 @@ import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
-import HConf.Stack.Cabal (checkCabal, Cabal (Cabal))
+import HConf.Stack.Cabal (checkCabal, Cabal (Cabal),CabalSrc(CabalSrc))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (FromConf (..), readPackages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
@@ -80,7 +80,7 @@ checkPackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m ()
 checkPackage dir =
   task (toText dir) $ do
     Package {..} <- rewritePackage dir
-    checkCabal dir (Cabal name version)
+    checkCabal (CabalSrc dir (Cabal name version))
 
 checkPackages :: (ReadBounds m, FromConf m Version, FromConf m [PkgDir]) => m ()
 checkPackages =
