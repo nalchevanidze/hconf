@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -82,10 +83,10 @@ toWarning (h : lns) | startsLike "warning" h = Just $ Warning h $ takeWhile isIn
 toWarning _ = Nothing
 
 checkCabal :: (Con m) => PkgDir -> Cabal -> m ()
-checkCabal pkg target = subTask "cabal" $ do
-  removeIfExists (cabalFile (name target) pkg)
+checkCabal pkg target@Cabal {..} = subTask "cabal" $ do
+  removeIfExists (cabalFile name pkg)
   stack "build" pkg ["test", "dry-run"]
   stack "sdist" pkg []
-  cabal <- getCabal pkg (name target)
-  field (name cabal) (show (version cabal))
+  cabal <- getCabal pkg name
+  field name (show version)
   unless (cabal == target) (throwError $ "mismatching version or name" <> msg pkg)
