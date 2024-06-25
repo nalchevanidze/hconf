@@ -59,13 +59,13 @@ stack cmd pkg options = do
     ExitFailure {} -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
     ExitSuccess {} -> printWarnings (pack cmd) (parseWarnings out)
 
+instance FLog Warning where 
+   flog (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
+
 printWarnings :: (Con m) => Name -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
-printWarnings cmd xs = task cmd $ traverse_ subWarn xs
-  where
-    subWarn (Warning x ls) =
-      warn (unpack x)
-        >> traverse_ (warn . unpack) ls
+printWarnings cmd xs = task cmd $ traverse_ flog xs
+
 
 parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack

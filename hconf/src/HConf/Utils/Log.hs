@@ -60,4 +60,4 @@ alert :: (Log m) => String -> m ()
 alert = log . chalk Red
 
 class FLog a where
-  flog :: (Log m) => a -> m ()
+  flog :: (Log m, Monad m) => a -> m ()
