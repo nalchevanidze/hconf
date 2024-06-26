@@ -29,9 +29,7 @@ color 2 = Cyan
 color _ = Gray
 
 task :: (Log m) => Name -> m a -> m a
-task name = inside f
-  where
-    f i = chalk (color i) (li i name)
+task name = inside (\i -> chalk (color i) (li i name))
 
 label :: (Log m) => Name -> m () -> m ()
 label = task
