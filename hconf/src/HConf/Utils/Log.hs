@@ -31,13 +31,13 @@ genColor 2 = Magenta
 genColor 3 = Cyan
 genColor _ = Gray
 
-task :: Name -> m a -> m a
+task :: Log m => Name -> m a -> m a
 task name = inside f
   where
     f i = chalk (genColor i) (toString name)
 
-label :: (Log m, Monad m) => String -> m () -> m ()
-label name = task (toString name)
+label :: (Log m) => Name -> m () -> m ()
+label = task
 
 -- task :: (Log m, Monad m) => Name -> m a -> m a
 -- task name m = log (chalk Magenta (li name)) >> inside m
