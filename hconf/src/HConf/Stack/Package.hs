@@ -54,7 +54,7 @@ updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
 updatePackage :: (ReadBounds m, FromConf m Version) => Maybe Package -> m Package
-updatePackage Nothing = throwError ""
+updatePackage Nothing = throwError "could not find package file"
 updatePackage (Just Package {..}) = do
   newLibrary <- traverse updateLibrary library
   newTests <- updateLibraries tests
