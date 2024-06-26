@@ -70,8 +70,7 @@ mapYaml f (Just (Yaml v props)) = (`Yaml` props) <$> f (Just v)
 mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 
 fromEither :: (MonadIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
-fromEither (Left _) = pure Nothing
-fromEither (Right v) = Just <$> liftIO (decodeThrow v)
+fromEither = either (const $ pure Nothing) (fmap Just . liftIO . decodeThrow)
 
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = read pkg >>= fromEither >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
