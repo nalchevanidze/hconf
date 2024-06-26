@@ -57,7 +57,7 @@ setupStack version =
       p <- stack <$> fromConf
       rewrite p (updateStack version) $> ()
 
-updateStack :: (FromConf m Builds, FromConf m [PkgDir]) => Tag -> Stack -> m Stack
+updateStack :: (FromConf m Builds, FromConf m [PkgDir]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
   resolver <- getResolver version
   extraDeps <- sort . map printExtra <$> getExtras version
