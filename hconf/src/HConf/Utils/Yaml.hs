@@ -69,7 +69,7 @@ mapYaml :: (Functor m) => (Maybe t -> m t) -> Maybe (Yaml t) -> m (Yaml t)
 mapYaml f (Just (Yaml v props)) = (`Yaml` props) <$> f (Just v)
 mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 
-fromEither :: (MonadIO f, FromJSON b) => Either a ByteString -> f (Maybe b)
+fromEither :: (MonadIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
 fromEither (Left _) = pure Nothing
 fromEither (Right v) = Just <$> liftIO (decodeThrow v)
 
