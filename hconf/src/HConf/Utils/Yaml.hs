@@ -65,10 +65,11 @@ toObject :: Value -> Object
 toObject (Object x) = x
 toObject _ = mempty
 
-mapYaml :: (Functor m) => (t -> m t) -> Yaml t -> m (Yaml t)
-mapYaml f (Yaml v props) = (`Yaml` props) <$> f v
+mapYaml :: (Functor m) => (Maybe t -> m t) -> Maybe (Yaml t) -> m (Yaml t)
+mapYaml f (Just (Yaml v props)) = (`Yaml` props) <$> f (Just v)
+mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 
-rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (t -> m t) -> m t
+rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
 remove :: (MonadIO m) => FilePath -> m ()
