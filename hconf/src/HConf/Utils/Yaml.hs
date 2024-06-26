@@ -73,11 +73,8 @@ fromEither :: (MonadIO f, FromJSON b) => Either a ByteString -> f (Maybe b)
 fromEither (Left _) = pure Nothing
 fromEither (Right v) = Just <$> liftIO (decodeThrow v)
 
-readOpt :: (HConfIO m, FromJSON a) => FilePath -> m (Maybe a)
-readOpt = read >=> fromEither
-
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
-rewrite pkg f = readOpt pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
+rewrite pkg f = read pkg >>= fromEither >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
 remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
