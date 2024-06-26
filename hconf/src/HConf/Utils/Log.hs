@@ -18,29 +18,23 @@ import HConf.Utils.Class (Log (..))
 import HConf.Utils.Core (Name)
 import Relude
 
-newLine :: (Log m) => m ()
-newLine = log ""
+li :: (ToString a) => Int -> a -> String
+li 0 e = "\n" <> toString e <> "\n"
+li _ e = "- " <> toString e <> ":"
 
-li :: (ToString a) => a -> String
-li e = "- " <> toString e <> ":"
-
-genColor :: (Eq a, Num a) => a -> Color
-genColor 0 = Green
-genColor 1 = Magenta
-genColor 2 = Cyan
-genColor _ = Gray
+color :: (Eq a, Num a) => a -> Color
+color 0 = Green
+color 1 = Magenta
+color 2 = Cyan
+color _ = Gray
 
 task :: (Log m) => Name -> m a -> m a
 task name = inside f
   where
-    f i = chalk (genColor i) (toString name)
+    f i = chalk (color i) (li i name)
 
 label :: (Log m) => Name -> m () -> m ()
 label = task
-
--- task :: (Log m, Monad m) => Name -> m a -> m a
--- task name m = log (chalk Magenta (li name)) >> inside m
-
 
 field :: (Log m) => Name -> String -> m ()
 field name = log . ((toString name <> ": ") <>)
