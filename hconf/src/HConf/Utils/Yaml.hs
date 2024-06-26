@@ -69,12 +69,12 @@ mapYaml :: (Functor m) => (Maybe t -> m t) -> Maybe (Yaml t) -> m (Yaml t)
 mapYaml f (Just (Yaml v props)) = (`Yaml` props) <$> f (Just v)
 mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 
-from :: (MonadIO f, FromJSON a1) => Either a2 ByteString -> f (Maybe a1)
-from (Left _) = pure Nothing
-from (Right v) = Just <$> liftIO (decodeThrow v)
+fromEither :: (MonadIO f, FromJSON a1) => Either a2 ByteString -> f (Maybe a1)
+fromEither (Left _) = pure Nothing
+fromEither (Right v) = Just <$> liftIO (decodeThrow v)
 
 readOpt :: (HConfIO m, FromJSON a) => FilePath -> m (Maybe a)
-readOpt = read >=> from
+readOpt = read >=> fromEither
 
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = readOpt pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
