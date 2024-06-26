@@ -34,7 +34,6 @@ import HConf.Utils.Core (Name)
 import HConf.Utils.Log
   ( Log (..),
     alert,
-    label,
     task,
   )
 import HConf.Utils.Yaml (readYaml, writeYaml)
@@ -87,7 +86,7 @@ run m env@Env {..} = do
   runConfigT (asks config >>= check >> m) env cfg >>= handle
 
 runTask :: Name -> ConfigT () -> Env -> IO ()
-runTask name m = run (label name m $> Just (chalk Green "Ok"))
+runTask name m = run (task name m $> Just (chalk Green "Ok"))
 
 handle :: (ToString a) => (Log m, Monad m) => Either String (Maybe a) -> m ()
 handle res = case res of
@@ -96,7 +95,7 @@ handle res = case res of
   (Right (Just msg)) -> log (toString msg)
 
 save :: Config -> ConfigT ()
-save cfg = label "save" $ task "hconf.yaml" $ do
+save cfg = task "save" $ task "hconf.yaml" $ do
   ctx <- asks id
   writeYaml (hconf $ env ctx) cfg
 

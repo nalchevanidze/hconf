@@ -20,7 +20,7 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (FromConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions)
-import HConf.Utils.Log (Log, label, task)
+import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (rewriteYaml)
 import Relude
 
@@ -51,7 +51,7 @@ setupStack ::
   Tag ->
   m ()
 setupStack version =
-  label ("stack(" <> show version <> ")")
+  task ("stack(" <> show version <> ")")
     $ task "stack.yaml"
     $ do
       p <- stack <$> fromConf

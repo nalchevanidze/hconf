@@ -8,7 +8,7 @@ import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (PkgDir, explore)
 import HConf.Utils.Class (FromConf, readPackages)
 import HConf.Utils.Core (throwError)
-import HConf.Utils.Log (Log, label)
+import HConf.Utils.Log (Log, task)
 import Ormolu
   ( ColorMode (..),
     Config (..),
@@ -23,7 +23,7 @@ import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
 
 formatWith :: (Log m, FromConf m [PkgDir]) => Bool -> m ()
-formatWith check = label "ormolu" $ do
+formatWith check = task "ormolu" $ do
   files <- sort . concat <$> (readPackages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
   unless (null errorCodes) (throwError "Error")

@@ -20,7 +20,7 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FromConf (fromConf))
-import HConf.Utils.Log (Log, label, task)
+import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
 
@@ -73,7 +73,7 @@ toLib (path, Package {..}) =
     comp _ _ = []
 
 genHie :: (FromConf m Env, Log m, FromConf m [PkgDir]) => m ()
-genHie = label "hie"
+genHie = task "hie"
   $ task "hie.yaml"
   $ do
     Env {..} <- fromConf

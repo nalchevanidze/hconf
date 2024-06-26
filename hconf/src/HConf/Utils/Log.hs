@@ -2,8 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Log
-  ( label,
-    task,
+  ( task,
     warn,
     alert,
     logFileChange,
@@ -30,9 +29,6 @@ color _ = Gray
 
 task :: (Log m) => Name -> m a -> m a
 task name = inside (\i -> chalk (color i) (li i name))
-
-label :: (Log m) => Name -> m () -> m ()
-label = task
 
 field :: (Log m) => Name -> String -> m ()
 field name = log . ((toString name <> ": ") <>)
