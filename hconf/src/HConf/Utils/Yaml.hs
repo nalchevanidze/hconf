@@ -69,8 +69,15 @@ mapYaml :: (Functor m) => (Maybe t -> m t) -> Maybe (Yaml t) -> m (Yaml t)
 mapYaml f (Just (Yaml v props)) = (`Yaml` props) <$> f (Just v)
 mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 
+readOpt :: (HConfIO m, FromJSON a) => FilePath -> m (Maybe a)
+readOpt p = do
+  yaml <- read p
+  case yaml of
+    Left _ -> pure Nothing
+    Right v -> Just <$> liftIO (decodeThrow v)
+
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
-rewrite pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
+rewrite pkg f = readOpt pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
 remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
