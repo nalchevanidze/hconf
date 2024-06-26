@@ -10,7 +10,6 @@ module HConf.Utils.Log
     Log (..),
     info,
     field,
-    subTask,
   )
 where
 
@@ -42,8 +41,6 @@ label = task
 -- task :: (Log m, Monad m) => Name -> m a -> m a
 -- task name m = log (chalk Magenta (li name)) >> inside m
 
-subTask :: (Log m, Monad m) => Name -> m a -> m a
-subTask = task
 
 field :: (Log m) => Name -> String -> m ()
 field name = log . ((toString name <> ": ") <>)

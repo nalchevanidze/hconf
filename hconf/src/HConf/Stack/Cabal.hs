@@ -18,7 +18,7 @@ import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Check (..), FLog (..), HConfIO (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, select, throwError)
-import HConf.Utils.Log (Log, alert, field, subTask, task, warn)
+import HConf.Utils.Log (Log, alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (remove)
 import Relude hiding (isPrefixOf)
@@ -90,7 +90,7 @@ instance FLog Cabal where
   flog Cabal {..} = field name (show version)
 
 instance Check CabalSrc where
-  check CabalSrc {..} = subTask "cabal" $ do
+  check CabalSrc {..} = task "cabal" $ do
     let path = cabalFile (name target) pkgDir
     remove path
     stack "build" pkgDir ["test", "dry-run"]

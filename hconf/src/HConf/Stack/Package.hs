@@ -23,7 +23,7 @@ import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (BaseM, Check (..), FromConf (..), readPackages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
-import HConf.Utils.Log (Log, label, subTask, task)
+import HConf.Utils.Log (Log, label, task)
 import HConf.Utils.Yaml (readYaml, rewriteYaml)
 import Relude hiding (Undefined, length, replicate)
 
@@ -74,7 +74,7 @@ updatePackage Package {..} = do
 
 rewritePackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m Package
 rewritePackage path =
-  subTask "package"
+  task "package"
     $ rewriteYaml (packageFile path) updatePackage
 
 checkPackage :: (ReadBounds m, BaseM m, FromConf m Version) => PkgDir -> m ()
