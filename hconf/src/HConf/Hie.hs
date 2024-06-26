@@ -66,7 +66,7 @@ toLib (path, Package {..}) =
     comp :: Text -> Maybe Library -> [Component]
     comp tag (Just Library {sourceDirs}) =
       [ Component
-          { path = pkgFile (toString sourceDirs) path,
+          { path = "./" <> pkgFile (toString sourceDirs) path,
             component = name <:> tag
           }
       ]
