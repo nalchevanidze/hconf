@@ -38,6 +38,7 @@ import HConf.Utils.Log
   )
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
+import HConf.Utils.Core (Name)
 
 data HCEnv = HCEnv
   { config :: Config,
@@ -85,7 +86,7 @@ run m env@Env {..} = do
   cfg <- readYaml hconf
   runConfigT (asks config >>= check >> m) env cfg >>= handle
 
-runTask :: String -> ConfigT () -> Env -> IO ()
+runTask :: Name -> ConfigT () -> Env -> IO ()
 runTask name m = run (label name m $> Just (chalk Green "Ok"))
 
 handle :: (ToString a) => (Log m, Monad m) => Either String (Maybe a) -> m ()
