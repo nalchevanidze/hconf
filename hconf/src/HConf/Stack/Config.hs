@@ -21,7 +21,7 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Class (FromConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (Log, task)
-import HConf.Utils.Yaml (rewriteYaml)
+import HConf.Utils.Yaml (rewrite)
 import Relude
 
 data Stack = Stack
@@ -55,7 +55,7 @@ setupStack version =
     $ task "stack.yaml"
     $ do
       p <- stack <$> fromConf
-      rewriteYaml p (updateStack version) $> ()
+      rewrite p (updateStack version) $> ()
 
 updateStack :: (FromConf m Builds, FromConf m [PkgDir]) => Tag -> Stack -> m Stack
 updateStack version _ = do

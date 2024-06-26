@@ -24,7 +24,7 @@ import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (BaseM, Check (..), FromConf (..), readPackages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
 import HConf.Utils.Log (Log, task)
-import HConf.Utils.Yaml (readYaml, rewriteYaml)
+import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude hiding (Undefined, length, replicate)
 
 data Package = Package
@@ -75,7 +75,7 @@ updatePackage Package {..} = do
 rewritePackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m Package
 rewritePackage path =
   task "package"
-    $ rewriteYaml (packageFile path) updatePackage
+    $ rewrite (packageFile path) updatePackage
 
 checkPackage :: (ReadBounds m, BaseM m, FromConf m Version) => PkgDir -> m ()
 checkPackage pkgDir =

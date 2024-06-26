@@ -6,7 +6,7 @@
 module HConf.Utils.Yaml
   ( readYaml,
     writeYaml,
-    rewriteYaml,
+    rewrite,
     remove,
   )
 where
@@ -68,8 +68,8 @@ toObject _ = mempty
 mapYaml :: (Functor m) => (t -> m t) -> Yaml t -> m (Yaml t)
 mapYaml f (Yaml v props) = (`Yaml` props) <$> f v
 
-rewriteYaml :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (t -> m t) -> m t
-rewriteYaml pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
+rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (t -> m t) -> m t
+rewrite pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
 remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
