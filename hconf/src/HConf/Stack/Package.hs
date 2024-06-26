@@ -22,7 +22,7 @@ import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (BaseM, Check (..), FromConf (..), readPackages)
-import HConf.Utils.Core (Name, aesonYAMLOptions, tupled)
+import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude hiding (Undefined, length, replicate)
@@ -53,8 +53,9 @@ resolvePackages = fromConf >>= traverse (tupled (readYaml . packageFile))
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: (ReadBounds m, FromConf m Version) => Package -> m Package
-updatePackage Package {..} = do
+updatePackage :: (ReadBounds m, FromConf m Version) => Maybe Package -> m Package
+updatePackage Nothing = throwError ""
+updatePackage (Just Package {..}) = do
   newLibrary <- traverse updateLibrary library
   newTests <- updateLibraries tests
   newExecutables <- updateLibraries executables
