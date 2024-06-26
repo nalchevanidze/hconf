@@ -86,7 +86,7 @@ run m env@Env {..} = do
   runConfigT (asks config >>= check >> m) env cfg >>= handle
 
 runTask :: Name -> ConfigT () -> Env -> IO ()
-runTask name m = run (task name m $> Just (chalk Green "Ok"))
+runTask name m = run (task name m $> Just (chalk Green "\nOk"))
 
 handle :: (ToString a) => (Log m, Monad m) => Either String (Maybe a) -> m ()
 handle res = case res of
