@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ConstraintKinds #-}
 
 module HConf.Utils.Class
   ( Parse (..),
@@ -24,7 +25,7 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude
 
-class (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir]) => BaseM m
+type BaseM m = (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir]) 
 
 class FLog a where
   flog :: (Log m, Monad m) => a -> m ()
