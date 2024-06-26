@@ -26,9 +26,9 @@ li :: (ToString a) => a -> String
 li e = "- " <> toString e <> ":"
 
 genColor :: (Eq a, Num a) => a -> Color
-genColor 1 = Green
-genColor 2 = Magenta
-genColor 3 = Cyan
+genColor 0 = Green
+genColor 1 = Magenta
+genColor 2 = Cyan
 genColor _ = Gray
 
 task :: (Log m) => Name -> m a -> m a
