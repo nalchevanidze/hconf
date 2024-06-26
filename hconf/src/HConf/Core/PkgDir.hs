@@ -9,6 +9,7 @@ module HConf.Core.PkgDir
     explore,
     packageFile,
     cabalFile,
+    pkgFile,
   )
 where
 

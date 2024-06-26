@@ -16,7 +16,7 @@ where
 import Data.Aeson (FromJSON (..), ToJSON (..), Value (..), object)
 import qualified Data.Map as M
 import HConf.Core.Env (Env (..))
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDir, pkgFile)
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FromConf (fromConf))
@@ -25,7 +25,7 @@ import HConf.Utils.Yaml (writeYaml)
 import Relude hiding (Undefined, intercalate)
 
 data Component = Component
-  { path :: Text,
+  { path :: FilePath,
     component :: Text
   }
   deriving
@@ -66,7 +66,7 @@ toLib (path, Package {..}) =
     comp :: Text -> Maybe Library -> [Component]
     comp tag (Just Library {sourceDirs}) =
       [ Component
-          { path = "./" <> toText path <> "/" <> sourceDirs,
+          { path = pkgFile (toString sourceDirs) path,
             component = name <:> tag
           }
       ]
