@@ -73,9 +73,7 @@ updatePackage Package {..} = do
       }
 
 rewritePackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m Package
-rewritePackage path =
-  task "package"
-    $ rewrite (packageFile path) updatePackage
+rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
 checkPackage :: (ReadBounds m, BaseM m, FromConf m Version) => PkgDir -> m ()
 checkPackage pkgDir =
