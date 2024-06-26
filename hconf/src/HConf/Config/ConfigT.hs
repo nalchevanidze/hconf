@@ -68,7 +68,10 @@ instance Log ConfigT where
   log txt = do
     i <- asks indention
     liftIO $ putStrLn $ indent i <> txt
-  inside = local (\c -> c {indention = indention c + 1})
+  inside f m = do 
+    i <- asks indention
+    log (f i)
+    local (\c -> c {indention = indention c + 1}) m
 
 instance HConfIO ConfigT where
   read = liftIO . read
