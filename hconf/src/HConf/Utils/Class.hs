@@ -33,11 +33,9 @@ class FLog a where
 instance (FLog a) => FLog [a] where
   flog = traverse_ flog
 
-
 class Log m where
   log :: String -> m ()
   inside :: (Int -> String) -> m a -> m a
-
 
 instance Log IO where
   log = putStrLn

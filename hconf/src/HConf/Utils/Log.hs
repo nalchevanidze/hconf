@@ -31,7 +31,7 @@ genColor 2 = Magenta
 genColor 3 = Cyan
 genColor _ = Gray
 
-task :: Log m => Name -> m a -> m a
+task :: (Log m) => Name -> m a -> m a
 task name = inside f
   where
     f i = chalk (genColor i) (toString name)

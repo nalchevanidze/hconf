@@ -30,6 +30,7 @@ import HConf.Utils.Class
     FromConf (..),
     HConfIO (..),
   )
+import HConf.Utils.Core (Name)
 import HConf.Utils.Log
   ( Log (..),
     alert,
@@ -38,7 +39,6 @@ import HConf.Utils.Log
   )
 import HConf.Utils.Yaml (readYaml, writeYaml)
 import Relude
-import HConf.Utils.Core (Name)
 
 data HCEnv = HCEnv
   { config :: Config,
@@ -69,7 +69,7 @@ instance Log ConfigT where
   log txt = do
     i <- asks indention
     liftIO $ putStrLn $ indent i <> txt
-  inside f m = do 
+  inside f m = do
     i <- asks indention
     log (f i)
     local (\c -> c {indention = indention c + 1}) m
