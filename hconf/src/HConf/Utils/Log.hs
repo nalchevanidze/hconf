@@ -25,11 +25,22 @@ newLine = log ""
 li :: (ToString a) => a -> String
 li e = "- " <> toString e <> ":"
 
+genColor :: (Eq a, Num a) => a -> Color
+genColor 1 = Green
+genColor 2 = Magenta
+genColor 3 = Cyan
+genColor _ = Gray
+
+task :: Name -> m a -> m a
+task name = inside f
+  where
+    f i = chalk (genColor i) (toString name)
+
 label :: (Log m, Monad m) => String -> m () -> m ()
 label name m = info (li name) >> newLine >> inside m >> newLine
 
-task :: (Log m, Monad m) => Name -> m a -> m a
-task name m = log (chalk Magenta (li name)) >> inside m
+-- task :: (Log m, Monad m) => Name -> m a -> m a
+-- task name m = log (chalk Magenta (li name)) >> inside m
 
 subTask :: (Log m, Monad m) => Name -> m a -> m a
 subTask name m = log (chalk Cyan (li name)) >> inside m
