@@ -71,7 +71,7 @@ mapYaml f (Yaml v props) = (`Yaml` props) <$> f v
 rewriteYaml :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (t -> m t) -> m t
 rewriteYaml pkg f = readYaml pkg >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
 
-remove :: MonadIO m => FilePath -> m ()
+remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
   where
     handleExists e

@@ -50,5 +50,3 @@ warn = log . chalk Yellow
 
 alert :: (Log m) => String -> m ()
 alert = log . chalk Red
-
-

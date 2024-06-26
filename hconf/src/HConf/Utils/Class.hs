@@ -1,9 +1,9 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ConstraintKinds #-}
 
 module HConf.Utils.Class
   ( Parse (..),
@@ -25,7 +25,7 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude
 
-type BaseM m = (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir]) 
+type BaseM m = (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir])
 
 class FLog a where
   flog :: (Log m, Monad m) => a -> m ()
