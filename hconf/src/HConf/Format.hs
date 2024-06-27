@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Format (formatWith) where
+module HConf.Format (format) where
 
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (PkgDir, explore)
@@ -22,8 +22,8 @@ import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
 
-formatWith :: (Log m, FromConf m [PkgDir]) => Bool -> m ()
-formatWith check = task "ormolu" $ do
+format :: (Log m, FromConf m [PkgDir]) => Bool -> m ()
+format check = task "ormolu" $ do
   files <- sort . concat <$> (readPackages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
   unless (null errorCodes) (throwError "Error")

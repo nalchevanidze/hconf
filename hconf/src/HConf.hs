@@ -18,7 +18,7 @@ import HConf.Config.Config (Config (..), updateConfig, updateConfigUpperBounds)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
 import HConf.Config.Tag (Tag (Latest))
 import HConf.Core.Env (Env (..), defaultConfig)
-import HConf.Format (formatWith)
+import HConf.Format (format)
 import HConf.Hie (genHie)
 import HConf.Stack.Config (setupStack)
 import HConf.Stack.Package (checkPackages)
@@ -55,6 +55,4 @@ exec Update =
     >>= updateConfigUpperBounds
     >>= save
 exec Version = run (Just . version <$> asks config)
-exec Format {check} =
-  runTask "format"
-    $ formatWith check
+exec Format {check} = runTask "format" $ format check
