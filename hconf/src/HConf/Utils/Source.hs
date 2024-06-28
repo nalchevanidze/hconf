@@ -65,7 +65,7 @@ indentText :: Text -> Text
 indentText = concatMap replaceNewLine
 
 parseField :: Text -> (Text, Text)
-parseField = second (drop 1) . breakAt (== ':')
+parseField = second (strip . drop 1) . breakAt (== ':')
 
 firstWord :: Text -> (Text, Text)
 firstWord = breakAt isSeparator
