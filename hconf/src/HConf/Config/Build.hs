@@ -31,7 +31,7 @@ import HConf.Core.Version (Version, checkVersion)
 import HConf.Utils.Class
   ( Check (..),
     FromConf (..),
-    readPackages,
+    packages,
   )
 import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError)
 import Relude hiding
@@ -69,7 +69,7 @@ instance Check Build where
 
 checkPkgNames :: (FromConf m [PkgDir]) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
-  known <- readPackages
+  known <- packages
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
@@ -97,7 +97,7 @@ getExtras tag =
 getPkgs :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m [PkgDir]
 getPkgs version = do
   Build {..} <- getBuild version
-  pkgs <- readPackages
+  pkgs <- packages
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
 getResolver :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m Text
