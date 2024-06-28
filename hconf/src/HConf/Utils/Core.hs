@@ -22,6 +22,7 @@ module HConf.Utils.Core
     ErrorMsg (..),
     withString,
     select,
+    exec,
   )
 where
 
@@ -32,7 +33,9 @@ import Data.List (elemIndex, intercalate)
 import Data.Map (lookup)
 import qualified Data.Map as M
 import Data.Text (toTitle)
+import GHC.IO.Exception (ExitCode (..))
 import Relude hiding (Undefined, intercalate)
+import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
 
 aesonYAMLOptions :: Options
@@ -174,3 +177,12 @@ maybeBool = fromMaybe False
 
 select :: (MonadFail m) => ErrorMsg -> Name -> Map Name a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
+
+exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
+exec name options = do
+  (code, _, out) <- liftIO (readProcessWithExitCode name options "")
+  pure ( out,
+        case code of
+          ExitSuccess {} -> True
+          ExitFailure {} -> False
+      )

@@ -53,10 +53,11 @@ getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options)) "")
-  case code of
-    ExitFailure {} -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
-    ExitSuccess {} -> printWarnings (pack cmd) (parseWarnings out)
+  (success, out) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
+  ( if success
+      then printWarnings (pack cmd) (parseWarnings out)
+      else alert $ cmd <> ": " <> unpack (indentText $ pack out)
+    )
 
 instance FLog Warning where
   flog (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
