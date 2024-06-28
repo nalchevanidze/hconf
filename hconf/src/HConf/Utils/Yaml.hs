@@ -34,8 +34,6 @@ serializeYaml =
     $ setConfDropNull True
     $ setConfCompare compareFields defConfig
 
-readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
-readYaml = withThrow . read >=> (liftIO . decodeThrow)
 
 data Yaml t = Yaml
   { getData :: t,
@@ -71,6 +69,9 @@ rewrite pkg f = do
   logFileChange pkg (fromRight "" original == newFile)
   withThrow (write pkg newFile)
   pure (getData yaml)
+
+readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
+readYaml = withThrow . read >=> (liftIO . decodeThrow)
 
 remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
