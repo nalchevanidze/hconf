@@ -21,7 +21,7 @@ import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FromConf (fromConf))
 import HConf.Utils.Log (Log, task)
-import HConf.Utils.Yaml (writeYaml)
+import HConf.Utils.Yaml (rewrite)
 import Relude hiding (Undefined, intercalate)
 
 data Component = Component
@@ -78,4 +78,4 @@ genHie = task "hie"
   $ do
     Env {..} <- fromConf
     components <- concatMap toLib <$> resolvePackages
-    writeYaml hie (packHie Components {stackYaml = stack, components})
+    rewrite hie (const $ pure $ packHie Components {stackYaml = stack, components}) $> ()

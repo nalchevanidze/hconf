@@ -5,7 +5,6 @@
 
 module HConf.Utils.Yaml
   ( readYaml,
-    writeYaml,
     rewrite,
     remove,
   )
@@ -20,6 +19,7 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
+import GHC.IO.Exception (IOError)
 import HConf.Utils.Class (HConfIO (..), withThrow)
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
@@ -27,7 +27,6 @@ import Relude hiding (Show, Undefined, intercalate, show)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
 import Prelude (Show (..))
-import GHC.IO.Exception (IOError)
 
 serializeYaml :: (ToJSON a) => a -> ByteString
 serializeYaml =
@@ -37,15 +36,6 @@ serializeYaml =
 
 readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
 readYaml = withThrow . read >=> (liftIO . decodeThrow)
-
-writeYaml :: (ToJSON a, HConfIO m, Log m) => FilePath -> a -> m ()
-writeYaml path v = checkAndWrite path (serializeYaml v) >>= logFileChange path
-
-checkAndWrite :: (HConfIO m) => FilePath -> ByteString -> m Bool
-checkAndWrite path newFile = do
-  file <- read path
-  withThrow (write path newFile)
-  return (fromRight "" file == newFile)
 
 data Yaml t = Yaml
   { getData :: t,
@@ -73,13 +63,23 @@ mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 fromEither :: (MonadIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
 fromEither = either (const $ pure Nothing) (fmap Just . liftIO . decodeThrow)
 
+checkAndWrite :: (HConfIO m) => FilePath -> ByteString -> m Bool
+checkAndWrite path newFile = do
+  file <- read path
+  withThrow (write path newFile)
+  return (fromRight "" file == newFile)
+
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
-rewrite pkg f = read pkg >>= fromEither >>= mapYaml f >>= \x -> writeYaml pkg x >> pure (getData x)
+rewrite pkg f = do
+  original <- read pkg
+  yaml <- fromEither original >>= mapYaml f
+  checkAndWrite pkg (serializeYaml yaml) >>= logFileChange pkg
+  pure (getData yaml)
 
 remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
 
 handleExists :: IOError -> IO ()
 handleExists e
-      | isDoesNotExistError e = return ()
-      | otherwise = throwIO e
+  | isDoesNotExistError e = return ()
+  | otherwise = throwIO e

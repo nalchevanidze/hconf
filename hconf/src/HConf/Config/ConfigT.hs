@@ -36,7 +36,7 @@ import HConf.Utils.Log
     alert,
     task,
   )
-import HConf.Utils.Yaml (readYaml, writeYaml)
+import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude
 
 data HCEnv = HCEnv
@@ -97,7 +97,7 @@ handle res = case res of
 save :: Config -> ConfigT ()
 save cfg = task "save" $ task "hconf.yaml" $ do
   ctx <- asks id
-  writeYaml (hconf $ env ctx) cfg
+  rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
 instance FromConf ConfigT [PkgDir] where
   fromConf = concatMap toPackageName <$> asks (groups . config)
