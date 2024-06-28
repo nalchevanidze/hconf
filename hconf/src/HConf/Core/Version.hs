@@ -96,14 +96,13 @@ instance FromJSON Version where
 instance ToJSON Version where
   toJSON = String . toText
 
-fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Map Text (NonEmpty Version))
+type Versions = NonEmpty Version
+
+fetchVersionResponse :: (MonadIO m, MonadFail m) => Name -> m (Map Text Versions)
 fetchVersionResponse name = hackage ["package", name, "preferred"]
 
-lookupVersions :: (MonadFail m) => Map Text a -> m a
-lookupVersions = select "Field" "normal-version"
-
-fetchVersions :: (MonadFail m, MonadIO m) => Name -> m (NonEmpty Version)
-fetchVersions name = fetchVersionResponse name >>= lookupVersions
+fetchVersions :: (MonadFail m, MonadIO m) => Name -> m Versions
+fetchVersions = fetchVersionResponse >=> select "Field" "normal-version"
 
 checkVersion :: (MonadFail m, MonadIO m) => (Name, Version) -> m ()
 checkVersion (name, version) = fetchVersions name >>= checkElem "version" name version . toList
