@@ -68,8 +68,8 @@ rewrite pkg f = do
   original <- read pkg
   yaml <-  fromEither original >>= mapYaml f
   let newFile = serializeYaml yaml
-  withThrow (write pkg newFile)
   logFileChange pkg (fromRight "" original == newFile)
+  withThrow (write pkg newFile)
   pure (getData yaml)
 
 remove :: (MonadIO m) => FilePath -> m ()
