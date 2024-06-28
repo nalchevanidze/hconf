@@ -12,7 +12,6 @@ module HConf.Stack.Cabal
 where
 
 import Data.Text (pack, unpack)
-import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Check (..), FLog (..), HConfIO (..), Parse (..), withThrow)
@@ -21,7 +20,6 @@ import HConf.Utils.Log (Log, alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (remove)
 import Relude hiding (isPrefixOf)
-import System.Process
 
 type Con m = (HConfIO m, Log m)
 
