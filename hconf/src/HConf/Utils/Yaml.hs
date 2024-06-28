@@ -66,7 +66,7 @@ fromEither = either (const $ pure Nothing) (fmap Just . liftIO . decodeThrow)
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = do
   original <- read pkg
-  yaml <-  fromEither original >>= mapYaml f
+  yaml <- fromEither original >>= mapYaml f
   let newFile = serializeYaml yaml
   logFileChange pkg (fromRight "" original == newFile)
   withThrow (write pkg newFile)
