@@ -63,17 +63,13 @@ mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 fromEither :: (MonadIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
 fromEither = either (const $ pure Nothing) (fmap Just . liftIO . decodeThrow)
 
-checkAndWrite :: (HConfIO m) => FilePath -> ByteString -> m Bool
-checkAndWrite path newFile = do
-  file <- read path
-  withThrow (write path newFile)
-  return (fromRight "" file == newFile)
-
 rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = do
   original <- read pkg
-  yaml <- fromEither original >>= mapYaml f
-  checkAndWrite pkg (serializeYaml yaml) >>= logFileChange pkg
+  yaml <-  fromEither original >>= mapYaml f
+  let newFile = serializeYaml yaml
+  withThrow (write pkg newFile)
+  logFileChange pkg (fromRight "" original == newFile)
   pure (getData yaml)
 
 remove :: (MonadIO m) => FilePath -> m ()
