@@ -33,6 +33,7 @@ import Data.Text
     strip,
     toLower,
     uncons,
+    drop
   )
 import qualified Data.Text as T
 import HConf.Utils.Class (Parse (..))
@@ -64,7 +65,7 @@ indentText :: Text -> Text
 indentText = concatMap replaceNewLine
 
 parseField :: Text -> (Text, Text)
-parseField = breakAt (== ':')
+parseField = second (drop 1) . breakAt (== ':')
 
 firstWord :: Text -> (Text, Text)
 firstWord = breakAt isSeparator
