@@ -101,8 +101,8 @@ type Versions = NonEmpty Version
 fetchPreferred :: (MonadIO m, MonadFail m) => Name -> m (Map Text Versions)
 fetchPreferred name = hackage ["package", name, "preferred"]
 
-fetchVersions :: (MonadFail m, MonadIO m) => Name -> m Versions
+fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
 fetchVersions = fetchPreferred >=> select "Field" "normal-version"
 
-checkVersion :: (MonadFail m, MonadIO m) => (Name, Version) -> m ()
+checkVersion :: (MonadIO m, MonadFail m) => (Name, Version) -> m ()
 checkVersion (name, version) = fetchVersions name >>= checkElem "version" name version . toList
