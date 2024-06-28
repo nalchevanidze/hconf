@@ -53,10 +53,10 @@ getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  (success, out) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
+  (success, msg) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
   ( if success
-      then printWarnings (pack cmd) (parseWarnings out)
-      else alert $ cmd <> ": " <> unpack (indentText $ pack out)
+      then printWarnings (pack cmd) (parseWarnings msg)
+      else alert $ cmd <> ": " <> unpack (indentText $ pack msg)
     )
 
 instance FLog Warning where
