@@ -3,7 +3,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
--- | GQL Types
 module HConf.Config.Config
   ( Config (..),
     getRule,

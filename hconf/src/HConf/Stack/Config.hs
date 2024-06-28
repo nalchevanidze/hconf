@@ -5,7 +5,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
--- | GQL Types
 module HConf.Stack.Config
   ( Stack,
     setupStack,

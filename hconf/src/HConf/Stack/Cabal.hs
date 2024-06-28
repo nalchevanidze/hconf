@@ -5,7 +5,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
--- | GQL Types
 module HConf.Stack.Cabal
   ( Cabal (..),
     CabalSrc (..),

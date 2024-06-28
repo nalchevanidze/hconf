@@ -5,7 +5,6 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
--- | GQL Types
 module HConf.Utils.Core
   ( compareFields,
     maybeList,

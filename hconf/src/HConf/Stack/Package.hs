@@ -6,7 +6,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
--- | GQL Types
 module HConf.Stack.Package
   ( Package (..),
     checkPackages,
