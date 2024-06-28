@@ -173,5 +173,5 @@ maybeMapToList = maybe [] M.toList
 maybeBool :: Maybe Bool -> Bool
 maybeBool = fromMaybe False
 
-select :: (MonadFail m, Msg k, Ord k) => ErrorMsg -> k -> Map k a -> m a
+select :: (MonadFail m) => ErrorMsg -> Name -> Map Name a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k

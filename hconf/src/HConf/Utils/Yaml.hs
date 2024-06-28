@@ -34,7 +34,6 @@ serializeYaml =
     $ setConfDropNull True
     $ setConfCompare compareFields defConfig
 
-
 data Yaml t = Yaml
   { getData :: t,
     rawValue :: Object
