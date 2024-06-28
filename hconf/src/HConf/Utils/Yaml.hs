@@ -20,7 +20,6 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
-import GHC.IO.Exception (IOError)
 import HConf.Utils.Class (HConfIO (..), withThrow)
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
@@ -28,6 +27,7 @@ import Relude hiding (Show, Undefined, intercalate, show)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
 import Prelude (Show (..))
+import GHC.IO.Exception (IOError)
 
 serializeYaml :: (ToJSON a) => a -> ByteString
 serializeYaml =
@@ -81,5 +81,5 @@ remove name = liftIO $ removeFile name `catch` handleExists
 
 handleExists :: IOError -> IO ()
 handleExists e
-  | isDoesNotExistError e = return ()
-  | otherwise = throwIO e
+      | isDoesNotExistError e = return ()
+      | otherwise = throwIO e
