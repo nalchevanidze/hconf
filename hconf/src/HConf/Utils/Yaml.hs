@@ -20,6 +20,7 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
+import GHC.IO.Exception (IOError)
 import HConf.Utils.Class (HConfIO (..), withThrow)
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
@@ -77,7 +78,8 @@ rewrite pkg f = read pkg >>= fromEither >>= mapYaml f >>= \x -> writeYaml pkg x 
 
 remove :: (MonadIO m) => FilePath -> m ()
 remove name = liftIO $ removeFile name `catch` handleExists
-  where
-    handleExists e
-      | isDoesNotExistError e = return ()
-      | otherwise = throwIO e
+
+handleExists :: IOError -> IO ()
+handleExists e
+  | isDoesNotExistError e = return ()
+  | otherwise = throwIO e
