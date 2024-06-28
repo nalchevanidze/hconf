@@ -21,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (BaseM, Check (..), FromConf (..), readPackages)
+import HConf.Utils.Class (BaseM, Check (..), FromConf (..), packages,)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -83,4 +83,4 @@ checkPackage pkgDir =
     check CabalSrc {pkgDir, target = Cabal {..}}
 
 checkPackages :: (ReadBounds m, FromConf m Version, BaseM m) => m ()
-checkPackages = task "packages" $ readPackages >>= traverse_ checkPackage
+checkPackages = task "packages" $ packages >>= traverse_ checkPackage
