@@ -98,11 +98,8 @@ instance ToJSON Version where
 
 type Versions = NonEmpty Version
 
-fetchPreferred :: (MonadIO m, MonadFail m) => Name -> m (Map Name Versions)
-fetchPreferred name = hackage ["package", name, "preferred"]
-
 fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
-fetchVersions = fetchPreferred >=> select "Field" "normal-version"
+fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
 
 checkVersion :: (MonadIO m, MonadFail m) => (Name, Version) -> m ()
 checkVersion (name, version) = fetchVersions name >>= checkElem "version" name version . toList
