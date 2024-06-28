@@ -16,7 +16,7 @@ import GHC.IO.Exception (ExitCode (..))
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Check (..), FLog (..), HConfIO (..), Parse (..), withThrow)
-import HConf.Utils.Core (Msg (..), Name, select, throwError)
+import HConf.Utils.Core (Msg (..), Name, exec, select, throwError)
 import HConf.Utils.Log (Log, alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import HConf.Utils.Yaml (remove)
@@ -53,10 +53,10 @@ getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (Con m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  (success, msg) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
+  (out, success) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
   ( if success
-      then printWarnings (pack cmd) (parseWarnings msg)
-      else alert $ cmd <> ": " <> unpack (indentText $ pack msg)
+      then printWarnings (pack cmd) (parseWarnings out)
+      else alert $ cmd <> ": " <> unpack (indentText $ pack out)
     )
 
 instance FLog Warning where
