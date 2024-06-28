@@ -6,7 +6,7 @@ module HConf.Format (format) where
 
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (PkgDir, explore)
-import HConf.Utils.Class (FromConf, readPackages)
+import HConf.Utils.Class (FromConf, packages)
 import HConf.Utils.Core (throwError)
 import HConf.Utils.Log (Log, task)
 import Ormolu
@@ -24,7 +24,7 @@ import System.Exit (ExitCode (..))
 
 format :: (Log m, FromConf m [PkgDir]) => Bool -> m ()
 format check = task "ormolu" $ do
-  files <- sort . concat <$> (readPackages >>= traverse explore)
+  files <- sort . concat <$> (packages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
   unless (null errorCodes) (throwError "Error")
 

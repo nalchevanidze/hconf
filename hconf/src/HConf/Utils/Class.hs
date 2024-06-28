@@ -13,7 +13,7 @@ module HConf.Utils.Class
     ResultT,
     Log (..),
     FLog (..),
-    readPackages,
+    packages,
     withThrow,
     BaseM,
   )
@@ -50,8 +50,8 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-readPackages :: (FromConf m [PkgDir]) => m [PkgDir]
-readPackages = fromConf
+packages :: (FromConf m [PkgDir]) => m [PkgDir]
+packages = fromConf
 
 class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
