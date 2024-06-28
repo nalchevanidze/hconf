@@ -98,7 +98,7 @@ instance ToJSON Version where
 
 type Versions = NonEmpty Version
 
-fetchPreferred :: (MonadIO m, MonadFail m) => Name -> m (Map Text Versions)
+fetchPreferred :: (MonadIO m, MonadFail m) => Name -> m (Map Name Versions)
 fetchPreferred name = hackage ["package", name, "preferred"]
 
 fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
