@@ -37,7 +37,7 @@ import HConf.Utils.Class
     packages,
   )
 import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError)
-import HConf.Utils.Log (Log)
+import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
     group,
@@ -71,9 +71,10 @@ instance Check Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (FromConf m [PkgDir]) => Maybe [PkgDir] -> m ()
+checkPkgNames :: (FromConf m [PkgDir], Log m) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
   known <- packages
+  log (show (known, ls))
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 

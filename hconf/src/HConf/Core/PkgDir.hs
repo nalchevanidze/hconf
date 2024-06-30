@@ -15,6 +15,7 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
+import Data.List (dropWhileEnd)
 import Data.Text (intercalate)
 import HConf.Utils.Core (Msg (..), withString)
 import Relude hiding (Undefined, intercalate)
@@ -55,11 +56,14 @@ packageFile = pkgFile "package.yaml"
 cabalFile :: Text -> PkgDir -> String
 cabalFile name = pkgFile (toString name <> ".cabal")
 
+resolveDir :: String -> Maybe String
+resolveDir "./" = Nothing
+resolveDir name = Just $ dropWhileEnd (/= '/') name
+
 parseDir :: FilePath -> PkgDir
-parseDir x = case splitFileName x of
-  (dir, name)
-    | dir == "./" -> PkgDir Nothing (fromString name)
-    | otherwise -> PkgDir (Just dir) (fromString name)
+parseDir x =
+  let (dir, name) = splitFileName x
+   in PkgDir (resolveDir dir) (fromString name)
 
 instance FromJSON PkgDir where
   parseJSON = withString "PkgDir" (pure . parseDir . toString)
