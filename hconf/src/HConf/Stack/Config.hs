@@ -16,7 +16,7 @@ import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Core.Version (Version)
+import HConf.Core.Version (Version, printHackageRef)
 import HConf.Utils.Class (FromConf (..))
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (Log, task)
@@ -59,7 +59,7 @@ setupStack version =
 updateStack :: (FromConf m Builds, FromConf m [PkgDir]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
   resolver <- getResolver version
-  extraDeps <- sort . map printExtra <$> getExtras version
+  extraDeps <- sort . map printHackageRef <$> getExtras version
   packages <- getPkgs version
   pure
     Stack
@@ -68,5 +68,4 @@ updateStack version _ = do
         ..
       }
 
-printExtra :: (Text, Version) -> Text
-printExtra (k, ver) = k <> "-" <> show ver
+

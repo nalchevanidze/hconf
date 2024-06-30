@@ -11,6 +11,7 @@ module HConf.Core.Version
     Version,
     fetchVersions,
     hackageRefs,
+    printHackageRef,
   )
 where
 
@@ -21,6 +22,7 @@ import Data.Aeson
   )
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
+import Data.Text (pack)
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Check (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, checkElem, select, throwError)
@@ -110,3 +112,6 @@ instance Check HackageRef where
 
 hackageRefs :: Map Name Version -> [HackageRef]
 hackageRefs = map (uncurry HackageRef) . M.toList
+
+printHackageRef :: HackageRef -> Text
+printHackageRef (HackageRef k ver) = k <> "-" <> pack (show ver)
