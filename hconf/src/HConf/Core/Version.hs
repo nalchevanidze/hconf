@@ -22,6 +22,7 @@ import Data.Aeson
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
 import Data.Text (pack)
+import qualified Data.Text as T
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Check (..), Format (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, checkElem, select, throwError)
@@ -68,6 +69,9 @@ compareSeries (x : xs) (y : ys)
   | x == y = compareSeries xs ys
   | otherwise = compare x y
 
+instance Format Version where
+  format = T.intercalate "." . map (pack . show) . toSeries
+
 instance Parse Version where
   parse s = toError ("invalid version(" <> msg s <> ")") (sepBy "." s >>= fromSeries)
 
@@ -80,7 +84,7 @@ toSeries :: Version -> [Int]
 toSeries Version {..} = [major, minor] <> revision
 
 instance ToString Version where
-  toString = intercalate "." . map show . toSeries
+  toString = toString . format
 
 instance Ord Version where
   compare a b = compareSeries (toSeries a) (toSeries b)
@@ -116,4 +120,4 @@ hackageRefs :: Map Name Version -> [HkgRef]
 hackageRefs = map (uncurry HkgRef) . M.toList
 
 instance Format HkgRef where
-  format HkgRef{..} = name <> "-" <> pack (show version)
+  format HkgRef {..} = name <> "-" <> format version
