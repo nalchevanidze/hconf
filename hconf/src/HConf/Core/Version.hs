@@ -16,14 +16,11 @@ import Data.Aeson
     ToJSON (toJSON),
     Value (..),
   )
-import Data.List.NonEmpty (toList)
-import qualified Data.Map as M
 import Data.Text (pack)
 import qualified Data.Text as T
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Check (..), Format (..), Parse (..))
-import HConf.Utils.Core (Msg (..), Name, checkElem, select, throwError)
-import HConf.Utils.Http (hackage)
+import HConf.Utils.Class (Format (..), Parse (..))
+import HConf.Utils.Core (Msg (..), throwError)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
   ( Undefined,
