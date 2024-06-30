@@ -28,9 +28,7 @@ import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version
-  ( HkgRef,
-    Version,
-    hkgRefs,
+  ( Version,
   )
 import HConf.Utils.Class
   ( Check (..),
@@ -45,6 +43,7 @@ import Relude hiding
     intercalate,
     isPrefixOf,
   )
+import HConf.Core.HkgRef (HkgRef, hkgRefs)
 
 type Extras = Map Text Version
 

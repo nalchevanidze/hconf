@@ -7,10 +7,7 @@
 module HConf.Core.Version
   ( nextVersion,
     dropPatch,
-    HkgRef,
     Version,
-    fetchVersions,
-    hkgRefs,
   )
 where
 
@@ -102,22 +99,3 @@ instance FromJSON Version where
 
 instance ToJSON Version where
   toJSON = String . toText
-
-type Versions = NonEmpty Version
-
-data HkgRef = HkgRef
-  { name :: Name,
-    version :: Version
-  }
-
-fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
-fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
-
-instance Check HkgRef where
-  check HkgRef {..} = fetchVersions name >>= checkElem "version" name version . toList
-
-hkgRefs :: Map Name Version -> [HkgRef]
-hkgRefs = map (uncurry HkgRef) . M.toList
-
-instance Format HkgRef where
-  format HkgRef {..} = name <> "-" <> format version
