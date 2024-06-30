@@ -16,6 +16,7 @@ module HConf.Utils.Class
     packages,
     withThrow,
     BaseM,
+    Format (..),
   )
 where
 
@@ -77,3 +78,6 @@ withThrow x = x >>= either (throwError . msg) pure
 instance HConfIO IO where
   read = safeIO . L.readFile
   write f = safeIO . L.writeFile f
+
+class Format a where
+  format :: a -> Text
