@@ -30,7 +30,7 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version
   ( HkgRef,
     Version,
-    hackageRefs,
+    hkgRefs,
   )
 import HConf.Utils.Class
   ( Check (..),
@@ -79,7 +79,7 @@ checkPkgNames ls = do
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
 checkExtraDeps :: (MonadFail f, FromConf f [PkgDir], MonadIO f, Log f) => Maybe Extras -> f ()
-checkExtraDeps = traverse_ check . maybe [] hackageRefs
+checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
 
@@ -93,7 +93,7 @@ selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc
 
 getExtras :: (FromConf m Builds) => Tag -> m [HkgRef]
 getExtras tag =
-  hackageRefs
+  hkgRefs
     . M.fromList
     . concatMap (maybeMapToList . extra)
     . selectBuilds tag

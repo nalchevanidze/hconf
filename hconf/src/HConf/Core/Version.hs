@@ -10,7 +10,7 @@ module HConf.Core.Version
     HkgRef,
     Version,
     fetchVersions,
-    hackageRefs,
+    hkgRefs,
   )
 where
 
@@ -116,8 +116,8 @@ fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "
 instance Check HkgRef where
   check HkgRef {..} = fetchVersions name >>= checkElem "version" name version . toList
 
-hackageRefs :: Map Name Version -> [HkgRef]
-hackageRefs = map (uncurry HkgRef) . M.toList
+hkgRefs :: Map Name Version -> [HkgRef]
+hkgRefs = map (uncurry HkgRef) . M.toList
 
 instance Format HkgRef where
   format HkgRef {..} = name <> "-" <> format version
