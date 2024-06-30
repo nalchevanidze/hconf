@@ -7,9 +7,10 @@
 module HConf.Core.Version
   ( nextVersion,
     dropPatch,
-    checkVersion,
+    HackageRef,
     Version,
     fetchVersions,
+    hackageRefs,
   )
 where
 
@@ -19,8 +20,9 @@ import Data.Aeson
     Value (..),
   )
 import Data.List.NonEmpty (toList)
+import qualified Data.Map as M
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Parse (..))
+import HConf.Utils.Class (Check (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, checkElem, select, throwError)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
@@ -98,8 +100,13 @@ instance ToJSON Version where
 
 type Versions = NonEmpty Version
 
+data HackageRef = HackageRef Name Version
+
 fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
 fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
 
-checkVersion :: (MonadIO m, MonadFail m) => (Name, Version) -> m ()
-checkVersion (name, version) = fetchVersions name >>= checkElem "version" name version . toList
+instance Check HackageRef where
+  check (HackageRef name version) = fetchVersions name >>= checkElem "version" name version . toList
+
+hackageRefs :: Map Name Version -> [HackageRef]
+hackageRefs = map (uncurry HackageRef) . M.toList

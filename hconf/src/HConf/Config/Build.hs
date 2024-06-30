@@ -27,13 +27,18 @@ import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Core.Version (Version, checkVersion)
+import HConf.Core.Version
+  ( HackageRef,
+    Version,
+    hackageRefs,
+  )
 import HConf.Utils.Class
   ( Check (..),
     FromConf (..),
     packages,
   )
 import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError)
+import HConf.Utils.Log (Log)
 import Relude hiding
   ( Undefined,
     group,
@@ -73,8 +78,8 @@ checkPkgNames ls = do
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (MonadFail f, MonadIO f) => Maybe Extras -> f ()
-checkExtraDeps = traverse_ checkVersion . maybeMapToList
+checkExtraDeps :: (MonadFail f, FromConf f [PkgDir], MonadIO f, Log f) => Maybe Extras -> f ()
+checkExtraDeps = traverse_ check . maybe [] hackageRefs
 
 type Builds = [Build]
 
@@ -86,9 +91,9 @@ getBuild v = do
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)
 
-getExtras :: (FromConf m Builds) => Tag -> m [(Text, Version)]
+getExtras :: (FromConf m Builds) => Tag -> m [HackageRef]
 getExtras tag =
-  M.toList
+  hackageRefs
     . M.fromList
     . concatMap (maybeMapToList . extra)
     . selectBuilds tag
