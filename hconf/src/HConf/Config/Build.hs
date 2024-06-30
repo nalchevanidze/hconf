@@ -26,6 +26,7 @@ import Data.Aeson.Types
 import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
+import HConf.Core.HkgRef (HkgRef, hkgRefs)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version
   ( Version,
@@ -43,7 +44,6 @@ import Relude hiding
     intercalate,
     isPrefixOf,
   )
-import HConf.Core.HkgRef (HkgRef, hkgRefs)
 
 type Extras = Map Text Version
 

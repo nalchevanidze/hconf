@@ -181,8 +181,9 @@ select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
 exec name options = do
   (code, _, out) <- liftIO (readProcessWithExitCode name options "")
-  pure ( out,
-        case code of
-          ExitSuccess {} -> True
-          ExitFailure {} -> False
-      )
+  pure
+    ( out,
+      case code of
+        ExitSuccess {} -> True
+        ExitFailure {} -> False
+    )

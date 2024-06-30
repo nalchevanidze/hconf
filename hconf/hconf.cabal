@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           hconf
-version:        0.1.4
+version:        0.1.5
 synopsis:       Stack Config
 description:    cli to manage multiple stack projects
 category:       web
@@ -62,12 +62,12 @@ library
     , aeson >=1.4.4 && <3.0.0
     , base >=4.7.0 && <5.0.0
     , bytestring >=0.10.4 && <0.15.0
-    , containers >=0.4.2.1 && <=0.7
+    , containers >=0.4.2.1 && <=0.7.0
     , directory >=1.0 && <2.0
     , filepath >=1.1.0 && <=1.5.2.0
     , modern-uri >=0.1.0.0 && <1.0.0
-    , ormolu
-    , process >=1.0 && <2.0
+    , ormolu >=0.5.0 && <1.0.0
+    , process >=1.0.0 && <2.0.0
     , relude >=0.3.0 && <2.0.0
     , req >=3.0.0 && <4.0.0
     , text >=1.2.3 && <3.0.0
@@ -87,14 +87,14 @@ executable hconf
     , aeson >=1.4.4 && <3.0.0
     , base >=4.7.0 && <5.0.0
     , bytestring >=0.10.4 && <0.15.0
-    , containers >=0.4.2.1 && <=0.7
+    , containers >=0.4.2.1 && <=0.7.0
     , directory >=1.0 && <2.0
     , filepath >=1.1.0 && <=1.5.2.0
     , hconf >=0.1.0 && <0.2.0
     , modern-uri >=0.1.0.0 && <1.0.0
     , optparse-applicative >=0.12.0 && <0.20.0
-    , ormolu
-    , process >=1.0 && <2.0
+    , ormolu >=0.5.0 && <1.0.0
+    , process >=1.0.0 && <2.0.0
     , relude >=0.3.0 && <2.0.0
     , req >=3.0.0 && <4.0.0
     , text >=1.2.3 && <3.0.0

@@ -23,6 +23,7 @@ import Data.Char (isSeparator)
 import Data.Text
   ( break,
     concatMap,
+    drop,
     head,
     isPrefixOf,
     null,
@@ -33,7 +34,6 @@ import Data.Text
     strip,
     toLower,
     uncons,
-    drop
   )
 import qualified Data.Text as T
 import HConf.Utils.Class (Parse (..))
