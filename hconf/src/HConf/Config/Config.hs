@@ -1,6 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Config.Config
@@ -22,8 +27,9 @@ import HConf.Config.Build (Builds)
 import HConf.Config.PkgGroup (PkgGroup, isMember)
 import HConf.Core.Bounds (Bounds, updateUpperBound, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
+import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version, nextVersion)
-import HConf.Utils.Class (Check (check))
+import HConf.Utils.Class (Check (check), FromConf, HConfIO)
 import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
@@ -53,7 +59,8 @@ getRule name Config {..}
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance Check Config where
+instance (HConfIO m, FromConf m [PkgDir], Log m) => Check m Config where
+  check :: (HConfIO m, FromConf m [PkgDir]) => Config -> m ()
   check Config {..} = traverse_ check (toList builds)
 
 updateConfig :: Bool -> Config -> Config
