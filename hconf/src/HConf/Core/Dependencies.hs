@@ -56,11 +56,11 @@ initDependencies = Dependencies . fromList . map toDuple
   where
     toDuple (Dependency a b) = (a, b)
 
-toDeps :: Dependencies -> [Dependency]
-toDeps (Dependencies m) = map (uncurry Dependency) $ toList m
+toDependencyList :: Dependencies -> [Dependency]
+toDependencyList (Dependencies m) = map (uncurry Dependency) $ toList m
 
 instance FromJSON Dependencies where
   parseJSON v = initDependencies <$> (parseJSON v >>= traverse parse . sort)
 
 instance ToJSON Dependencies where
-  toJSON = toJSON . formatTable . map format . toDeps
+  toJSON = toJSON . formatTable . map format . toDependencyList
