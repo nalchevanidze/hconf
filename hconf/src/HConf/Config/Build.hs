@@ -5,8 +5,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Config.Build
   ( Build,
@@ -67,7 +67,7 @@ data Build = Build
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (HConfIO m,FromConf m [PkgDir], Log m) => Check m Build where
+instance (HConfIO m, FromConf m [PkgDir], Log m) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
