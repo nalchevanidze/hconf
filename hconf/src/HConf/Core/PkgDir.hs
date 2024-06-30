@@ -15,7 +15,6 @@ where
 
 import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
-import Data.List (dropWhileEnd)
 import Data.Text (intercalate)
 import HConf.Utils.Core (Msg (..), withString)
 import Relude hiding (Undefined, intercalate)
@@ -23,8 +22,9 @@ import System.FilePath.Glob (glob)
 import System.FilePath.Posix
   ( joinPath,
     normalise,
-    splitFileName,
+    splitFileName, splitDirectories,
   )
+import Data.List (stripPrefix)
 
 data PkgDir = PkgDir
   { root :: Maybe FilePath,
@@ -58,7 +58,7 @@ cabalFile name = pkgFile (toString name <> ".cabal")
 
 resolveDir :: String -> Maybe String
 resolveDir "./" = Nothing
-resolveDir name = Just $ dropWhileEnd (/= '/') name
+resolveDir name = Just $ joinPath $ splitDirectories $ fromMaybe name (stripPrefix "./" name)
 
 parseDir :: FilePath -> PkgDir
 parseDir x =

@@ -74,7 +74,6 @@ instance Check Build where
 checkPkgNames :: (FromConf m [PkgDir], Log m) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
   known <- packages
-  log (show (known, ls))
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
