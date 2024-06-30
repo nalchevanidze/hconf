@@ -1,9 +1,12 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module HConf.Config.Build
   ( Build,
@@ -34,6 +37,7 @@ import HConf.Core.Version
 import HConf.Utils.Class
   ( Check (..),
     FromConf (..),
+    HConfIO,
     packages,
   )
 import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError)
@@ -63,7 +67,7 @@ data Build = Build
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance Check Build where
+instance (HConfIO m,FromConf m [PkgDir], Log m) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
