@@ -60,7 +60,6 @@ instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
 instance (HConfIO m, FromConf m [PkgDir], Log m) => Check m Config where
-  check :: (HConfIO m, FromConf m [PkgDir]) => Config -> m ()
   check Config {..} = traverse_ check (toList builds)
 
 updateConfig :: Bool -> Config -> Config
