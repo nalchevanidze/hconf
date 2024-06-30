@@ -36,7 +36,7 @@ instance Msg PkgDir where
   msg = msg . resolve []
 
 pkgDir :: Maybe FilePath -> [Text] -> PkgDir
-pkgDir dir xs = PkgDir dir (intercalate "-" xs)
+pkgDir dir xs = PkgDir (dir >>= resolveDir) (intercalate "-" xs)
 
 resolve :: [FilePath] -> PkgDir -> FilePath
 resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString dirName : xs)))
@@ -62,8 +62,8 @@ resolveDir name = Just $ dropWhileEnd (/= '/') name
 
 parseDir :: FilePath -> PkgDir
 parseDir x =
-  let (dir, name) = splitFileName x
-   in PkgDir (resolveDir dir) (fromString name)
+  let (dir, name) = second fromString (splitFileName x)
+   in PkgDir (resolveDir dir) name
 
 instance FromJSON PkgDir where
   parseJSON = withString "PkgDir" (pure . parseDir . toString)
