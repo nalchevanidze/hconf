@@ -10,8 +10,7 @@ module HConf.Core.Version
     HkgRef,
     Version,
     fetchVersions,
-    hackageRefs,
-    printHackageRef,
+    hackageRefs
   )
 where
 
@@ -24,7 +23,7 @@ import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
 import Data.Text (pack)
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Check (..), Parse (..))
+import HConf.Utils.Class (Check (..), Format (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, checkElem, select, throwError)
 import HConf.Utils.Http (hackage)
 import HConf.Utils.Source (fromToString, sepBy, toError)
@@ -113,5 +112,5 @@ instance Check HkgRef where
 hackageRefs :: Map Name Version -> [HkgRef]
 hackageRefs = map (uncurry HkgRef) . M.toList
 
-printHackageRef :: HkgRef -> Text
-printHackageRef (HkgRef k ver) = k <> "-" <> pack (show ver)
+instance Format HkgRef where
+  format (HkgRef k ver) = k <> "-" <> pack (show ver)
