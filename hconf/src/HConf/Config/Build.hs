@@ -28,7 +28,7 @@ import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version
-  ( HackageRef,
+  ( HkgRef,
     Version,
     hackageRefs,
   )
@@ -91,7 +91,7 @@ getBuild v = do
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)
 
-getExtras :: (FromConf m Builds) => Tag -> m [HackageRef]
+getExtras :: (FromConf m Builds) => Tag -> m [HkgRef]
 getExtras tag =
   hackageRefs
     . M.fromList

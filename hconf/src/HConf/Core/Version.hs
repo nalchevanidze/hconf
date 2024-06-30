@@ -7,7 +7,7 @@
 module HConf.Core.Version
   ( nextVersion,
     dropPatch,
-    HackageRef,
+    HkgRef,
     Version,
     fetchVersions,
     hackageRefs,
@@ -102,16 +102,16 @@ instance ToJSON Version where
 
 type Versions = NonEmpty Version
 
-data HackageRef = HackageRef Name Version
+data HkgRef = HkgRef Name Version
 
 fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
 fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
 
-instance Check HackageRef where
-  check (HackageRef name version) = fetchVersions name >>= checkElem "version" name version . toList
+instance Check HkgRef where
+  check (HkgRef name version) = fetchVersions name >>= checkElem "version" name version . toList
 
-hackageRefs :: Map Name Version -> [HackageRef]
-hackageRefs = map (uncurry HackageRef) . M.toList
+hackageRefs :: Map Name Version -> [HkgRef]
+hackageRefs = map (uncurry HkgRef) . M.toList
 
-printHackageRef :: HackageRef -> Text
-printHackageRef (HackageRef k ver) = k <> "-" <> pack (show ver)
+printHackageRef :: HkgRef -> Text
+printHackageRef (HkgRef k ver) = k <> "-" <> pack (show ver)
