@@ -15,8 +15,8 @@ import Data.Aeson
   )
 import Data.Map (fromList, toList)
 import Data.Map.Strict (traverseWithKey)
-import HConf.Core.Bounds (Bounds, printBoundParts)
-import HConf.Utils.Class (Parse (..))
+import HConf.Core.Bounds (Bounds)
+import HConf.Utils.Class (Format (format), Parse (..))
 import HConf.Utils.Core (Name, select)
 import HConf.Utils.Format (formatTable)
 import HConf.Utils.Source (firstWord)
@@ -39,6 +39,9 @@ instance Parse Dependency where
     (\(name, txt) -> Dependency name <$> parse txt)
       . firstWord
 
+instance Format Dependency where
+  format (Dependency name b) = name <> " " <> format b
+
 newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
   deriving (Show)
 
@@ -53,8 +56,11 @@ initDependencies = Dependencies . fromList . map toDuple
   where
     toDuple (Dependency a b) = (a, b)
 
+toDeps :: Dependencies -> [Dependency]
+toDeps (Dependencies m) = map (uncurry Dependency) $ toList m
+
 instance FromJSON Dependencies where
   parseJSON v = initDependencies <$> (parseJSON v >>= traverse parse . sort)
 
 instance ToJSON Dependencies where
-  toJSON (Dependencies m) = toJSON $ formatTable $ map (\(name, b) -> name : printBoundParts b) (toList m)
+  toJSON = toJSON . formatTable . map format . toDeps

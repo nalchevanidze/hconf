@@ -8,7 +8,6 @@ module HConf.Core.Bounds
   ( Bounds,
     versionBounds,
     diff,
-    printBoundParts,
     updateUpperBound,
     ReadBounds (..),
   )
@@ -20,11 +19,12 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum)
+import qualified Data.Text as T
 import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Parse (..))
+import HConf.Utils.Class (Format (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
 import HConf.Utils.Log (Log, field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
@@ -85,8 +85,11 @@ instance Parse Bounds where
   parse "" = pure $ Bounds []
   parse str = Bounds <$> sepBy "&&" str
 
+instance Format Bounds where
+  format (Bounds xs) = T.intercalate "  " . intercalate ["&&"] $ map printBoundPart $ sort xs
+
 instance ToString Bounds where
-  toString = intercalate "  " . map toString . printBoundParts
+  toString = toString . format
 
 instance FromJSON Bounds where
   parseJSON = withString "Bounds" parse
@@ -103,9 +106,6 @@ versionBounds version =
 
 diff :: Bounds -> Bounds -> String
 diff old deps = toString old <> chalk Yellow "  ->  " <> toString deps
-
-printBoundParts :: Bounds -> [Text]
-printBoundParts (Bounds xs) = intercalate ["&&"] $ map printBoundPart $ sort xs
 
 getBound :: Restriction -> Bounds -> Maybe Bound
 getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs

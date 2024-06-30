@@ -4,8 +4,8 @@
 module HConf.Utils.Format (formatTable) where
 
 import Data.List (maximum)
-import Data.Text (intercalate, justifyLeft, length, strip)
-import Relude hiding (intercalate, length)
+import Data.Text (intercalate, justifyLeft, length, strip, words)
+import Relude hiding (intercalate, length, words)
 
 type Table = [[Text]]
 
@@ -21,5 +21,7 @@ printRow sizes ls =
     $ intercalate "  "
     $ zipWith (\item s -> justifyLeft s ' ' item) ls sizes
 
-formatTable :: Table -> [Text]
-formatTable deps = sort $ map (printRow (getSizes deps)) deps
+formatTable :: [Text] -> [Text]
+formatTable deps = sort $ map (printRow (getSizes table)) table
+  where
+    table = map words deps
