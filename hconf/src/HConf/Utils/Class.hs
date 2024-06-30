@@ -57,8 +57,8 @@ packages = fromConf
 class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
 
-class Check a where
-  check :: (BaseM m) => a -> m ()
+class Check m a where
+  check :: a -> m ()
 
 class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)

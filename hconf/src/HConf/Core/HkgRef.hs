@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module HConf.Core.HkgRef
   ( fetchVersions,
@@ -12,7 +14,7 @@ where
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (Check (..), Format (..))
+import HConf.Utils.Class (Check (..), Format (..), HConfIO)
 import HConf.Utils.Core (Name, checkElem, select)
 import HConf.Utils.Http (hackage)
 import Relude hiding
@@ -37,7 +39,7 @@ data HkgRef = HkgRef
 fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
 fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
 
-instance Check HkgRef where
+instance (HConfIO m) => Check m HkgRef where
   check HkgRef {..} = fetchVersions name >>= checkElem "version" name version . toList
 
 hkgRefs :: Map Name Version -> [HkgRef]

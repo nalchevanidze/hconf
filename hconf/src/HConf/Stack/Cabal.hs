@@ -1,5 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -87,7 +89,7 @@ data CabalSrc = CabalSrc
 instance FLog Cabal where
   flog Cabal {..} = field name (show version)
 
-instance Check CabalSrc where
+instance (HConfIO m, Log m) => Check m CabalSrc where
   check CabalSrc {..} = task "cabal" $ do
     let path = cabalFile (name target) pkgDir
     remove path
