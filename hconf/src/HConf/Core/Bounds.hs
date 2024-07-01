@@ -19,7 +19,7 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum)
-import qualified Data.Text as T
+import Data.Text (intercalate)
 import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
@@ -37,7 +37,7 @@ import Relude hiding
     length,
     null,
     show,
-    toList,
+    toList,intercalate
   )
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
@@ -61,14 +61,14 @@ data Bound = Bound
   }
   deriving (Show, Eq)
 
+instance Format Bound where
+  format Bound {..} = unwords $ (toText restriction <> if orEquals then "=" else "") : [toText version]
+
 instance Ord Bound where
   compare a b =
     compare (version a) (version b)
       <> compare (restriction a) (restriction b)
       <> compare (orEquals a) (orEquals b)
-
-printBoundPart :: Bound -> [Text]
-printBoundPart Bound {..} = (toText restriction <> if orEquals then "=" else "") : [toText version]
 
 instance Parse Bound where
   parse txt = do
@@ -86,7 +86,7 @@ instance Parse Bounds where
   parse str = Bounds <$> sepBy "&&" str
 
 instance Format Bounds where
-  format (Bounds xs) = T.intercalate "  " . intercalate ["&&"] $ map printBoundPart $ sort xs
+  format (Bounds xs) = T.intercalate " && " $ map format $ sort xs
 
 instance ToString Bounds where
   toString = toString . format
