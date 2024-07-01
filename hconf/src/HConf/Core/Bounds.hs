@@ -24,7 +24,7 @@ import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Format (..), Parse (..), Diff (..))
+import HConf.Utils.Class (Diff (..), Format (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
 import HConf.Utils.Log (Log, field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
@@ -107,7 +107,7 @@ versionBounds version =
       Bound Max False (nextVersion True version)
     ]
 
-instance Diff Bounds where 
+instance Diff Bounds where
   diff old deps
     | old /= deps =
         Just (toString old <> chalk Yellow "  ->  " <> toString deps)
