@@ -63,7 +63,10 @@ data Bound = Bound
   deriving (Show, Eq)
 
 instance Format Bound where
-  format Bound {..} = unwords $ (toText restriction <> if orEquals then "=" else "") : [toText version]
+  format Bound {..} =
+    unwords
+      $ (toText restriction <> if orEquals then "=" else "")
+      : [toText version]
 
 instance Ord Bound where
   compare a b =
