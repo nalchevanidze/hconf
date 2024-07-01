@@ -33,11 +33,12 @@ import Relude hiding
     break,
     drop,
     fromList,
+    intercalate,
     isPrefixOf,
     length,
     null,
     show,
-    toList,intercalate
+    toList,
   )
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
