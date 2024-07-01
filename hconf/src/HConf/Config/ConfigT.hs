@@ -19,7 +19,7 @@ where
 import Control.Exception (tryJust)
 import HConf.Config.Build (Builds)
 import HConf.Config.Config (Config (..), getRule)
-import HConf.Config.PkgGroup (toPackageName)
+import HConf.Config.PkgGroup (pkgDirs)
 import HConf.Core.Bounds (ReadBounds (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
@@ -100,7 +100,7 @@ save cfg = task "save" $ task "hconf.yaml" $ do
   rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
 instance FromConf ConfigT [PkgDir] where
-  fromConf = concatMap toPackageName <$> asks (groups . config)
+  fromConf = concatMap pkgDirs <$> asks (groups . config)
 
 instance FromConf ConfigT Builds where
   fromConf = asks (builds . config)

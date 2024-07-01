@@ -6,7 +6,7 @@
 
 module HConf.Config.PkgGroup
   ( PkgGroup (..),
-    toPackageName,
+    pkgDirs,
     isMember,
   )
 where
@@ -45,8 +45,8 @@ data PkgGroup = PkgGroup
 instance ToJSON PkgGroup where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-toPackageName :: PkgGroup -> [PkgDir]
-toPackageName PkgGroup {..} = map pkgPath packages
+pkgDirs :: PkgGroup -> [PkgDir]
+pkgDirs PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg = pkgDir dir ([name | maybeBool prefix] <> [pkg | pkg /= "."])
 
