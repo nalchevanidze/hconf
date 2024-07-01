@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Core.Dependencies
@@ -32,7 +33,10 @@ import Relude hiding
     toList,
   )
 
-data Dependency = Dependency Name Bounds
+data Dependency = Dependency
+  { name :: Name,
+    bounds :: Bounds
+  }
 
 instance Parse Dependency where
   parse =
@@ -40,7 +44,7 @@ instance Parse Dependency where
       . firstWord
 
 instance Format Dependency where
-  format (Dependency name b) = name <> " " <> format b
+  format Dependency {..} = name <> " " <> format bounds
 
 newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
   deriving (Show)
