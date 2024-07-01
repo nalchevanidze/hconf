@@ -17,6 +17,8 @@ module HConf.Utils.Class
     withThrow,
     BaseM,
     Format (..),
+    Diff (..),
+    printDiff,
   )
 where
 
@@ -81,3 +83,9 @@ instance HConfIO IO where
 
 class Format a where
   format :: a -> Text
+
+class Diff a where
+  diff :: a -> a -> Maybe String
+
+printDiff :: (Diff a, Monad m) => (String -> m ()) -> a -> a -> m ()
+printDiff f a = maybe (pure ()) f . diff a
