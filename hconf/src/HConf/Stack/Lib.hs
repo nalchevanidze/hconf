@@ -36,7 +36,7 @@ import HConf.Core.Bounds (Bounds, ReadBounds (..))
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
 import HConf.Utils.Class (logDiff)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
-import HConf.Utils.Log (Log, field)
+import HConf.Utils.Log (field)
 import Relude hiding
   ( Undefined,
     break,
