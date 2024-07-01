@@ -86,7 +86,7 @@ instance Parse Bounds where
   parse str = Bounds <$> sepBy "&&" str
 
 instance Format Bounds where
-  format (Bounds xs) = T.intercalate " && " $ map format $ sort xs
+  format (Bounds xs) = intercalate " && " $ map format $ sort xs
 
 instance ToString Bounds where
   toString = toString . format
