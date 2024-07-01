@@ -33,7 +33,7 @@ import Relude hiding
 data PkgGroup = PkgGroup
   { name :: Name,
     dir :: Maybe FilePath,
-    packages :: [Text],
+    packages :: [Name],
     prefix :: Maybe Bool
   }
   deriving
