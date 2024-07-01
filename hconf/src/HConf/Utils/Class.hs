@@ -18,7 +18,7 @@ module HConf.Utils.Class
     BaseM,
     Format (..),
     Diff (..),
-    printDiff,
+    logDiff,
   )
 where
 
@@ -87,5 +87,5 @@ class Format a where
 class Diff a where
   diff :: a -> a -> Maybe String
 
-printDiff :: (Diff a, Monad m) => (String -> m ()) -> a -> a -> m ()
-printDiff f a = maybe (pure ()) f . diff a
+logDiff :: (Diff a, Monad m) => (String -> m ()) -> a -> a -> m ()
+logDiff f a = maybe (pure ()) f . diff a
