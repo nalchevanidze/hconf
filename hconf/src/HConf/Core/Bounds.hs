@@ -107,8 +107,11 @@ versionBounds version =
       Bound Max False (nextVersion True version)
     ]
 
-diff :: Bounds -> Bounds -> String
-diff old deps = toString old <> chalk Yellow "  ->  " <> toString deps
+diff :: Bounds -> Bounds -> Maybe String
+diff old deps
+  | old /= deps =
+      Just (toString old <> chalk Yellow "  ->  " <> toString deps)
+  | otherwise = Nothing
 
 getBound :: Restriction -> Bounds -> Maybe Bound
 getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs
