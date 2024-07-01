@@ -75,7 +75,10 @@ toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
 withRule :: (MonadIO m, Log m) => Name -> Bounds -> Bounds -> m Bounds
-withRule name oldBounds bounds = maybe (pure ()) (field name) (diff oldBounds bounds) $> bounds
+withRule name oldBounds bounds = printDiff (field name) (diff oldBounds bounds) $> bounds
+
+printDiff :: Monad m => (a -> m ()) -> Maybe a -> m ()
+printDiff = maybe (pure ())
 
 updateDependency :: (ReadBounds m) => Name -> Bounds -> m Bounds
 updateDependency name oldBounds =
