@@ -75,13 +75,11 @@ toObject :: Value -> Object
 toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
-withRule :: (MonadIO m, Log m) => Name -> Bounds -> Bounds -> m Bounds
-withRule name oldBounds bounds = logDiff (field name) oldBounds bounds $> bounds
-
 updateDependency :: (ReadBounds m) => Name -> Bounds -> m Bounds
-updateDependency name oldBounds =
-  readBounds name
-    >>= withRule name oldBounds
+updateDependency name oldBounds = do
+  bounds <- readBounds name
+  logDiff (field name) oldBounds bounds
+  pure bounds
 
 updateDependencies :: (ReadBounds m) => Dependencies -> m Dependencies
 updateDependencies = traverseDeps updateDependency
