@@ -72,9 +72,7 @@ toLib (path, Package {..}) =
     comp _ _ = []
 
 genHie :: (FromConf m Env, Log m, FromConf m [PkgDir]) => m ()
-genHie = task "hie"
-  $ task "hie.yaml"
-  $ do
-    Env {..} <- fromConf
-    components <- concatMap toLib <$> resolvePackages
-    rewrite hie (const $ pure $ packHie Components {stackYaml = stack, components}) $> ()
+genHie = task "hie" $ task "hie.yaml" $ do
+  Env {..} <- fromConf
+  components <- concatMap toLib <$> resolvePackages
+  rewrite hie (const $ pure $ packHie Components {stackYaml = stack, components}) $> ()
