@@ -10,7 +10,7 @@
 module HConf.Config.Config
   ( Config (..),
     getRule,
-    updateConfig,
+    nextVersionConfig,
     updateConfigUpperBounds,
   )
 where
@@ -61,8 +61,8 @@ instance ToJSON Config where
 instance (HConfIO m, FromConf m [PkgDir], Log m) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
-updateConfig :: Bool -> Config -> Config
-updateConfig isBreaking Config {..} =
+nextVersionConfig :: Bool -> Config -> Config
+nextVersionConfig isBreaking Config {..} =
   let version' = nextVersion isBreaking version
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}

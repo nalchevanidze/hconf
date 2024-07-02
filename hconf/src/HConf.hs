@@ -14,7 +14,7 @@ module HConf
 where
 
 import Data.Version (showVersion)
-import HConf.Config.Config (Config (..), updateConfig, updateConfigUpperBounds)
+import HConf.Config.Config (Config (..), nextVersionConfig, updateConfigUpperBounds)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
 import HConf.Config.Tag (Tag (Latest))
 import HConf.Core.Env (Env (..), defaultConfig)
@@ -47,7 +47,7 @@ exec Setup {tag} =
     checkPackages
 exec Next {isBreaking} =
   runTask "next"
-    $ (asks config <&> updateConfig isBreaking)
+    $ (asks config <&> nextVersionConfig isBreaking)
     >>= save
 exec Update =
   runTask "update"
