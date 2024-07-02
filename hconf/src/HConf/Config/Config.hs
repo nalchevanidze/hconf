@@ -11,7 +11,7 @@ module HConf.Config.Config
   ( Config (..),
     getRule,
     nextRelease,
-    updateConfigUpperBounds,
+    updateConfig,
   )
 where
 
@@ -67,7 +67,7 @@ nextRelease isBreaking Config {..} =
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
-updateConfigUpperBounds :: (MonadFail m, MonadIO m, Log m) => Config -> m Config
-updateConfigUpperBounds Config {..} = do
+updateConfig :: (MonadFail m, MonadIO m, Log m) => Config -> m Config
+updateConfig Config {..} = do
   dependencies' <- traverseDeps updateUpperBound dependencies
   pure Config {dependencies = dependencies', ..}
