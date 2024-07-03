@@ -112,8 +112,8 @@ instance Diff Bounds where
         Just (toString old <> chalk Yellow "  ->  " <> toString deps)
     | otherwise = Nothing
 
-getBound :: Restriction -> Bounds -> Maybe Bound
-getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs
+getBound :: Restriction -> Bounds -> [Bound]
+getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 
 getLatestBound :: (MonadFail m, MonadIO m) => Name -> m Bound
 getLatestBound = fmap (Bound Max True . head) . fetchVersions
@@ -122,10 +122,9 @@ updateDepBounds :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
 updateDepBounds name bounds = do
   latest <- getLatestBound name
   let ma = getBound Max bounds
-  let mi = maybeToList (getBound Min bounds)
-  let newVersion = maximum (latest : maybeToList ma)
-  if ma == Just newVersion then pure () else field name (show newVersion)
-  pure (Bounds (mi <> [newVersion]))
+  let newVersion = maximum (latest : ma)
+  if ma == [newVersion] then pure () else field name (show newVersion)
+  pure (Bounds (getBound Min bounds <> [newVersion]))
 
 class (MonadFail m, MonadIO m, Log m) => ReadBounds m where
   readBounds :: Name -> m Bounds
