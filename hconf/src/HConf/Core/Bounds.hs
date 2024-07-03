@@ -121,9 +121,9 @@ getLatestBound = fmap (Bound Max True . head) . fetchVersions
 updateDepBounds :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
 updateDepBounds name bounds = do
   latest <- getLatestBound name
-  let ma = getBound Max bounds
-  let newVersion = maximum (latest : ma)
-  if ma == [newVersion] then pure () else field name (show newVersion)
+  let upper = getBound Max bounds
+  let newVersion = maximum (latest : upper)
+  if upper == [newVersion] then pure () else field name (show newVersion)
   pure (Bounds (getBound Min bounds <> [newVersion]))
 
 class (MonadFail m, MonadIO m, Log m) => ReadBounds m where
