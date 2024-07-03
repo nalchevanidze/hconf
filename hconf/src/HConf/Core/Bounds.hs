@@ -7,7 +7,6 @@
 module HConf.Core.Bounds
   ( Bounds,
     versionBounds,
-    diff,
     updateUpperBound,
     ReadBounds (..),
   )
