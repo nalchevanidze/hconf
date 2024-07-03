@@ -7,7 +7,7 @@
 module HConf.Core.Bounds
   ( Bounds,
     versionBounds,
-    updateUpperBound,
+    updateDepBounds,
     ReadBounds (..),
   )
 where
@@ -118,8 +118,8 @@ getBound v (Bounds xs) = find (\Bound {..} -> restriction == v) xs
 getLatestBound :: (MonadFail m, MonadIO m) => Name -> m Bound
 getLatestBound = fmap (Bound Max True . head) . fetchVersions
 
-updateUpperBound :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
-updateUpperBound name bounds = do
+updateDepBounds :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
+updateDepBounds name bounds = do
   latest <- getLatestBound name
   let ma = getBound Max bounds
   let mi = maybeToList (getBound Min bounds)

@@ -24,7 +24,7 @@ import Data.Aeson
 import Data.Aeson.Types (defaultOptions)
 import HConf.Config.Build (Builds)
 import HConf.Config.PkgGroup (PkgGroup, isMember)
-import HConf.Core.Bounds (Bounds, updateUpperBound, versionBounds)
+import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version, nextVersion)
@@ -69,5 +69,5 @@ nextRelease isBreaking Config {..} =
 
 updateConfig :: (MonadFail m, MonadIO m, Log m) => Config -> m Config
 updateConfig Config {..} = do
-  dependencies' <- traverseDeps updateUpperBound dependencies
+  dependencies' <- traverseDeps updateDepBounds dependencies
   pure Config {dependencies = dependencies', ..}
