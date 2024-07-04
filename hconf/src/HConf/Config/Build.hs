@@ -40,7 +40,7 @@ import HConf.Utils.Class
     HConfIO,
     packages,
   )
-import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError)
+import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError, Name)
 import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
@@ -49,7 +49,7 @@ import Relude hiding
     isPrefixOf,
   )
 
-type Extras = Map Text Version
+type Extras = Map Name Version
 
 data Build = Build
   { ghc :: Tag,
