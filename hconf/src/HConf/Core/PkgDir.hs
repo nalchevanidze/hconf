@@ -17,7 +17,7 @@ import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
 import Data.List (stripPrefix)
 import Data.Text (intercalate)
-import HConf.Utils.Core (Msg (..), withString, Name)
+import HConf.Utils.Core (Msg (..), Name, withString)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix
