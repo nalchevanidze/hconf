@@ -16,7 +16,6 @@ import Data.Aeson
     ToJSON (toJSON),
     Value (..),
   )
-import Data.Text (pack)
 import qualified Data.Text as T
 import GHC.Show (Show (..))
 import HConf.Utils.Class (Format (..), Parse (..))
@@ -64,7 +63,7 @@ compareSeries (x : xs) (y : ys)
   | otherwise = compare x y
 
 instance Format Version where
-  format = T.intercalate "." . map (pack . show) . toSeries
+  format = T.intercalate "." . map (fromString . show) . toSeries
 
 instance Parse Version where
   parse s = toError ("invalid version(" <> msg s <> ")") (sepBy "." s >>= fromSeries)

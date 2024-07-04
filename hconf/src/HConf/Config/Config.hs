@@ -29,6 +29,7 @@ import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version, nextVersion)
 import HConf.Utils.Class (Check (check), FromConf, HConfIO)
+import HConf.Utils.Core (Name)
 import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
@@ -50,7 +51,7 @@ data Config = Config
       Show
     )
 
-getRule :: (MonadFail m) => Text -> Config -> m Bounds
+getRule :: (MonadFail m) => Name -> Config -> m Bounds
 getRule name Config {..}
   | any (isMember name) groups = pure bounds
   | otherwise = getBounds name dependencies

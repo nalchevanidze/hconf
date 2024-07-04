@@ -109,5 +109,5 @@ getPkgs version = do
   pkgs <- packages
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
-getResolver :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m Text
+getResolver :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m ResolverName
 getResolver version = resolver <$> getBuild version

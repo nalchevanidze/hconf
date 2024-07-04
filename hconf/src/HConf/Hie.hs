@@ -22,10 +22,11 @@ import HConf.Utils.Class (FromConf (fromConf))
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (rewrite)
 import Relude hiding (Undefined, intercalate)
+import HConf.Utils.Core (Name)
 
 data Component = Component
   { path :: FilePath,
-    component :: Text
+    component :: Name
   }
   deriving
     ( ToJSON,
