@@ -23,6 +23,7 @@ module HConf.Utils.Core
     withString,
     select,
     exec,
+    ResolverName,
   )
 where
 
@@ -42,6 +43,8 @@ aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
 type Name = Text
+
+type ResolverName = Text
 
 fields :: [Text]
 fields =

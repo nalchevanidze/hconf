@@ -40,7 +40,7 @@ import HConf.Utils.Class
     HConfIO,
     packages,
   )
-import HConf.Utils.Core (maybeList, maybeMapToList, notElemError, throwError, Name)
+import HConf.Utils.Core (Name, maybeList, maybeMapToList, notElemError, throwError, ResolverName)
 import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
@@ -51,9 +51,10 @@ import Relude hiding
 
 type Extras = Map Name Version
 
+
 data Build = Build
   { ghc :: Tag,
-    resolver :: Text,
+    resolver :: ResolverName,
     extra :: Maybe Extras,
     include :: Maybe [PkgDir],
     exclude :: Maybe [PkgDir]
