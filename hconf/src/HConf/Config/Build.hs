@@ -40,7 +40,14 @@ import HConf.Utils.Class
     HConfIO,
     packages,
   )
-import HConf.Utils.Core (Name, ResolverName, maybeList, maybeMapToList, notElemError, throwError)
+import HConf.Utils.Core
+  ( Name,
+    ResolverName,
+    maybeList,
+    maybeMapToList,
+    notElemError,
+    throwError,
+  )
 import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
