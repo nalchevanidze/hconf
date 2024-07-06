@@ -17,7 +17,7 @@ import Ormolu
     ormolu,
     withPrettyOrmoluExceptions,
   )
-import Ormolu.Diff.Text (diffText, printTextDiff)
+import Ormolu.Diff.Text (TextDiff, diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
@@ -29,14 +29,14 @@ format check = task "ormolu" $ do
   unless (null errorCodes) (throwError "Error")
 
 formatFile :: (MonadIO m) => Bool -> FilePath -> m ExitCode
-formatFile check path = liftIO $ withPrettyOrmoluExceptions colorMode $ do
+formatFile check path = liftIO $ withPrettyOrmoluExceptions Always $ do
   original <- T.readFile path
   formatted <- formatter path original
   handle original formatted
   where
     handle original formatted
       | not check = when (formatted /= original) (T.writeFile path formatted) $> ExitSuccess
-      | otherwise = handleDiff original formatted path
+      | otherwise = handleDiff (diffText original formatted path)
 
 formatter :: (MonadIO m) => FilePath -> Text -> m Text
 formatter path =
@@ -48,14 +48,8 @@ formatter path =
       }
     path
 
-handleDiff :: Text -> Text -> FilePath -> IO ExitCode
-handleDiff original formatted path =
-  case diffText original formatted path of
-    Nothing -> return ExitSuccess
-    Just diff -> do
-      runTerm (printTextDiff diff) Always stderr
-      return (ExitFailure 100)
-
+handleDiff :: Maybe TextDiff -> IO ExitCode
+handleDiff = maybe (pure ExitSuccess) (\diff -> runTerm (printTextDiff diff) Always stderr $> ExitFailure 100)
 
 selectFailure :: ExitCode -> Maybe Int
 selectFailure ExitSuccess = Nothing
