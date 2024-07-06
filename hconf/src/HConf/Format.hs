@@ -43,7 +43,7 @@ formatter path =
   ormolu
     defaultConfig
       { cfgCheckIdempotence = True,
-        cfgColorMode = colorMode,
+        cfgColorMode = Always,
         cfgSourceType = detectSourceType path
       }
     path
@@ -53,11 +53,9 @@ handleDiff original formatted path =
   case diffText original formatted path of
     Nothing -> return ExitSuccess
     Just diff -> do
-      runTerm (printTextDiff diff) colorMode stderr
+      runTerm (printTextDiff diff) Always stderr
       return (ExitFailure 100)
 
-colorMode :: ColorMode
-colorMode = Always
 
 selectFailure :: ExitCode -> Maybe Int
 selectFailure ExitSuccess = Nothing
