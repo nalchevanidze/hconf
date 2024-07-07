@@ -59,7 +59,11 @@ cabalFile name = pkgFile (toString name <> ".cabal")
 
 resolveDir :: String -> Maybe String
 resolveDir "./" = Nothing
-resolveDir name = Just $ joinPath $ splitDirectories $ fromMaybe name (stripPrefix "./" name)
+resolveDir name =
+  Just
+    $ joinPath
+    $ splitDirectories
+    $ fromMaybe name (stripPrefix "./" name)
 
 parseDir :: FilePath -> PkgDir
 parseDir x =
