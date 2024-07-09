@@ -90,17 +90,11 @@ fields =
 getIndex :: Text -> Int
 getIndex = fromMaybe (length fields) . (`elemIndex` fields)
 
-type TupleRes a = (Text, Text) -> (a, a)
-
-mapTuple :: (Text -> a) -> TupleRes a
-mapTuple f = bimap f f
+mapTuple :: (a -> b) -> (b -> b -> c) -> a -> a -> c
+mapTuple f g a b= g (f a) (f b)
 
 compareFields :: Text -> Text -> Ordering
-compareFields =
-  curry
-    ( (\t -> uncurry compare (mapTuple getIndex t) <> uncurry compare t)
-        . mapTuple toTitle
-    )
+compareFields = mapTuple toTitle (mapTuple getIndex compare <> compare)
 
 maybeList :: Maybe [a] -> [a]
 maybeList = fromMaybe []
