@@ -102,11 +102,8 @@ compareFieldNames t = case mapTuple getIndex t of
   (_, Nothing) -> LT
   (i1, i2) -> compare i1 i2
 
-compareFieldsTuple :: (Text, Text) -> Ordering
-compareFieldsTuple = compareFieldNames . mapTuple toTitle
-
 compareFields :: Text -> Text -> Ordering
-compareFields = curry compareFieldsTuple
+compareFields = curry (compareFieldNames . mapTuple toTitle)
 
 maybeList :: Maybe [a] -> [a]
 maybeList = fromMaybe []
