@@ -68,7 +68,7 @@ nextRelease isBreaking Config {..} =
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
-updateConfig :: (MonadFail m, MonadIO m, Log m) => Config -> m Config
+updateConfig :: (HConfIO m, Log m) => Config -> m Config
 updateConfig Config {..} = do
   dependencies' <- traverseDeps updateDepBounds dependencies
   pure Config {dependencies = dependencies', ..}
