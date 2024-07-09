@@ -38,7 +38,6 @@ import GHC.IO.Exception (ExitCode (..))
 import Relude hiding (Undefined, intercalate)
 import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
-import HConf.Utils.Class (HConfIO)
 
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
@@ -182,7 +181,7 @@ maybeBool = fromMaybe False
 select :: (MonadFail m) => ErrorMsg -> Name -> Map Name a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 
-exec :: (HConfIO m) => FilePath -> [String] -> m (String, Bool)
+exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
 exec name options = do
   (code, _, out) <- liftIO (readProcessWithExitCode name options "")
   pure
