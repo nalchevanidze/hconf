@@ -38,7 +38,7 @@ formatFile check path = liftIO $ withPrettyOrmoluExceptions Always $ do
       | not check = when (formatted /= original) (T.writeFile path formatted) $> ExitSuccess
       | otherwise = handleDiff (diffText original formatted path)
 
-formatter :: (MonadIO m) => FilePath -> Text -> m Text
+formatter :: FilePath -> Text -> IO Text
 formatter path =
   ormolu
     defaultConfig
