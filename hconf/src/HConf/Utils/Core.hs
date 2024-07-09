@@ -95,11 +95,12 @@ type TupleRes a = (Text, Text) -> (a, a)
 mapTuple :: (Text -> a) -> TupleRes a
 mapTuple f = bimap f f
 
-compareFieldNames :: (Text, Text) -> Ordering
-compareFieldNames t = uncurry compare (mapTuple getIndex t) <> uncurry compare t
-
 compareFields :: Text -> Text -> Ordering
-compareFields = curry (compareFieldNames . mapTuple toTitle)
+compareFields =
+  curry
+    ( (\t -> uncurry compare (mapTuple getIndex t) <> uncurry compare t)
+        . mapTuple toTitle
+    )
 
 maybeList :: Maybe [a] -> [a]
 maybeList = fromMaybe []
