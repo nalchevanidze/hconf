@@ -126,5 +126,5 @@ updateDepBounds name bounds = do
   if upper == [newVersion] then pure () else field name (show newVersion)
   pure (Bounds (getBound Min bounds <> [newVersion]))
 
-class (MonadFail m, MonadIO m, Log m) => ReadBounds m where
+class (HConfIO m, Log m) => ReadBounds m where
   readBounds :: Name -> m Bounds
