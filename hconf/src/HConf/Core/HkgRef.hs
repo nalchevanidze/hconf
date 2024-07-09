@@ -36,7 +36,7 @@ data HkgRef = HkgRef
     version :: Version
   }
 
-fetchVersions :: (MonadIO m, MonadFail m) => Name -> m Versions
+fetchVersions :: (HConfIO m) => Name -> m Versions
 fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
 
 instance (HConfIO m) => Check m HkgRef where
