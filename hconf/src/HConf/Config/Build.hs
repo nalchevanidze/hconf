@@ -88,7 +88,7 @@ checkPkgNames ls = do
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (MonadFail f, FromConf f [PkgDir], MonadIO f, Log f) => Maybe Extras -> f ()
+checkExtraDeps :: (HConfIO f, FromConf f [PkgDir], Log f) => Maybe Extras -> f ()
 checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
