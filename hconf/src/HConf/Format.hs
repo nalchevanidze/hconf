@@ -6,7 +6,7 @@ module HConf.Format (format) where
 
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (PkgDir, explore)
-import HConf.Utils.Class (FromConf, packages)
+import HConf.Utils.Class (FromConf, HConfIO, packages)
 import HConf.Utils.Core (throwError)
 import HConf.Utils.Log (Log, task)
 import Ormolu
@@ -28,7 +28,7 @@ format check = task "ormolu" $ do
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
   unless (null errorCodes) (throwError "Error")
 
-formatFile :: (MonadIO m) => Bool -> FilePath -> m ExitCode
+formatFile :: (HConfIO m) => Bool -> FilePath -> m ExitCode
 formatFile check path = liftIO $ withPrettyOrmoluExceptions Always $ do
   original <- T.readFile path
   formatted <- formatter path original
