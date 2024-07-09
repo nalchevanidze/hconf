@@ -23,7 +23,7 @@ import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Diff (..), Format (..), Parse (..))
+import HConf.Utils.Class (Diff (..), Format (..), Parse (..), HConfIO)
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
 import HConf.Utils.Log (Log, field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
@@ -115,10 +115,10 @@ instance Diff Bounds where
 getBound :: Restriction -> Bounds -> [Bound]
 getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 
-getLatestBound :: (MonadFail m, MonadIO m) => Name -> m Bound
+getLatestBound :: (HConfIO m) => Name -> m Bound
 getLatestBound = fmap (Bound Max True . head) . fetchVersions
 
-updateDepBounds :: (MonadFail m, MonadIO m, Log m) => Name -> Bounds -> m Bounds
+updateDepBounds :: (HConfIO m, Log m) => Name -> Bounds -> m Bounds
 updateDepBounds name bounds = do
   latest <- getLatestBound name
   let upper = getBound Max bounds
