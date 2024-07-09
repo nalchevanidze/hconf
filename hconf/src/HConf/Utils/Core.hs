@@ -87,8 +87,8 @@ fields =
       "component"
     ]
 
-getIndex :: Text -> Maybe Int
-getIndex = (`elemIndex` fields)
+getIndex :: Text -> Int
+getIndex = fromMaybe (length fields) . (`elemIndex` fields)
 
 type TupleRes a = (Text, Text) -> (a, a)
 
@@ -96,11 +96,7 @@ mapTuple :: (Text -> a) -> TupleRes a
 mapTuple f = bimap f f
 
 compareFieldNames :: (Text, Text) -> Ordering
-compareFieldNames t = case mapTuple getIndex t of
-  (Nothing, Nothing) -> uncurry compare t
-  (Nothing, _) -> GT
-  (_, Nothing) -> LT
-  (i1, i2) -> compare i1 i2
+compareFieldNames t = uncurry compare (mapTuple getIndex t) <> uncurry compare t
 
 compareFields :: Text -> Text -> Ordering
 compareFields = curry (compareFieldNames . mapTuple toTitle)
