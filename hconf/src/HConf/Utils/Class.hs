@@ -22,11 +22,13 @@ module HConf.Utils.Class
   )
 where
 
-import Control.Exception (tryJust)
+import Control.Exception (catch, throwIO, tryJust)
 import qualified Data.ByteString as L
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude
+import System.Directory (removeFile)
+import System.IO.Error (isDoesNotExistError)
 
 type BaseM m = (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir])
 
@@ -65,6 +67,7 @@ class Check m a where
 class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
   write :: FilePath -> ByteString -> m (Either String ())
+  remove :: FilePath -> m ()
 
 printException :: SomeException -> String
 printException = show
@@ -80,6 +83,7 @@ withThrow x = x >>= either (throwError . msg) pure
 instance HConfIO IO where
   read = safeIO . L.readFile
   write f = safeIO . L.writeFile f
+  remove name = removeFile name `catch` (\e -> unless (isDoesNotExistError e) (throwIO e))
 
 class Format a where
   format :: a -> Text

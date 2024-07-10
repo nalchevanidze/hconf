@@ -6,7 +6,6 @@
 module HConf.Utils.Yaml
   ( readYaml,
     rewrite,
-    remove,
   )
 where
 
@@ -19,13 +18,10 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
-import GHC.IO.Exception (IOError)
 import HConf.Utils.Class (HConfIO (..), withThrow)
 import HConf.Utils.Core (compareFields)
 import HConf.Utils.Log (Log, logFileChange)
 import Relude hiding (Show, Undefined, intercalate, show)
-import System.Directory (removeFile)
-import System.IO.Error (isDoesNotExistError)
 import Prelude (Show (..))
 
 serializeYaml :: (ToJSON a) => a -> ByteString
@@ -71,12 +67,3 @@ rewrite pkg f = do
 
 readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
 readYaml = withThrow . read >=> (liftIO . decodeThrow)
-
-remove :: (HConfIO m) => FilePath -> m ()
-remove name =
-  liftIO
-    $ removeFile name
-    `catch` handleExists
-
-handleExists :: IOError -> IO ()
-handleExists e = unless (isDoesNotExistError e) (throwIO e)
