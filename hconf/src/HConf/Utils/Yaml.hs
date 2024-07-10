@@ -73,9 +73,10 @@ readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
 readYaml = withThrow . read >=> (liftIO . decodeThrow)
 
 remove :: (HConfIO m) => FilePath -> m ()
-remove name = liftIO $ removeFile name `catch` handleExists
+remove name =
+  liftIO
+    $ removeFile name
+    `catch` handleExists
 
 handleExists :: IOError -> IO ()
-handleExists e
-  | isDoesNotExistError e = return ()
-  | otherwise = throwIO e
+handleExists e = unless (isDoesNotExistError e) (throwIO e)
