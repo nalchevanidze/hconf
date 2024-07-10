@@ -20,7 +20,6 @@ import HConf.Utils.Class (Check (..), FLog (..), HConfIO (..), Parse (..), withT
 import HConf.Utils.Core (Msg (..), Name, exec, select, throwError)
 import HConf.Utils.Log (Log, alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
-import HConf.Utils.Yaml (remove)
 import Relude hiding (isPrefixOf)
 
 type Con m = (HConfIO m, Log m)
