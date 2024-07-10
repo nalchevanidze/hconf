@@ -83,7 +83,7 @@ withThrow x = x >>= either (throwError . msg) pure
 instance HConfIO IO where
   read = safeIO . readFile
   write f = safeIO . writeFile f
-  remove name = removeFile name `catch` (\e -> unless (isDoesNotExistError e) (throwIO e))
+  remove file = removeFile file `catch` (\e -> unless (isDoesNotExistError e) (throwIO e))
 
 class Format a where
   format :: a -> Text
