@@ -76,6 +76,7 @@ instance Log ConfigT where
 instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
+  remove = liftIO . remove
 
 instance ReadBounds ConfigT where
   readBounds name = asks config >>= getRule name
