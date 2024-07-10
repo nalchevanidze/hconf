@@ -91,7 +91,7 @@ getIndex :: Text -> Int
 getIndex = fromMaybe (length fields) . (`elemIndex` fields)
 
 mapTuple :: (a -> b) -> (b -> b -> c) -> a -> a -> c
-mapTuple f g a b= g (f a) (f b)
+mapTuple f g a b = g (f a) (f b)
 
 compareFields :: Text -> Text -> Ordering
 compareFields = mapTuple toTitle (mapTuple getIndex compare <> compare)

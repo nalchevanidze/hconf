@@ -9,6 +9,7 @@ where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.Text as T
+import HConf.Utils.Class (HConfIO)
 import HConf.Utils.Core
   ( Msg (..),
     Name,
@@ -31,7 +32,6 @@ import Network.HTTP.Req
   )
 import Relude hiding (ByteString)
 import Text.URI (mkURI)
-import HConf.Utils.Class (HConfIO)
 
 decodeUrl :: (MonadHttp p) => Either (Url s, Option s) (Url s', Option s') -> p LbsResponse
 decodeUrl (Left (u, o)) = req GET u NoReqBody lbsResponse o
