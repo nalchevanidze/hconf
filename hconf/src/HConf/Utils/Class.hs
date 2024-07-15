@@ -26,6 +26,7 @@ module HConf.Utils.Class
     FCon,
     fromConf,
     FromConfKey,
+    confList,
   )
 where
 
@@ -62,14 +63,17 @@ instance Parse Int where
       (readMaybe $ toString t)
 
 packages :: (FCon m ()) => m [PkgDir]
-packages = fromConf
+packages = confList
+
+confList :: (FromConf m [a], FromConfKey [a] ~ ()) => m [a]
+confList = fromConf' ()
 
 fromConf :: (FromConf m a, FromConfKey a ~ ()) => m a
 fromConf = fromConf' ()
 
 type family FromConfKey a :: Type
 
-type instance FromConfKey [PkgDir] = ()
+type instance FromConfKey [k] = ()
 
 type instance FromConfKey Env = ()
 

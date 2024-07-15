@@ -39,7 +39,6 @@ import HConf.Core.Version
 import HConf.Utils.Class
   ( Check (..),
     FCon,
-    FromConfKey,
     fromConf,
     packages,
   )
@@ -72,8 +71,6 @@ data Build = Build
       FromJSON,
       Show
     )
-
-type instance FromConfKey Builds = ()
 
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
