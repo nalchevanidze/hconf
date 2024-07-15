@@ -7,6 +7,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE DataKinds #-}
 
 module HConf.Config.Build
   ( Build,
@@ -36,9 +37,9 @@ import HConf.Core.Version
   )
 import HConf.Utils.Class
   ( Check (..),
-    FromConf (..),
+    fromConf,
     HConfIO,
-    packages,
+    packages, FConM, FCon,
   )
 import HConf.Utils.Core
   ( Name,
@@ -74,7 +75,7 @@ data Build = Build
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (HConfIO m, FromConf m [PkgDir], Log m) => Check m Build where
+instance (HConfIO m, FConM m, Log m) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
@@ -82,18 +83,18 @@ instance (HConfIO m, FromConf m [PkgDir], Log m) => Check m Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (FromConf m [PkgDir], Log m) => Maybe [PkgDir] -> m ()
+checkPkgNames :: (FConM m, Log m) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
   known <- packages
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (HConfIO f, FromConf f [PkgDir], Log f) => Maybe Extras -> f ()
+checkExtraDeps :: (HConfIO m, FConM m, Log m) => Maybe Extras -> m ()
 checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
 
-getBuild :: (FromConf m Builds) => Tag -> m Build
+getBuild :: (FCon m '[Builds]) => Tag -> m Build
 getBuild v = do
   builds <- fromConf
   maybe (notElemError "build" (show v) (map ghc builds)) pure (find ((== v) . ghc) builds)
@@ -101,7 +102,7 @@ getBuild v = do
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)
 
-getExtras :: (FromConf m Builds) => Tag -> m [HkgRef]
+getExtras :: (FCon m '[Builds]) => Tag -> m [HkgRef]
 getExtras tag =
   hkgRefs
     . M.fromList
@@ -109,11 +110,11 @@ getExtras tag =
     . selectBuilds tag
     <$> fromConf
 
-getPkgs :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m [PkgDir]
+getPkgs :: (FCon m '[Builds]) => Tag -> m [PkgDir]
 getPkgs version = do
   Build {..} <- getBuild version
   pkgs <- packages
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
-getResolver :: (FromConf m [PkgDir], FromConf m Builds) => Tag -> m ResolverName
+getResolver :: (FCon m '[Builds]) => Tag -> m ResolverName
 getResolver version = resolver <$> getBuild version
