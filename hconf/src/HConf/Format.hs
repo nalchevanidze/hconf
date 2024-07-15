@@ -22,7 +22,7 @@ import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
 
-format :: (Log m, FCon m ()) => Bool -> m ()
+format :: (FCon m ()) => Bool -> m ()
 format check = task "ormolu" $ do
   files <- sort . concat <$> (packages >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files

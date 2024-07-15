@@ -25,7 +25,7 @@ import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
 import HConf.Utils.Class (Diff (..), Format (..), HConfIO, Parse (..))
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
-import HConf.Utils.Log (Log, field)
+import HConf.Utils.Log (field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
 import Relude hiding
   ( Undefined,
@@ -118,7 +118,7 @@ getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 getLatestBound :: (HConfIO m) => Name -> m Bound
 getLatestBound = fmap (Bound Max True . head) . fetchVersions
 
-updateDepBounds :: (HConfIO m, Log m) => Name -> Bounds -> m Bounds
+updateDepBounds :: (HConfIO m) => Name -> Bounds -> m Bounds
 updateDepBounds name bounds = do
   latest <- getLatestBound name
   let upper = getBound Max bounds
@@ -126,5 +126,5 @@ updateDepBounds name bounds = do
   if upper == [newVersion] then pure () else field name (show newVersion)
   pure (Bounds (getBound Min bounds <> [newVersion]))
 
-class (HConfIO m, Log m) => ReadBounds m where
+class (HConfIO m) => ReadBounds m where
   readBounds :: Name -> m Bounds

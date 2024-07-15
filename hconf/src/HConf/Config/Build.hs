@@ -49,7 +49,6 @@ import HConf.Utils.Core
     notElemError,
     throwError,
   )
-import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
     group,
@@ -75,7 +74,7 @@ data Build = Build
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (FCon m (), Log m) => Check m Build where
+instance (FCon m ()) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
@@ -83,13 +82,13 @@ instance (FCon m (), Log m) => Check m Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (FCon m (), Log m) => Maybe [PkgDir] -> m ()
+checkPkgNames :: (FCon m ()) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
   known <- packages
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (FCon m (), Log m) => Maybe Extras -> m ()
+checkExtraDeps :: (FCon m ()) => Maybe Extras -> m ()
 checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]

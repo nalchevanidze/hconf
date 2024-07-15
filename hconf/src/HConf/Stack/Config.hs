@@ -19,7 +19,7 @@ import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Class (FCon, Format (..), fromConf)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
-import HConf.Utils.Log (Log, task)
+import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
 import Relude
 
@@ -41,12 +41,7 @@ instance FromJSON Stack where
 instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
-setupStack ::
-  ( FCon m '[Builds, Env],
-    Log m
-  ) =>
-  Tag ->
-  m ()
+setupStack :: (FCon m '[Builds, Env]) => Tag -> m ()
 setupStack version =
   task ("stack(" <> show version <> ")")
     $ task "stack.yaml"

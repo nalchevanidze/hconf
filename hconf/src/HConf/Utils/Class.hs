@@ -81,7 +81,7 @@ type family FCon' m a where
 class Check m a where
   check :: a -> m ()
 
-class (MonadIO m, MonadFail m) => HConfIO m where
+class (MonadIO m, MonadFail m, Log m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
   write :: FilePath -> ByteString -> m (Either String ())
   remove :: FilePath -> m ()

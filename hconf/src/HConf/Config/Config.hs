@@ -58,7 +58,7 @@ getRule name Config {..}
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (FCon m (), Log m) => Check m Config where
+instance (FCon m ()) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
 nextRelease :: Bool -> Config -> Config
@@ -67,7 +67,7 @@ nextRelease isBreaking Config {..} =
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
-updateConfig :: (HConfIO m, Log m) => Config -> m Config
+updateConfig :: (HConfIO m) => Config -> m Config
 updateConfig Config {..} = do
   dependencies' <- traverseDeps updateDepBounds dependencies
   pure Config {dependencies = dependencies', ..}

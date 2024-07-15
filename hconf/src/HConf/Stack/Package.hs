@@ -47,7 +47,7 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-resolvePackages :: (FCon m (), Log m) => m [(PkgDir, Package)]
+resolvePackages :: (FCon m ()) => m [(PkgDir, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . packageFile))
 
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
@@ -76,11 +76,11 @@ updatePackage (Just Package {..}) = do
 rewritePackage :: (ReadBounds m, FCon m Version) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
-checkPackage :: (ReadBounds m, Log m, FCon m Version) => PkgDir -> m ()
+checkPackage :: (ReadBounds m, FCon m Version) => PkgDir -> m ()
 checkPackage pkgDir =
   task (toText pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (ReadBounds m, FCon m Version, Log m) => m ()
+checkPackages :: (ReadBounds m, FCon m Version) => m ()
 checkPackages = task "packages" $ packages >>= traverse_ checkPackage

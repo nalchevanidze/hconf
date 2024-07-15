@@ -18,11 +18,9 @@ import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Check (..), FLog (..), HConfIO (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, exec, select, throwError)
-import HConf.Utils.Log (Log, alert, field, task, warn)
+import HConf.Utils.Log (alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
 import Relude hiding (isPrefixOf)
-
-type Con m = (HConfIO m, Log m)
 
 data Cabal = Cabal
   { name :: Name,
@@ -47,10 +45,10 @@ instance Parse Cabal where
 
 data Warning = Warning Text [Text]
 
-getCabal :: (Con m) => FilePath -> m Cabal
+getCabal :: (HConfIO m) => FilePath -> m Cabal
 getCabal path = withThrow (read path) >>= parse . fromByteString
 
-stack :: (Con m) => String -> PkgDir -> [String] -> m ()
+stack :: (HConfIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
   (out, success) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
   ( if success
@@ -61,7 +59,7 @@ stack cmd pkg options = do
 instance FLog Warning where
   flog (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
 
-printWarnings :: (Con m) => Name -> [Warning] -> m ()
+printWarnings :: (HConfIO m) => Name -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
 printWarnings cmd xs = task cmd $ traverse_ flog xs
 
@@ -88,7 +86,7 @@ data CabalSrc = CabalSrc
 instance FLog Cabal where
   flog Cabal {..} = field name (show version)
 
-instance (HConfIO m, Log m) => Check m CabalSrc where
+instance (HConfIO m) => Check m CabalSrc where
   check CabalSrc {..} = task "cabal" $ do
     let path = cabalFile (name target) pkgDir
     remove path
