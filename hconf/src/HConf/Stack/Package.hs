@@ -21,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (BaseM, Check (..), FCon, FConM, fromConf, packages)
+import HConf.Utils.Class (BaseM, Check (..), FCon, FCon, fromConf, packages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -47,7 +47,7 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-resolvePackages :: (FConM m, Log m) => m [(PkgDir, Package)]
+resolvePackages :: (FCon m (), Log m) => m [(PkgDir, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . packageFile))
 
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)

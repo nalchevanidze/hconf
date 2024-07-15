@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PolyKinds #-}
@@ -24,7 +25,6 @@ module HConf.Utils.Class
     Diff (..),
     logDiff,
     FCon,
-    FConM,
   )
 where
 
@@ -61,17 +61,25 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-packages :: (FConM m) => m [PkgDir]
+packages :: (FCon m ()) => m [PkgDir]
 packages = fromConf
 
 class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
 
-type FConM m = FCon m '[]
+class FC m a where
+  type FCon m a :: Constraint
 
-type family FCon m (l :: [Type]) where
-  FCon m (a : xs) = (FromConf m a, FCon m xs)
-  FCon m '[] = (FromConf m [PkgDir])
+instance FC (m :: Type -> Type) (a :: Type) where
+  type FCon m a = FCon' m '[a]
+
+instance FC (m :: Type -> Type) (a :: [Type]) where
+  type FCon m a = FCon' m a
+
+type family FCon' m a where
+  FCon' m '[()] = FromConf m [PkgDir]
+  FCon' m '[] = FromConf m [PkgDir]
+  FCon' m (a : xs) = (FromConf m a, FCon' m xs)
 
 class Check m a where
   check :: a -> m ()

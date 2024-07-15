@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -7,7 +8,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE DataKinds #-}
 
 module HConf.Config.Build
   ( Build,
@@ -37,9 +37,10 @@ import HConf.Core.Version
   )
 import HConf.Utils.Class
   ( Check (..),
-    fromConf,
+    FCon,
     HConfIO,
-    packages, FConM, FCon,
+    fromConf,
+    packages,
   )
 import HConf.Utils.Core
   ( Name,
@@ -75,7 +76,7 @@ data Build = Build
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (HConfIO m, FConM m, Log m) => Check m Build where
+instance (HConfIO m, FCon m (), Log m) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
@@ -83,13 +84,13 @@ instance (HConfIO m, FConM m, Log m) => Check m Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (FConM m, Log m) => Maybe [PkgDir] -> m ()
+checkPkgNames :: (FCon m (), Log m) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
   known <- packages
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (HConfIO m, FConM m, Log m) => Maybe Extras -> m ()
+checkExtraDeps :: (HConfIO m, FCon m (), Log m) => Maybe Extras -> m ()
 checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
