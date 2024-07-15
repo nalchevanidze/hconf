@@ -79,8 +79,6 @@ instance HConfIO ConfigT where
   write f = liftIO . write f
   remove = liftIO . remove
 
-
-
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
   cfg <- readYaml hconf
