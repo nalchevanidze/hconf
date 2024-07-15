@@ -19,7 +19,7 @@ import Data.Aeson
   )
 import qualified Data.Text as T
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Format (..), FromConfKey, Parse (..))
+import HConf.Utils.Class (Format (..), LookupKey, Parse (..))
 import HConf.Utils.Core (Msg (..), throwError)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
@@ -44,7 +44,7 @@ data Version = Version
       Eq
     )
 
-type instance FromConfKey Version = ()
+type instance LookupKey Version = ()
 
 getNumber :: [Int] -> Int
 getNumber (n : _) = n

@@ -14,7 +14,7 @@ module HConf.Utils.Class
   ( Parse (..),
     Check (..),
     HConfIO (..),
-    FromConf (..),
+    LookupConf (..),
     ResultT,
     Log (..),
     FLog (..),
@@ -24,7 +24,7 @@ module HConf.Utils.Class
     logDiff,
     FCon,
     fromConf,
-    FromConfKey,
+    LookupKey,
     confList,
   )
 where
@@ -62,20 +62,20 @@ instance Parse Int where
       (readMaybe $ toString t)
 
 
-confList :: (FromConf m [a], FromConfKey [a] ~ ()) => m [a]
-confList = fromConf' ()
+confList :: (LookupConf m [a], LookupKey [a] ~ ()) => m [a]
+confList = lookupConf ()
 
-fromConf :: (FromConf m a, FromConfKey a ~ ()) => m a
-fromConf = fromConf' ()
+fromConf :: (LookupConf m a, LookupKey a ~ ()) => m a
+fromConf = lookupConf ()
 
-type family FromConfKey a :: Type
+type family LookupKey a :: Type
 
-type instance FromConfKey [k] = ()
+type instance LookupKey [k] = ()
 
-type instance FromConfKey Env = ()
+type instance LookupKey Env = ()
 
-class (HConfIO m) => FromConf m a where
-  fromConf' :: FromConfKey a -> m a
+class (HConfIO m) => LookupConf m a where
+  lookupConf :: LookupKey a -> m a
 
 class FC m a where
   type FCon m a :: Constraint
@@ -88,8 +88,8 @@ instance FC (m :: Type -> Type) (a :: [Type]) where
 
 type family FCon' m a where
   FCon' m '[()] = FCon' m '[]
-  FCon' m '[] = (FromConf m [PkgDir])
-  FCon' m (x : xs) = (FromConf m x, FCon' m xs)
+  FCon' m '[] = (LookupConf m [PkgDir])
+  FCon' m (x : xs) = (LookupConf m x, FCon' m xs)
 
 class Check m a where
   check :: a -> m ()

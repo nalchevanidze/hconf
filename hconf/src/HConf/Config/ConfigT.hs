@@ -28,7 +28,7 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
   ( Check (..),
-    FromConf (..),
+    LookupConf (..),
     HConfIO (..),
   )
 import HConf.Utils.Core (Name)
@@ -98,17 +98,17 @@ save cfg = task "save" $ task "hconf.yaml" $ do
   ctx <- asks id
   rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
-instance FromConf ConfigT [PkgDir] where
-  fromConf' _ = concatMap pkgDirs <$> asks (groups . config)
+instance LookupConf ConfigT [PkgDir] where
+  lookupConf _ = concatMap pkgDirs <$> asks (groups . config)
 
-instance FromConf ConfigT Builds where
-  fromConf' () = asks (builds . config)
+instance LookupConf ConfigT Builds where
+  lookupConf () = asks (builds . config)
 
-instance FromConf ConfigT Env where
-  fromConf' _ = asks env
+instance LookupConf ConfigT Env where
+  lookupConf _ = asks env
 
-instance FromConf ConfigT Version where
-  fromConf' _ = asks (version . config)
+instance LookupConf ConfigT Version where
+  lookupConf _ = asks (version . config)
 
-instance FromConf ConfigT Bounds where
-  fromConf' name = asks config >>= getRule name
+instance LookupConf ConfigT Bounds where
+  lookupConf name = asks config >>= getRule name
