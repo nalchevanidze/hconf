@@ -36,7 +36,7 @@ import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
 
-type BaseM m = (MonadFail m, MonadIO m, Log m, FromConf m [PkgDir])
+type BaseM m = (Log m, FCon m ())
 
 class FLog a where
   flog :: (Log m, Monad m) => a -> m ()
@@ -64,7 +64,7 @@ instance Parse Int where
 packages :: (FCon m ()) => m [PkgDir]
 packages = fromConf
 
-class (MonadFail m, HConfIO m) => FromConf m a where
+class (HConfIO m) => FromConf m a where
   fromConf :: m a
 
 class FC m a where
