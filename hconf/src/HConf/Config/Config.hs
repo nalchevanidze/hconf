@@ -58,7 +58,7 @@ getRule name Config {..}
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (HConfIO m, FCon m (), Log m) => Check m Config where
+instance (FCon m (), Log m) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
 nextRelease :: Bool -> Config -> Config
