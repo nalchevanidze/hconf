@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -20,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (BaseM, Check (..), FromConf (..), packages)
+import HConf.Utils.Class (BaseM, Check (..), FCon, FConM, fromConf, packages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -46,13 +47,13 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-resolvePackages :: (FromConf m [PkgDir], Log m) => m [(PkgDir, Package)]
+resolvePackages :: (FConM m, Log m) => m [(PkgDir, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . packageFile))
 
 updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: (ReadBounds m, FromConf m Version) => Maybe Package -> m Package
+updatePackage :: (ReadBounds m, FCon m '[Version]) => Maybe Package -> m Package
 updatePackage Nothing = throwError "could not find package file"
 updatePackage (Just Package {..}) = do
   newLibrary <- traverse updateLibrary library
@@ -72,14 +73,14 @@ updatePackage (Just Package {..}) = do
         ..
       }
 
-rewritePackage :: (ReadBounds m, FromConf m Version) => PkgDir -> m Package
+rewritePackage :: (ReadBounds m, FCon m '[Version]) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
-checkPackage :: (ReadBounds m, BaseM m, FromConf m Version) => PkgDir -> m ()
+checkPackage :: (ReadBounds m, BaseM m, FCon m '[Version]) => PkgDir -> m ()
 checkPackage pkgDir =
   task (toText pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (ReadBounds m, FromConf m Version, BaseM m) => m ()
+checkPackages :: (ReadBounds m, FCon m '[Version], BaseM m) => m ()
 checkPackages = task "packages" $ packages >>= traverse_ checkPackage
