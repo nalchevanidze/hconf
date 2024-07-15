@@ -2,6 +2,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Core.Version
@@ -18,7 +19,7 @@ import Data.Aeson
   )
 import qualified Data.Text as T
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Format (..), Parse (..))
+import HConf.Utils.Class (Format (..), FromConfKey, Parse (..))
 import HConf.Utils.Core (Msg (..), throwError)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
@@ -42,6 +43,8 @@ data Version = Version
     ( Generic,
       Eq
     )
+
+type instance FromConfKey Version = ()
 
 getNumber :: [Int] -> Int
 getNumber (n : _) = n

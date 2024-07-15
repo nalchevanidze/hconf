@@ -24,11 +24,14 @@ module HConf.Utils.Class
     Diff (..),
     logDiff,
     FCon,
+    fromConf,
+    FromConfKey,
   )
 where
 
 import Control.Exception (catch, throwIO, tryJust)
 import Data.ByteString (readFile, writeFile)
+import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude hiding (readFile, writeFile)
@@ -61,8 +64,17 @@ instance Parse Int where
 packages :: (FCon m ()) => m [PkgDir]
 packages = fromConf
 
+fromConf :: (FromConf m a, FromConfKey a ~ ()) => m a
+fromConf = fromConf' ()
+
+type family FromConfKey a :: Type
+
+type instance FromConfKey [PkgDir] = ()
+
+type instance FromConfKey Env = ()
+
 class (HConfIO m) => FromConf m a where
-  fromConf :: m a
+  fromConf' :: FromConfKey a -> m a
 
 class FC m a where
   type FCon m a :: Constraint
@@ -75,7 +87,7 @@ instance FC (m :: Type -> Type) (a :: [Type]) where
 
 type family FCon' m a where
   FCon' m '[()] = FCon' m '[]
-  FCon' m '[] = FromConf m [PkgDir]
+  FCon' m '[] = (FromConf m [PkgDir])
   FCon' m (x : xs) = (FromConf m x, FCon' m xs)
 
 class Check m a where

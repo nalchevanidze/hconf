@@ -32,9 +32,9 @@ import Data.Aeson.Types
     withObject,
   )
 import GHC.Generics (Generic (..))
-import HConf.Core.Bounds (Bounds, ReadBounds (..))
+import HConf.Core.Bounds (Bounds)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
-import HConf.Utils.Class (logDiff)
+import HConf.Utils.Class (FCon, FromConf (..), logDiff)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (field)
 import Relude hiding
@@ -75,16 +75,16 @@ toObject :: Value -> Object
 toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
-updateDependency :: (ReadBounds m) => Name -> Bounds -> m Bounds
+updateDependency :: (FCon m Bounds) => Name -> Bounds -> m Bounds
 updateDependency name oldBounds = do
-  bounds <- readBounds name
+  bounds <- fromConf' name
   logDiff (field name) oldBounds bounds
   pure bounds
 
-updateDependencies :: (ReadBounds m) => Dependencies -> m Dependencies
+updateDependencies :: (FCon m Bounds) => Dependencies -> m Dependencies
 updateDependencies = traverseDeps updateDependency
 
-updateLibrary :: (ReadBounds m) => Library -> m Library
+updateLibrary :: (FCon m Bounds) => Library -> m Library
 updateLibrary Library {..} = do
   newDependencies <- traverse updateDependencies dependencies
   pure $ Library {dependencies = newDependencies, ..}

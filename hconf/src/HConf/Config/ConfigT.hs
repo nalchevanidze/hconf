@@ -5,6 +5,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Config.ConfigT
@@ -20,7 +21,7 @@ import Control.Exception (tryJust)
 import HConf.Config.Build (Builds)
 import HConf.Config.Config (Config (..), getRule)
 import HConf.Config.PkgGroup (pkgDirs)
-import HConf.Core.Bounds (ReadBounds (..))
+import HConf.Core.Bounds (Bounds)
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
@@ -78,8 +79,7 @@ instance HConfIO ConfigT where
   write f = liftIO . write f
   remove = liftIO . remove
 
-instance ReadBounds ConfigT where
-  readBounds name = asks config >>= getRule name
+
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
@@ -101,13 +101,16 @@ save cfg = task "save" $ task "hconf.yaml" $ do
   rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
 instance FromConf ConfigT [PkgDir] where
-  fromConf = concatMap pkgDirs <$> asks (groups . config)
+  fromConf' _ = concatMap pkgDirs <$> asks (groups . config)
 
 instance FromConf ConfigT Builds where
-  fromConf = asks (builds . config)
+  fromConf' () = asks (builds . config)
 
 instance FromConf ConfigT Env where
-  fromConf = asks env
+  fromConf' _ = asks env
 
 instance FromConf ConfigT Version where
-  fromConf = asks (version . config)
+  fromConf' _ = asks (version . config)
+
+instance FromConf ConfigT Bounds where
+  fromConf' name = asks config >>= getRule name

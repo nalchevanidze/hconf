@@ -8,7 +8,6 @@ module HConf.Core.Bounds
   ( Bounds,
     versionBounds,
     updateDepBounds,
-    ReadBounds (..),
   )
 where
 
@@ -23,7 +22,7 @@ import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Diff (..), Format (..), HConfIO, Parse (..))
+import HConf.Utils.Class (Diff (..), Format (..), HConfIO, Parse (..), FromConfKey)
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
 import HConf.Utils.Log (field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
@@ -83,6 +82,8 @@ instance Parse Bound where
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
 
+type instance FromConfKey Bounds = Name
+
 instance Parse Bounds where
   parse "" = pure $ Bounds []
   parse str = Bounds <$> sepBy "&&" str
@@ -125,6 +126,3 @@ updateDepBounds name bounds = do
   let newVersion = maximum (latest : upper)
   if upper == [newVersion] then pure () else field name (show newVersion)
   pure (Bounds (getBound Min bounds <> [newVersion]))
-
-class (HConfIO m) => ReadBounds m where
-  readBounds :: Name -> m Bounds

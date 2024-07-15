@@ -15,7 +15,7 @@ module HConf.Stack.Package
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import HConf.Core.Bounds (ReadBounds (..))
+import HConf.Core.Bounds (Bounds)
 import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
@@ -50,10 +50,10 @@ instance ToJSON Package where
 resolvePackages :: (FCon m ()) => m [(PkgDir, Package)]
 resolvePackages = fromConf >>= traverse (tupled (readYaml . packageFile))
 
-updateLibraries :: (ReadBounds m) => Maybe Libraries -> m (Maybe Libraries)
+updateLibraries :: (FCon m Bounds) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: (ReadBounds m, FCon m Version) => Maybe Package -> m Package
+updatePackage :: (FCon m '[Version, Bounds]) => Maybe Package -> m Package
 updatePackage Nothing = throwError "could not find package file"
 updatePackage (Just Package {..}) = do
   newLibrary <- traverse updateLibrary library
@@ -73,14 +73,14 @@ updatePackage (Just Package {..}) = do
         ..
       }
 
-rewritePackage :: (ReadBounds m, FCon m Version) => PkgDir -> m Package
+rewritePackage :: (FCon m '[Version, Bounds]) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
-checkPackage :: (ReadBounds m, FCon m Version) => PkgDir -> m ()
+checkPackage :: (FCon m '[Version, Bounds]) => PkgDir -> m ()
 checkPackage pkgDir =
   task (toText pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (ReadBounds m, FCon m Version) => m ()
+checkPackages :: (FCon m '[Version, Bounds]) => m ()
 checkPackages = task "packages" $ packages >>= traverse_ checkPackage
