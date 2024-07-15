@@ -28,8 +28,8 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
   ( Check (..),
-    LookupConf (..),
     HConfIO (..),
+    LookupConf (..),
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log
