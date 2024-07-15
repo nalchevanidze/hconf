@@ -23,7 +23,7 @@ import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (Check (..), FCon, fromConf, packages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
-import HConf.Utils.Log (Log, task)
+import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude hiding (Undefined, length, replicate)
 

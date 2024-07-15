@@ -29,7 +29,6 @@ import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
 import HConf.Utils.Class (Check (check), FCon, HConfIO)
 import HConf.Utils.Core (Name)
-import HConf.Utils.Log (Log (..))
 import Relude hiding
   ( Undefined,
     group,

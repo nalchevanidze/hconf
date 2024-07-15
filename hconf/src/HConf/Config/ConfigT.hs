@@ -89,7 +89,7 @@ run m env@Env {..} = do
 runTask :: Name -> ConfigT () -> Env -> IO ()
 runTask name m = run (task name m $> Just (chalk Green "\nOk"))
 
-handle :: (ToString a) => (Log m, Monad m) => Either String (Maybe a) -> m ()
+handle :: (ToString a) => (HConfIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
   Left x -> alert ("ERROR: " <> x)
   (Right Nothing) -> pure ()

@@ -21,7 +21,7 @@ import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
 import HConf.Utils.Class (FCon, fromConf)
 import HConf.Utils.Core (Name)
-import HConf.Utils.Log (Log, task)
+import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
 import Relude hiding (Undefined, intercalate)
 
@@ -73,7 +73,7 @@ toLib (path, Package {..}) =
       ]
     comp _ _ = []
 
-genHie :: (FCon m Env, Log m) => m ()
+genHie :: (FCon m Env) => m ()
 genHie = task "hie" $ task "hie.yaml" $ do
   Env {..} <- fromConf
   components <- concatMap toLib <$> resolvePackages

@@ -19,7 +19,7 @@ import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
 import HConf.Utils.Class (HConfIO (..), withThrow)
 import HConf.Utils.Core (compareFields)
-import HConf.Utils.Log (Log, logFileChange)
+import HConf.Utils.Log (logFileChange)
 import Relude hiding (Show, Undefined, intercalate, show)
 import Prelude (Show (..))
 
@@ -55,7 +55,7 @@ mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 fromEither :: (HConfIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
 fromEither = either (const $ pure Nothing) (fmap Just . liftIO . decodeThrow)
 
-rewrite :: (HConfIO m, Log m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
+rewrite :: (HConfIO m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = do
   original <- read pkg
   yaml <- fromEither original >>= mapYaml f

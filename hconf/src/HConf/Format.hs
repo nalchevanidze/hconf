@@ -8,7 +8,7 @@ import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (explore)
 import HConf.Utils.Class (FCon, HConfIO, packages)
 import HConf.Utils.Core (throwError)
-import HConf.Utils.Log (Log, task)
+import HConf.Utils.Log (task)
 import Ormolu
   ( ColorMode (..),
     Config (..),
