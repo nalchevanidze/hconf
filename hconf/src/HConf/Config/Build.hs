@@ -95,7 +95,7 @@ checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
 
-getBuild :: (FCon m '[Builds]) => Tag -> m Build
+getBuild :: (FCon m Builds) => Tag -> m Build
 getBuild v = do
   builds <- fromConf
   maybe (notElemError "build" (show v) (map ghc builds)) pure (find ((== v) . ghc) builds)
@@ -103,7 +103,7 @@ getBuild v = do
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)
 
-getExtras :: (FCon m '[Builds]) => Tag -> m [HkgRef]
+getExtras :: (FCon m Builds) => Tag -> m [HkgRef]
 getExtras tag =
   hkgRefs
     . M.fromList
@@ -111,11 +111,11 @@ getExtras tag =
     . selectBuilds tag
     <$> fromConf
 
-getPkgs :: (FCon m '[Builds]) => Tag -> m [PkgDir]
+getPkgs :: (FCon m Builds) => Tag -> m [PkgDir]
 getPkgs version = do
   Build {..} <- getBuild version
   pkgs <- packages
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
-getResolver :: (FCon m '[Builds]) => Tag -> m ResolverName
+getResolver :: (FCon m Builds) => Tag -> m ResolverName
 getResolver version = resolver <$> getBuild version

@@ -73,7 +73,7 @@ toLib (path, Package {..}) =
       ]
     comp _ _ = []
 
-genHie :: (FCon m '[Env], Log m) => m ()
+genHie :: (FCon m Env, Log m) => m ()
 genHie = task "hie" $ task "hie.yaml" $ do
   Env {..} <- fromConf
   components <- concatMap toLib <$> resolvePackages
