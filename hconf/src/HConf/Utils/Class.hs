@@ -25,7 +25,7 @@ module HConf.Utils.Class
     ReadConf,
     fromConf,
     LookupKey,
-    confList,
+    readList,
     fromEnv,
   )
 where
@@ -62,8 +62,8 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-confList :: (ReadConf m [a], LookupKey [a] ~ ()) => m [a]
-confList = lookupConf ()
+readList :: (ReadConf m [a], LookupKey [a] ~ ()) => m [a]
+readList = lookupConf ()
 
 fromEnv :: (ReadConf m Env) => (Env -> a) -> m a
 fromEnv f = f <$> lookupConf ()

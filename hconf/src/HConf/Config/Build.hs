@@ -39,7 +39,7 @@ import HConf.Core.Version
 import HConf.Utils.Class
   ( Check (..),
     ReadConf,
-    confList,
+    readList,
   )
 import HConf.Utils.Core
   ( Name,
@@ -84,7 +84,7 @@ instance (ReadConf m ()) => Check m Build where
 
 checkPkgNames :: (ReadConf m ()) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
-  known <- confList
+  known <- readList
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
@@ -95,7 +95,7 @@ type Builds = [Build]
 
 getBuild :: (ReadConf m Builds) => Tag -> m Build
 getBuild v = do
-  builds <- confList
+  builds <- readList
   maybe (notElemError "build" (show v) (map ghc builds)) pure (find ((== v) . ghc) builds)
 
 selectBuilds :: Tag -> [Build] -> [Build]
@@ -107,12 +107,12 @@ getExtras tag =
     . M.fromList
     . concatMap (maybeMapToList . extra)
     . selectBuilds tag
-    <$> confList
+    <$> readList
 
 getPkgs :: (ReadConf m Builds) => Tag -> m [PkgDir]
 getPkgs version = do
   Build {..} <- getBuild version
-  pkgs <- confList
+  pkgs <- readList
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
 getResolver :: (ReadConf m Builds) => Tag -> m ResolverName

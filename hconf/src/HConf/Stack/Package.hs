@@ -21,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (Check (..), ReadConf, confList, fromConf)
+import HConf.Utils.Class (Check (..), ReadConf, fromConf, readList)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -48,7 +48,7 @@ instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
 resolvePackages :: (ReadConf m ()) => m [(PkgDir, Package)]
-resolvePackages = confList >>= traverse (tupled (readYaml . packageFile))
+resolvePackages = readList >>= traverse (tupled (readYaml . packageFile))
 
 updateLibraries :: (ReadConf m Bounds) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
@@ -83,4 +83,4 @@ checkPackage pkgDir =
     check CabalSrc {pkgDir, target = Cabal {..}}
 
 checkPackages :: (ReadConf m '[Version, Bounds]) => m ()
-checkPackages = task "packages" $ confList >>= traverse_ checkPackage
+checkPackages = task "packages" $ readList >>= traverse_ checkPackage
