@@ -18,7 +18,6 @@ module HConf.Utils.Class
     ResultT,
     Log (..),
     FLog (..),
-    packages,
     withThrow,
     Format (..),
     Diff (..),
