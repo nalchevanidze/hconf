@@ -19,7 +19,7 @@ import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir, pkgFile)
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
-import HConf.Utils.Class (FCon, fromConf)
+import HConf.Utils.Class (FCon, fromEnv)
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
@@ -75,6 +75,6 @@ toLib (path, Package {..}) =
 
 genHie :: (FCon m Env) => m ()
 genHie = task "hie" $ task "hie.yaml" $ do
-  Env {..} <- fromConf
+  Env {..} <- fromEnv id
   components <- concatMap toLib <$> resolvePackages
   rewrite hie (const $ pure $ packHie Components {stackYaml = stack, components}) $> ()

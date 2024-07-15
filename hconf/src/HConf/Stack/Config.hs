@@ -17,7 +17,7 @@ import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Class (FCon, Format (..), fromConf)
+import HConf.Utils.Class (FCon, Format (..), fromEnv)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
@@ -46,7 +46,7 @@ setupStack version =
   task ("stack(" <> show version <> ")")
     $ task "stack.yaml"
     $ do
-      p <- stack <$> fromConf
+      p <- fromEnv stack
       rewrite p (updateStack version) $> ()
 
 updateStack :: (FCon m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
