@@ -77,7 +77,7 @@ instance FC (m :: Type -> Type) (a :: [Type]) where
   type FCon m a = FCon' m a
 
 type family FCon' m a where
-  FCon' m '[()] = FromConf m [PkgDir]
+  FCon' m '[()] = FCon' m '[]
   FCon' m '[] = FromConf m [PkgDir]
   FCon' m (a : xs) = (FromConf m a, FCon' m xs)
 
