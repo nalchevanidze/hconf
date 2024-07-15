@@ -87,7 +87,7 @@ instance FC (m :: Type -> Type) (a :: [Type]) where
 
 type family ReadConf' m a where
   ReadConf' m '[()] = ReadConf' m '[]
-  ReadConf' m '[] = (LookupConf m [PkgDir])
+  ReadConf' m '[] = LookupConf m [PkgDir]
   ReadConf' m (x : xs) = (LookupConf m x, ReadConf' m xs)
 
 class Check m a where
