@@ -38,7 +38,7 @@ import HConf.Core.Version
   )
 import HConf.Utils.Class
   ( Check (..),
-    FCon,
+    ReadConf,
     confList,
   )
 import HConf.Utils.Core
@@ -74,7 +74,7 @@ data Build = Build
 instance ToJSON Build where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (FCon m ()) => Check m Build where
+instance (ReadConf m ()) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
@@ -82,18 +82,18 @@ instance (FCon m ()) => Check m Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (FCon m ()) => Maybe [PkgDir] -> m ()
+checkPkgNames :: (ReadConf m ()) => Maybe [PkgDir] -> m ()
 checkPkgNames ls = do
   known <- confList
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (FCon m ()) => Maybe Extras -> m ()
+checkExtraDeps :: (ReadConf m ()) => Maybe Extras -> m ()
 checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
 
-getBuild :: (FCon m Builds) => Tag -> m Build
+getBuild :: (ReadConf m Builds) => Tag -> m Build
 getBuild v = do
   builds <- confList
   maybe (notElemError "build" (show v) (map ghc builds)) pure (find ((== v) . ghc) builds)
@@ -101,7 +101,7 @@ getBuild v = do
 selectBuilds :: Tag -> [Build] -> [Build]
 selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc)
 
-getExtras :: (FCon m Builds) => Tag -> m [HkgRef]
+getExtras :: (ReadConf m Builds) => Tag -> m [HkgRef]
 getExtras tag =
   hkgRefs
     . M.fromList
@@ -109,11 +109,11 @@ getExtras tag =
     . selectBuilds tag
     <$> confList
 
-getPkgs :: (FCon m Builds) => Tag -> m [PkgDir]
+getPkgs :: (ReadConf m Builds) => Tag -> m [PkgDir]
 getPkgs version = do
   Build {..} <- getBuild version
   pkgs <- confList
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
-getResolver :: (FCon m Builds) => Tag -> m ResolverName
+getResolver :: (ReadConf m Builds) => Tag -> m ResolverName
 getResolver version = resolver <$> getBuild version

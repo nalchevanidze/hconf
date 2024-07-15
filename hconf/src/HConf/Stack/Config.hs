@@ -17,7 +17,7 @@ import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Class (FCon, Format (..), fromEnv)
+import HConf.Utils.Class (ReadConf, Format (..), fromEnv)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
@@ -41,7 +41,7 @@ instance FromJSON Stack where
 instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
-setupStack :: (FCon m '[Builds, Env]) => Tag -> m ()
+setupStack :: (ReadConf m '[Builds, Env]) => Tag -> m ()
 setupStack version =
   task ("stack(" <> show version <> ")")
     $ task "stack.yaml"
@@ -49,7 +49,7 @@ setupStack version =
       p <- fromEnv stack
       rewrite p (updateStack version) $> ()
 
-updateStack :: (FCon m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
+updateStack :: (ReadConf m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
   resolver <- getResolver version
   extraDeps <- sort . map format <$> getExtras version

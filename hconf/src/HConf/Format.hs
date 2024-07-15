@@ -6,7 +6,7 @@ module HConf.Format (format) where
 
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (explore)
-import HConf.Utils.Class (FCon, HConfIO, confList)
+import HConf.Utils.Class (ReadConf, HConfIO, confList)
 import HConf.Utils.Core (throwError)
 import HConf.Utils.Log (task)
 import Ormolu
@@ -22,7 +22,7 @@ import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
 
-format :: (FCon m ()) => Bool -> m ()
+format :: (ReadConf m ()) => Bool -> m ()
 format check = task "ormolu" $ do
   files <- sort . concat <$> (confList >>= traverse explore)
   errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files

@@ -27,7 +27,7 @@ import HConf.Config.PkgGroup (PkgGroup, isMember)
 import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
-import HConf.Utils.Class (Check (check), FCon, HConfIO)
+import HConf.Utils.Class (Check (check), ReadConf, HConfIO)
 import HConf.Utils.Core (Name)
 import Relude hiding
   ( Undefined,
@@ -57,7 +57,7 @@ getRule name Config {..}
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (FCon m ()) => Check m Config where
+instance (ReadConf m ()) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
 nextRelease :: Bool -> Config -> Config

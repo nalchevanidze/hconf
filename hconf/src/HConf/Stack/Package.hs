@@ -21,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (Check (..), FCon, confList, fromConf)
+import HConf.Utils.Class (Check (..), ReadConf, confList, fromConf)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -47,13 +47,13 @@ instance FromJSON Package where
 instance ToJSON Package where
   toJSON = genericToJSON aesonYAMLOptions
 
-resolvePackages :: (FCon m ()) => m [(PkgDir, Package)]
+resolvePackages :: (ReadConf m ()) => m [(PkgDir, Package)]
 resolvePackages = confList >>= traverse (tupled (readYaml . packageFile))
 
-updateLibraries :: (FCon m Bounds) => Maybe Libraries -> m (Maybe Libraries)
+updateLibraries :: (ReadConf m Bounds) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: (FCon m '[Version, Bounds]) => Maybe Package -> m Package
+updatePackage :: (ReadConf m '[Version, Bounds]) => Maybe Package -> m Package
 updatePackage Nothing = throwError "could not find package file"
 updatePackage (Just Package {..}) = do
   newLibrary <- traverse updateLibrary library
@@ -73,14 +73,14 @@ updatePackage (Just Package {..}) = do
         ..
       }
 
-rewritePackage :: (FCon m '[Version, Bounds]) => PkgDir -> m Package
+rewritePackage :: (ReadConf m '[Version, Bounds]) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
-checkPackage :: (FCon m '[Version, Bounds]) => PkgDir -> m ()
+checkPackage :: (ReadConf m '[Version, Bounds]) => PkgDir -> m ()
 checkPackage pkgDir =
   task (toText pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (FCon m '[Version, Bounds]) => m ()
+checkPackages :: (ReadConf m '[Version, Bounds]) => m ()
 checkPackages = task "packages" $ confList >>= traverse_ checkPackage
