@@ -61,8 +61,6 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-packages :: (FCon m ()) => m [PkgDir]
-packages = confList
 
 confList :: (FromConf m [a], FromConfKey [a] ~ ()) => m [a]
 confList = fromConf' ()
