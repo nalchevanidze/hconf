@@ -1,8 +1,12 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE StarIsType #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Class
@@ -19,6 +23,8 @@ module HConf.Utils.Class
     Format (..),
     Diff (..),
     logDiff,
+    FCon,
+    FConM,
   )
 where
 
@@ -55,11 +61,17 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-packages :: (FromConf m [PkgDir]) => m [PkgDir]
+packages :: (FConM m) => m [PkgDir]
 packages = fromConf
 
 class (MonadFail m, HConfIO m) => FromConf m a where
   fromConf :: m a
+
+type FConM m = FCon m '[]
+
+type family FCon m (l :: [Type]) where
+  FCon m (a : xs) = (FromConf m a, FCon m xs)
+  FCon m '[] = (FromConf m [PkgDir])
 
 class Check m a where
   check :: a -> m ()

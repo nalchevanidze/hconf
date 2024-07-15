@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -16,7 +17,7 @@ import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Class (Format (..), FromConf (..))
+import HConf.Utils.Class (FCon, Format (..), fromConf)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (rewrite)
@@ -41,9 +42,7 @@ instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
 setupStack ::
-  ( FromConf m Builds,
-    FromConf m Env,
-    FromConf m [PkgDir],
+  ( FCon m '[Builds, Env],
     Log m
   ) =>
   Tag ->
@@ -55,7 +54,7 @@ setupStack version =
       p <- stack <$> fromConf
       rewrite p (updateStack version) $> ()
 
-updateStack :: (FromConf m Builds, FromConf m [PkgDir]) => Tag -> Maybe Stack -> m Stack
+updateStack :: (FCon m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
   resolver <- getResolver version
   extraDeps <- sort . map format <$> getExtras version
