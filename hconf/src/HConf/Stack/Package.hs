@@ -18,10 +18,10 @@ import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import HConf.Core.Bounds (Bounds)
 import HConf.Core.Dependencies (Dependencies)
 import HConf.Core.PkgDir (PkgDir, packageFile)
-import HConf.Core.Version (Version)
+import HConf.Core.Version (Version, readVersion)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (Check (..), ReadConf, fromConf, readList)
+import HConf.Utils.Class (Check (..), ReadConf, readList)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -61,7 +61,7 @@ updatePackage (Just Package {..}) = do
   newExecutables <- updateLibraries executables
   newBenchmarks <- updateLibraries benchmarks
   newDependencies <- updateDependencies dependencies
-  newVersion <- fromConf
+  newVersion <- readVersion
   pure
     $ Package
       { version = newVersion,

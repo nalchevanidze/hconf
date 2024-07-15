@@ -23,7 +23,6 @@ module HConf.Utils.Class
     Diff (..),
     logDiff,
     ReadConf,
-    fromConf,
     LookupKey,
     readList,
     readEnv,
@@ -67,9 +66,6 @@ readList = lookupConf ()
 
 readEnv :: (ReadConf m Env) => (Env -> a) -> m a
 readEnv f = f <$> lookupConf ()
-
-fromConf :: (LookupConf m a, LookupKey a ~ ()) => m a
-fromConf = lookupConf ()
 
 type family LookupKey a :: Type
 
