@@ -79,7 +79,7 @@ instance FC (m :: Type -> Type) (a :: [Type]) where
 type family FCon' m a where
   FCon' m '[()] = FCon' m '[]
   FCon' m '[] = FromConf m [PkgDir]
-  FCon' m (a : xs) = (FromConf m a, FCon' m xs)
+  FCon' m (x : xs) = (FromConf m x, FCon' m xs)
 
 class Check m a where
   check :: a -> m ()
