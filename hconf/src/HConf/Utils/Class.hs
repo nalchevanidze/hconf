@@ -26,7 +26,7 @@ module HConf.Utils.Class
     fromConf,
     LookupKey,
     readList,
-    fromEnv,
+    readEnv,
   )
 where
 
@@ -65,8 +65,8 @@ instance Parse Int where
 readList :: (ReadConf m [a], LookupKey [a] ~ ()) => m [a]
 readList = lookupConf ()
 
-fromEnv :: (ReadConf m Env) => (Env -> a) -> m a
-fromEnv f = f <$> lookupConf ()
+readEnv :: (ReadConf m Env) => (Env -> a) -> m a
+readEnv f = f <$> lookupConf ()
 
 fromConf :: (LookupConf m a, LookupKey a ~ ()) => m a
 fromConf = lookupConf ()
