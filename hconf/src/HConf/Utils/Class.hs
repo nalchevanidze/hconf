@@ -20,7 +20,6 @@ module HConf.Utils.Class
     FLog (..),
     packages,
     withThrow,
-    BaseM,
     Format (..),
     Diff (..),
     logDiff,
@@ -35,8 +34,6 @@ import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
-
-type BaseM m = (Log m, FCon m ())
 
 class FLog a where
   flog :: (Log m, Monad m) => a -> m ()

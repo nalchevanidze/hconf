@@ -21,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (BaseM, Check (..), FCon, fromConf, packages)
+import HConf.Utils.Class (Check (..), FCon, fromConf, packages)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (Log, task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -76,11 +76,11 @@ updatePackage (Just Package {..}) = do
 rewritePackage :: (ReadBounds m, FCon m Version) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
-checkPackage :: (ReadBounds m, BaseM m, FCon m Version) => PkgDir -> m ()
+checkPackage :: (ReadBounds m, Log m, FCon m Version) => PkgDir -> m ()
 checkPackage pkgDir =
   task (toText pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (ReadBounds m, FCon m Version, BaseM m) => m ()
+checkPackages :: (ReadBounds m, FCon m Version, Log m) => m ()
 checkPackages = task "packages" $ packages >>= traverse_ checkPackage
