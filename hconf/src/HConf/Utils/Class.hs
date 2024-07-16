@@ -61,7 +61,7 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-readList :: (ReadConf m [a], LookupKey [a] ~ ()) => m [a]
+readList :: (ReadConf m [a]) => m [a]
 readList = lookupConf ()
 
 readEnv :: (ReadConf m Env) => (Env -> a) -> m a
