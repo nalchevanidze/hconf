@@ -6,7 +6,7 @@
 
 module HConf.Core.Bounds
   ( Bounds,
-    BOUNDS,
+    BoundsByName,
     versionBounds,
     updateDepBounds,
   )
@@ -83,7 +83,7 @@ instance Parse Bound where
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
 
-type BOUNDS = ByName Bounds
+type BoundsByName = ByName Bounds
 
 instance Parse Bounds where
   parse "" = pure $ Bounds []
