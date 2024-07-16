@@ -76,13 +76,13 @@ type instance LookupKey Env = ()
 class (HConfIO m) => LookupConf m a where
   lookupConf :: LookupKey a -> m a
 
-class ReadConfDef m a where
+class ReadConfFuncDef m a where
   type ReadConf m a :: Constraint
 
-instance ReadConfDef (m :: Type -> Type) (a :: Type) where
+instance ReadConfFuncDef (m :: Type -> Type) (a :: Type) where
   type ReadConf m a = ReadConfFunc m '[a]
 
-instance ReadConfDef (m :: Type -> Type) (a :: [Type]) where
+instance ReadConfFuncDef (m :: Type -> Type) (a :: [Type]) where
   type ReadConf m a = ReadConfFunc m a
 
 type family ReadConfFunc m a where
