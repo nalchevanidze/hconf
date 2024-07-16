@@ -23,9 +23,10 @@ module HConf.Utils.Class
     Diff (..),
     logDiff,
     ReadConf,
-    LookupKey,
     readList,
     readEnv,
+    readByName,
+    ByName(..),
   )
 where
 
@@ -33,7 +34,7 @@ import Control.Exception (catch, throwIO, tryJust)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Core (Msg (..), maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), Name, maybeToError, throwError)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -67,11 +68,14 @@ readList = lookupConf ()
 readEnv :: (ReadConf m Env) => (Env -> a) -> m a
 readEnv f = f <$> lookupConf ()
 
-type family LookupKey a :: Type
+readByName :: (ReadConf m (ByName a)) => Name -> m a
+readByName name = byId <$> lookupConf name
 
-type instance LookupKey [k] = ()
+newtype ByName a = ByName {byId :: a}
 
-type instance LookupKey Env = ()
+type family LookupKey a :: Type where
+  LookupKey (ByName a) = Name
+  LookupKey a = ()
 
 class (HConfIO m) => LookupConf m a where
   lookupConf :: LookupKey a -> m a

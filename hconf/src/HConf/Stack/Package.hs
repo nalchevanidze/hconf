@@ -21,7 +21,7 @@ import HConf.Core.PkgDir (PkgDir, packageFile)
 import HConf.Core.Version (Version, readVersion)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (Check (..), ReadConf, readList)
+import HConf.Utils.Class (ByName, Check (..), ReadConf, readList)
 import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -50,10 +50,10 @@ instance ToJSON Package where
 resolvePackages :: (ReadConf m ()) => m [(PkgDir, Package)]
 resolvePackages = readList >>= traverse (tupled (readYaml . packageFile))
 
-updateLibraries :: (ReadConf m Bounds) => Maybe Libraries -> m (Maybe Libraries)
+updateLibraries :: (ReadConf m (ByName Bounds)) => Maybe Libraries -> m (Maybe Libraries)
 updateLibraries = traverse (traverse updateLibrary)
 
-updatePackage :: (ReadConf m '[Version, Bounds]) => Maybe Package -> m Package
+updatePackage :: (ReadConf m '[Version, (ByName Bounds)]) => Maybe Package -> m Package
 updatePackage Nothing = throwError "could not find package file"
 updatePackage (Just Package {..}) = do
   newLibrary <- traverse updateLibrary library
@@ -73,14 +73,14 @@ updatePackage (Just Package {..}) = do
         ..
       }
 
-rewritePackage :: (ReadConf m '[Version, Bounds]) => PkgDir -> m Package
+rewritePackage :: (ReadConf m '[Version, (ByName Bounds)]) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
-checkPackage :: (ReadConf m '[Version, Bounds]) => PkgDir -> m ()
+checkPackage :: (ReadConf m '[Version, (ByName Bounds)]) => PkgDir -> m ()
 checkPackage pkgDir =
   task (toText pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (ReadConf m '[Version, Bounds]) => m ()
+checkPackages :: (ReadConf m '[Version, (ByName Bounds)]) => m ()
 checkPackages = task "packages" $ readList >>= traverse_ checkPackage
