@@ -6,6 +6,7 @@
 
 module HConf.Core.Bounds
   ( Bounds,
+    BOUNDS,
     versionBounds,
     updateDepBounds,
   )
@@ -22,7 +23,7 @@ import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class (Diff (..), Format (..), HConfIO, Parse (..))
+import HConf.Utils.Class (ByName, Diff (..), Format (..), HConfIO, Parse (..))
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
 import HConf.Utils.Log (field)
 import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
@@ -81,6 +82,8 @@ instance Parse Bound where
 
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
+
+type BOUNDS = ByName Bounds
 
 instance Parse Bounds where
   parse "" = pure $ Bounds []
