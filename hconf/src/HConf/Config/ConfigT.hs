@@ -1,7 +1,6 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -29,7 +28,7 @@ import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
   ( Check (..),
     HConfIO (..),
-    LookupConf (..),
+    LookupConf (..), ByName (..),
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log
@@ -110,5 +109,5 @@ instance LookupConf ConfigT Env where
 instance LookupConf ConfigT Version where
   lookupConf _ = asks (version . config)
 
-instance LookupConf ConfigT Bounds where
-  lookupConf name = asks config >>= getRule name
+instance LookupConf ConfigT (ByName Bounds) where
+  lookupConf name = ByName <$> (asks config >>= getRule name)
