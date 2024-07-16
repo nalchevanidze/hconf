@@ -32,7 +32,7 @@ import Data.Aeson.Types
     withObject,
   )
 import GHC.Generics (Generic (..))
-import HConf.Core.Bounds (Bounds, BOUNDS)
+import HConf.Core.Bounds (BOUNDS, Bounds)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
 import HConf.Utils.Class (ByName, ReadConf, logDiff, readByName)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
