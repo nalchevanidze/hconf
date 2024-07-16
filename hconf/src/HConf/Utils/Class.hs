@@ -80,15 +80,15 @@ class ReadConfDef m a where
   type ReadConf m a :: Constraint
 
 instance ReadConfDef (m :: Type -> Type) (a :: Type) where
-  type ReadConf m a = ReadConfCon m '[a]
+  type ReadConf m a = ReadConfFunc m '[a]
 
 instance ReadConfDef (m :: Type -> Type) (a :: [Type]) where
-  type ReadConf m a = ReadConfCon m a
+  type ReadConf m a = ReadConfFunc m a
 
-type family ReadConfCon m a where
-  ReadConfCon m '[()] = ReadConfCon m '[]
-  ReadConfCon m '[] = LookupConf m [PkgDir]
-  ReadConfCon m (x : xs) = (LookupConf m x, ReadConfCon m xs)
+type family ReadConfFunc m a where
+  ReadConfFunc m '[()] = ReadConfFunc m '[]
+  ReadConfFunc m '[] = LookupConf m [PkgDir]
+  ReadConfFunc m (x : xs) = (LookupConf m x, ReadConfFunc m xs)
 
 class Check m a where
   check :: a -> m ()
