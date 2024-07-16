@@ -26,9 +26,10 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
-  ( Check (..),
+  ( ByName (..),
+    Check (..),
     HConfIO (..),
-    LookupConf (..), ByName (..),
+    LookupConf (..),
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log

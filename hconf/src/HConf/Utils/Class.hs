@@ -26,7 +26,7 @@ module HConf.Utils.Class
     readList,
     readEnv,
     readByName,
-    ByName(..),
+    ByName (..),
   )
 where
 
