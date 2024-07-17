@@ -99,16 +99,16 @@ save cfg = task "save" $ task "hconf.yaml" $ do
   rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
 instance LookupConf ConfigT [PkgDir] where
-  lookupConf _ = concatMap pkgDirs <$> asks (groups . config)
+  readFromConf _ = concatMap pkgDirs <$> asks (groups . config)
 
 instance LookupConf ConfigT Builds where
-  lookupConf () = asks (builds . config)
+  readFromConf () = asks (builds . config)
 
 instance LookupConf ConfigT Env where
-  lookupConf _ = asks env
+  readFromConf _ = asks env
 
 instance LookupConf ConfigT Version where
-  lookupConf _ = asks (version . config)
+  readFromConf _ = asks (version . config)
 
 instance LookupConf ConfigT (ByKey Name Bounds) where
-  lookupConf name = ByKey <$> (asks config >>= getRule name)
+  readFromConf name = ByKey <$> (asks config >>= getRule name)

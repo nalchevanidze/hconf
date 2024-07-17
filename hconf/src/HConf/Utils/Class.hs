@@ -63,13 +63,13 @@ instance Parse Int where
       (readMaybe $ toString t)
 
 readList :: (ReadConf m [a]) => m [a]
-readList = lookupConf ()
+readList = readFromConf ()
 
 readEnv :: (ReadConf m Env) => (Env -> a) -> m a
-readEnv f = f <$> lookupConf ()
+readEnv f = f <$> readFromConf ()
 
 readByKey :: (ReadConf m (ByKey k a)) => k -> m a
-readByKey = unpackKey lookupConf
+readByKey = unpackKey readFromConf
 
 unpackKey :: (Functor m) => (k -> m (ByKey k a)) -> k -> m a
 unpackKey f k = byKey <$> f k
@@ -81,7 +81,7 @@ type family Key a :: Type where
   Key a = ()
 
 class (HConfIO m) => LookupConf m a where
-  lookupConf :: Key a -> m a
+  readFromConf :: Key a -> m a
 
 class ReadConfFuncDef m a where
   type ReadConf m a :: Constraint

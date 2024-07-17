@@ -46,7 +46,7 @@ data Version = Version
     )
 
 readVersion :: (ReadConf m Version) => m Version
-readVersion = lookupConf ()
+readVersion = readFromConf ()
 
 getNumber :: [Int] -> Int
 getNumber (n : _) = n
