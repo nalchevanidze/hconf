@@ -26,7 +26,7 @@ module HConf.Utils.Class
     readList,
     readEnv,
     readByName,
-    ByName (..),
+    ByKey (..),
   )
 where
 
@@ -68,13 +68,16 @@ readList = lookupConf ()
 readEnv :: (ReadConf m Env) => (Env -> a) -> m a
 readEnv f = f <$> lookupConf ()
 
-readByName :: (ReadConf m (ByName a)) => Name -> m a
-readByName name = byId <$> lookupConf name
+readByName :: (ReadConf m (ByKey k a)) => k -> m a
+readByName = unpackKey lookupConf
 
-newtype ByName a = ByName {byId :: a}
+unpackKey :: (Functor m) => (k -> m (ByKey k a)) -> k -> m a
+unpackKey f k = byKey <$> f k
+
+newtype ByKey k a = ByKey {byKey :: a}
 
 type family LookupKey a :: Type where
-  LookupKey (ByName a) = Name
+  LookupKey (ByKey k a) = k
   LookupKey a = ()
 
 class (HConfIO m) => LookupConf m a where
