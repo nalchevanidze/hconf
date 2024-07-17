@@ -25,7 +25,7 @@ module HConf.Utils.Class
     ReadConf,
     readList,
     readEnv,
-    readByName,
+    readByKey,
     ByKey (..),
   )
 where
@@ -34,7 +34,7 @@ import Control.Exception (catch, throwIO, tryJust)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Core (Msg (..), Name, maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), maybeToError, throwError)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -68,8 +68,8 @@ readList = lookupConf ()
 readEnv :: (ReadConf m Env) => (Env -> a) -> m a
 readEnv f = f <$> lookupConf ()
 
-readByName :: (ReadConf m (ByKey k a)) => k -> m a
-readByName = unpackKey lookupConf
+readByKey :: (ReadConf m (ByKey k a)) => k -> m a
+readByKey = unpackKey lookupConf
 
 unpackKey :: (Functor m) => (k -> m (ByKey k a)) -> k -> m a
 unpackKey f k = byKey <$> f k

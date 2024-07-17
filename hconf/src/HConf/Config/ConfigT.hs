@@ -26,10 +26,10 @@ import HConf.Core.PkgDir (PkgDir)
 import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
-  ( ByName (..),
+  ( ByKey (..),
     Check (..),
     HConfIO (..),
-    LookupConf (..),
+    LookupConf (..), ByKey,
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log
@@ -110,5 +110,5 @@ instance LookupConf ConfigT Env where
 instance LookupConf ConfigT Version where
   lookupConf _ = asks (version . config)
 
-instance LookupConf ConfigT (ByName Bounds) where
-  lookupConf name = ByName <$> (asks config >>= getRule name)
+instance LookupConf ConfigT (ByKey Name Bounds) where
+  lookupConf name = ByKey <$> (asks config >>= getRule name)
