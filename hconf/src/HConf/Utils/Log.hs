@@ -6,14 +6,13 @@ module HConf.Utils.Log
     warn,
     alert,
     logFileChange,
-    Log (..),
     info,
     field,
   )
 where
 
 import HConf.Utils.Chalk (Color (..), chalk)
-import HConf.Utils.Class (Log (..))
+import HConf.Utils.Class (HConfIO (..))
 import HConf.Utils.Core (Name)
 import Relude
 
@@ -27,22 +26,22 @@ color 1 = Magenta
 color 2 = Cyan
 color _ = Gray
 
-task :: (Log m) => Name -> m a -> m a
+task :: (HConfIO m) => Name -> m a -> m a
 task name = inside (\i -> chalk (color i) (li i name))
 
-field :: (Log m) => Name -> String -> m ()
+field :: (HConfIO m) => Name -> String -> m ()
 field name = log . ((toString name <> ": ") <>)
 
-logFileChange :: (Log m) => String -> Bool -> m ()
+logFileChange :: (HConfIO m) => String -> Bool -> m ()
 logFileChange path noChange
   | noChange = field "checked" $ chalk Gray path
   | otherwise = field "updated" $ chalk Yellow path
 
-info :: (Log m) => String -> m ()
+info :: (HConfIO m) => String -> m ()
 info = log . chalk Green
 
-warn :: (Log m) => String -> m ()
+warn :: (HConfIO m) => String -> m ()
 warn = log . chalk Yellow
 
-alert :: (Log m) => String -> m ()
+alert :: (HConfIO m) => String -> m ()
 alert = log . chalk Red

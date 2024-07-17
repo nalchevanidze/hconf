@@ -16,7 +16,6 @@ module HConf.Utils.Class
     HConfIO (..),
     LookupConf (..),
     ResultT,
-    Log (..),
     FLog (..),
     withThrow,
     Format (..),
@@ -40,18 +39,10 @@ import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
 
 class FLog a where
-  flog :: (Log m, Monad m) => a -> m ()
+  flog :: (HConfIO m) => a -> m ()
 
 instance (FLog a) => FLog [a] where
   flog = traverse_ flog
-
-class Log m where
-  log :: String -> m ()
-  inside :: (Int -> String) -> m a -> m a
-
-instance Log IO where
-  log = putStrLn
-  inside _ = id
 
 class Parse a where
   parse :: (MonadFail m) => Text -> m a
@@ -100,10 +91,12 @@ type family ReadConfFunc m a where
 class Check m a where
   check :: a -> m ()
 
-class (MonadIO m, MonadFail m, Log m) => HConfIO m where
+class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
   write :: FilePath -> ByteString -> m (Either String ())
   remove :: FilePath -> m ()
+  log :: String -> m ()
+  inside :: (Int -> String) -> m a -> m a
 
 printException :: SomeException -> String
 printException = show
@@ -120,6 +113,8 @@ instance HConfIO IO where
   read = safeIO . readFile
   write f = safeIO . writeFile f
   remove file = removeFile file `catch` (\e -> unless (isDoesNotExistError e) (throwIO e))
+  log = putStrLn
+  inside _ = id
 
 class Format a where
   format :: a -> Text

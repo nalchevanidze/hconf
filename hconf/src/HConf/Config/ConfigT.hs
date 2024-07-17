@@ -33,8 +33,7 @@ import HConf.Utils.Class
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log
-  ( Log (..),
-    alert,
+  ( alert,
     task,
   )
 import HConf.Utils.Yaml (readYaml, rewrite)
@@ -65,7 +64,10 @@ runConfigT (ConfigT (ReaderT f)) env config = tryJust (Just . printException) (f
 indent :: Int -> String
 indent i = replicate (i * 2) ' '
 
-instance Log ConfigT where
+instance HConfIO ConfigT where
+  read = liftIO . read
+  write f = liftIO . write f
+  remove = liftIO . remove
   log txt = do
     i <- asks indention
     liftIO $ putStrLn $ indent i <> txt
@@ -73,11 +75,6 @@ instance Log ConfigT where
     i <- asks indention
     log (f i)
     local (\c -> c {indention = indention c + 1}) m
-
-instance HConfIO ConfigT where
-  read = liftIO . read
-  write f = liftIO . write f
-  remove = liftIO . remove
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
