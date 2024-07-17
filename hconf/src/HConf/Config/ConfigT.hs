@@ -29,7 +29,7 @@ import HConf.Utils.Class
   ( ByKey (..),
     Check (..),
     HConfIO (..),
-    LookupConf (..), ByKey,
+    LookupConf (..),
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log
