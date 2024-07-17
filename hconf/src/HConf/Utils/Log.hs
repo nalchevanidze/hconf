@@ -30,7 +30,7 @@ task :: (HConfIO m) => Name -> m a -> m a
 task name = inside (\i -> chalk (color i) (li i name))
 
 field :: (HConfIO m) => Name -> String -> m ()
-field name = log . ((toString name <> ": ") <>)
+field name = putLine . ((toString name <> ": ") <>)
 
 logFileChange :: (HConfIO m) => String -> Bool -> m ()
 logFileChange path noChange
@@ -38,10 +38,10 @@ logFileChange path noChange
   | otherwise = field "updated" $ chalk Yellow path
 
 info :: (HConfIO m) => String -> m ()
-info = log . chalk Green
+info = putLine . chalk Green
 
 warn :: (HConfIO m) => String -> m ()
-warn = log . chalk Yellow
+warn = putLine . chalk Yellow
 
 alert :: (HConfIO m) => String -> m ()
-alert = log . chalk Red
+alert = putLine . chalk Red

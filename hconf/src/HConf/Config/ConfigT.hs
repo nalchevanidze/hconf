@@ -68,12 +68,11 @@ instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
   remove = liftIO . remove
-  log txt = do
+  putLine txt = do
     i <- asks indention
     liftIO $ putStrLn $ indent i <> txt
   inside f m = do
-    i <- asks indention
-    log (f i)
+    asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
@@ -88,7 +87,7 @@ handle :: (ToString a) => (HConfIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
   Left x -> alert ("ERROR: " <> x)
   (Right Nothing) -> pure ()
-  (Right (Just msg)) -> log (toString msg)
+  (Right (Just msg)) -> putLine (toString msg)
 
 save :: Config -> ConfigT ()
 save cfg = task "save" $ task "hconf.yaml" $ do

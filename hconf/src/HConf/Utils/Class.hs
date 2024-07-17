@@ -95,7 +95,7 @@ class (MonadIO m, MonadFail m) => HConfIO m where
   read :: FilePath -> m (Either String ByteString)
   write :: FilePath -> ByteString -> m (Either String ())
   remove :: FilePath -> m ()
-  log :: String -> m ()
+  putLine :: String -> m ()
   inside :: (Int -> String) -> m a -> m a
 
 printException :: SomeException -> String
@@ -113,7 +113,7 @@ instance HConfIO IO where
   read = safeIO . readFile
   write f = safeIO . writeFile f
   remove file = removeFile file `catch` (\e -> unless (isDoesNotExistError e) (throwIO e))
-  log = putStrLn
+  putLine = putStrLn
   inside _ = id
 
 class Format a where
