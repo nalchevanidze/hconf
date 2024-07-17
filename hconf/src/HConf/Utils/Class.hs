@@ -16,7 +16,7 @@ module HConf.Utils.Class
     HConfIO (..),
     LookupConf (..),
     ResultT,
-    FLog (..),
+    Log (..),
     withThrow,
     Format (..),
     Diff (..),
@@ -38,11 +38,11 @@ import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
 
-class FLog a where
-  flog :: (HConfIO m) => a -> m ()
+class Log a where
+  log :: (HConfIO m) => a -> m ()
 
-instance (FLog a) => FLog [a] where
-  flog = traverse_ flog
+instance (Log a) => Log [a] where
+  log = traverse_ log
 
 class Parse a where
   parse :: (MonadFail m) => Text -> m a

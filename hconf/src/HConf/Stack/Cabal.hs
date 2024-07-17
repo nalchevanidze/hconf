@@ -16,7 +16,7 @@ where
 import Data.Text (pack, unpack)
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (Check (..), FLog (..), HConfIO (..), Parse (..), withThrow)
+import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..), withThrow)
 import HConf.Utils.Core (Msg (..), Name, exec, select, throwError)
 import HConf.Utils.Log (alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
@@ -56,12 +56,12 @@ stack cmd pkg options = do
       else alert $ cmd <> ": " <> unpack (indentText $ pack out)
     )
 
-instance FLog Warning where
-  flog (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
+instance Log Warning where
+  log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
 
 printWarnings :: (HConfIO m) => Name -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
-printWarnings cmd xs = task cmd $ traverse_ flog xs
+printWarnings cmd xs = task cmd $ traverse_ log xs
 
 parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
@@ -83,8 +83,8 @@ data CabalSrc = CabalSrc
     target :: Cabal
   }
 
-instance FLog Cabal where
-  flog Cabal {..} = field name (show version)
+instance Log Cabal where
+  log Cabal {..} = field name (show version)
 
 instance (HConfIO m) => Check m CabalSrc where
   check CabalSrc {..} = task "cabal" $ do
@@ -94,5 +94,5 @@ instance (HConfIO m) => Check m CabalSrc where
     stack "sdist" pkgDir []
     cabal <- getCabal path
     if cabal == target
-      then flog cabal
+      then log cabal
       else throwError $ "mismatching version or name" <> msg pkgDir
