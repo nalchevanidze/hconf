@@ -61,16 +61,14 @@ printException = show
 runConfigT :: ConfigT a -> Env -> Config -> IO (Either String a)
 runConfigT (ConfigT (ReaderT f)) env config = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
-indent :: Int -> String
-indent i = replicate (i * 2) ' '
+indent :: Int -> String -> String
+indent i = (replicate (i * 2) ' ' <>)
 
 instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
   remove = liftIO . remove
-  putLine txt = do
-    i <- asks indention
-    liftIO $ putStrLn $ indent i <> txt
+  putLine txt = asks indention >>= putLine . flip indent txt
   inside f m = do
     asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
