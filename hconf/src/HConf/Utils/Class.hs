@@ -76,12 +76,12 @@ unpackKey f k = byKey <$> f k
 
 newtype ByKey k a = ByKey {byKey :: a}
 
-type family LookupKey a :: Type where
-  LookupKey (ByKey k a) = k
-  LookupKey a = ()
+type family Key a :: Type where
+  Key (ByKey k a) = k
+  Key a = ()
 
 class (HConfIO m) => LookupConf m a where
-  lookupConf :: LookupKey a -> m a
+  lookupConf :: Key a -> m a
 
 class ReadConfFuncDef m a where
   type ReadConf m a :: Constraint
