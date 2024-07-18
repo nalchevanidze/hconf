@@ -14,7 +14,7 @@ module HConf.Utils.Class
   ( Parse (..),
     Check (..),
     HConfIO (..),
-    LookupConf (..),
+    ReadFromConf (..),
     ResultT,
     Log (..),
     withThrow,
@@ -71,7 +71,7 @@ type family Key a :: Type where
   Key (ByKey k a) = k
   Key a = ()
 
-class (HConfIO m) => LookupConf m a where
+class (HConfIO m) => ReadFromConf m a where
   readFromConf :: Key a -> m a
 
 class ReadConfFuncDef m a where
@@ -85,8 +85,8 @@ instance ReadConfFuncDef (m :: Type -> Type) (a :: [Type]) where
 
 type family ReadConfFunc m a where
   ReadConfFunc m '[()] = ReadConfFunc m '[]
-  ReadConfFunc m '[] = LookupConf m [PkgDir]
-  ReadConfFunc m (x : xs) = (LookupConf m x, ReadConfFunc m xs)
+  ReadConfFunc m '[] = ReadFromConf m [PkgDir]
+  ReadConfFunc m (x : xs) = (ReadFromConf m x, ReadConfFunc m xs)
 
 class Check m a where
   check :: a -> m ()

@@ -29,7 +29,7 @@ import HConf.Utils.Class
   ( ByKey (..),
     Check (..),
     HConfIO (..),
-    LookupConf (..),
+    ReadFromConf (..),
   )
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log
@@ -92,17 +92,17 @@ save cfg = task "save" $ task "hconf.yaml" $ do
   ctx <- asks id
   rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
-instance LookupConf ConfigT [PkgDir] where
+instance ReadFromConf ConfigT [PkgDir] where
   readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)
 
-instance LookupConf ConfigT Builds where
+instance ReadFromConf ConfigT Builds where
   readFromConf = const $ asks (builds . config)
 
-instance LookupConf ConfigT Env where
+instance ReadFromConf ConfigT Env where
   readFromConf = const $ asks env
 
-instance LookupConf ConfigT Version where
+instance ReadFromConf ConfigT Version where
   readFromConf = const $ asks (version . config)
 
-instance LookupConf ConfigT (ByKey Name Bounds) where
+instance ReadFromConf ConfigT (ByKey Name Bounds) where
   readFromConf name = ByKey <$> (asks config >>= getRule name)

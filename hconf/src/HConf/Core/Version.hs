@@ -20,7 +20,12 @@ import Data.Aeson
   )
 import qualified Data.Text as T
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Format (..), LookupConf (..), Parse (..), ReadConf)
+import HConf.Utils.Class
+  ( Format (..),
+    Parse (..),
+    ReadConf,
+    readFromConf,
+  )
 import HConf.Utils.Core (Msg (..), throwError)
 import HConf.Utils.Source (fromToString, sepBy, toError)
 import Relude hiding
