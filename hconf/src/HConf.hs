@@ -55,4 +55,6 @@ exec Update =
     >>= updateConfig
     >>= save
 exec Version = run (Just . version <$> asks config)
-exec Format {check} = runTask "format" $ format check
+exec Format {check} =
+  runTask "format"
+    $ format check
