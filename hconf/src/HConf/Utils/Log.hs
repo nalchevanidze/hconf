@@ -20,7 +20,7 @@ li :: (ToString a) => Int -> a -> String
 li 0 e = "\n" <> toString e <> "\n"
 li _ e = "- " <> toString e <> ":"
 
-color :: (Eq a, Num a) => a -> Color
+color :: Int -> Color
 color 0 = Green
 color 1 = Magenta
 color 2 = Cyan
