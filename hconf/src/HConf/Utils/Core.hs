@@ -24,7 +24,7 @@ module HConf.Utils.Core
     select,
     exec,
     ResolverName,
-    printException,
+    printException,safeIO
   )
 where
 
@@ -39,6 +39,7 @@ import GHC.IO.Exception (ExitCode (..))
 import Relude hiding (Undefined, intercalate)
 import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
+import Control.Exception (tryJust)
 
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
@@ -182,3 +183,6 @@ exec name options = do
 
 printException :: SomeException -> String
 printException = show
+
+safeIO :: IO a -> IO (Either String a)
+safeIO = tryJust (Just . printException)

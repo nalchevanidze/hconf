@@ -15,7 +15,6 @@ module HConf.Utils.Class
     Check (..),
     HConfIO (..),
     ReadFromConf (..),
-    ResultT,
     Log (..),
     withThrow,
     Format (..),
@@ -33,7 +32,7 @@ import Control.Exception (catch, throwIO, tryJust)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Core (Msg (..), maybeToError, throwError, printException)
+import HConf.Utils.Core (Msg (..), maybeToError, printException, safeIO, throwError)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -97,13 +96,6 @@ class (MonadIO m, MonadFail m) => HConfIO m where
   remove :: FilePath -> m ()
   putLine :: String -> m ()
   inside :: (Int -> String) -> m a -> m a
-
-
-
-safeIO :: IO a -> IO (Either String a)
-safeIO = tryJust (Just . printException)
-
-type ResultT = ExceptT String
 
 withThrow :: (HConfIO m) => m (Either String a) -> m a
 withThrow x = x >>= either (throwError . msg) pure
