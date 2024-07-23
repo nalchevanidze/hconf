@@ -24,6 +24,7 @@ module HConf.Utils.Core
     select,
     exec,
     ResolverName,
+    printException,
   )
 where
 
@@ -178,3 +179,6 @@ exec name options = do
         ExitSuccess {} -> True
         ExitFailure {} -> False
     )
+
+printException :: SomeException -> String
+printException = show

@@ -33,7 +33,7 @@ import Control.Exception (catch, throwIO, tryJust)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDir)
-import HConf.Utils.Core (Msg (..), maybeToError, throwError)
+import HConf.Utils.Core (Msg (..), maybeToError, throwError, printException)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -98,8 +98,7 @@ class (MonadIO m, MonadFail m) => HConfIO m where
   putLine :: String -> m ()
   inside :: (Int -> String) -> m a -> m a
 
-printException :: SomeException -> String
-printException = show
+
 
 safeIO :: IO a -> IO (Either String a)
 safeIO = tryJust (Just . printException)

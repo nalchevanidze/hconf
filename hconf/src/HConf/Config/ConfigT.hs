@@ -31,7 +31,7 @@ import HConf.Utils.Class
     HConfIO (..),
     ReadFromConf (..),
   )
-import HConf.Utils.Core (Name)
+import HConf.Utils.Core (Name, printException)
 import HConf.Utils.Log
   ( alert,
     task,
@@ -54,9 +54,6 @@ newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
       MonadIO,
       MonadFail
     )
-
-printException :: SomeException -> String
-printException = show
 
 runConfigT :: ConfigT a -> Env -> Config -> IO (Either String a)
 runConfigT (ConfigT (ReaderT f)) env config = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
