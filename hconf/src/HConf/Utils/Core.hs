@@ -24,10 +24,13 @@ module HConf.Utils.Core
     select,
     exec,
     ResolverName,
-    printException,safeIO
+    printException,
+    safeIO,
+    withThrow,
   )
 where
 
+import Control.Exception (tryJust)
 import Data.Aeson (Options (..), Value (..), defaultOptions, encode)
 import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
@@ -39,7 +42,6 @@ import GHC.IO.Exception (ExitCode (..))
 import Relude hiding (Undefined, intercalate)
 import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
-import Control.Exception (tryJust)
 
 aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
@@ -186,3 +188,6 @@ printException = show
 
 safeIO :: IO a -> IO (Either String a)
 safeIO = tryJust (Just . printException)
+
+withThrow :: (MonadFail m) => m (Either String a) -> m a
+withThrow x = x >>= either (throwError . msg) pure
