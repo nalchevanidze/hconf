@@ -1,7 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.Format (formatTable) where
+module HConf.Utils.Format
+  ( formatTable,
+  )
+where
 
 import Data.List (maximum)
 import Data.Text (intercalate, justifyLeft, length, strip, words)
