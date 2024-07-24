@@ -15,6 +15,7 @@ module HConf.Utils.Source
     isIndentedLine,
     indentText,
     startsLike,
+    SourceText,
   )
 where
 
@@ -54,57 +55,59 @@ import Relude hiding
 
 -- terms
 
-startsLike :: Text -> Text -> Bool
+type SourceText = Text
+
+startsLike :: SourceText -> SourceText -> Bool
 startsLike x y = toLower x `isPrefixOf` toLower y
 
-replaceNewLine :: Char -> Text
+replaceNewLine :: Char -> SourceText
 replaceNewLine '\n' = "          \n"
 replaceNewLine x = singleton x
 
-indentText :: Text -> Text
+indentText :: SourceText -> SourceText
 indentText = concatMap replaceNewLine
 
-parseField :: Text -> (Text, Text)
+parseField :: SourceText -> (SourceText, SourceText)
 parseField = second (strip . drop 1) . breakAt (== ':')
 
-firstWord :: Text -> (Text, Text)
+firstWord :: SourceText -> (SourceText, SourceText)
 firstWord = breakAt isSeparator
 
 -- lexer
-parseLines :: Text -> [Text]
+parseLines :: SourceText -> [SourceText]
 parseLines = split (== '\n')
 
-ignoreEmpty :: [(Text, b)] -> [(Text, b)]
+ignoreEmpty :: [(SourceText, b)] -> [(SourceText, b)]
 ignoreEmpty = filter (not . null . fst)
 
-fromByteString :: BS.ByteString -> Text
+fromByteString :: BS.ByteString -> SourceText
 fromByteString = pack . BS.unpack
 
-isIndentedLine :: Text -> Bool
+isIndentedLine :: SourceText -> Bool
 isIndentedLine line = head line == ' '
 
-ignoreSpaces :: Text -> Text
+ignoreSpaces :: SourceText -> SourceText
 ignoreSpaces = T.filter (not . isSeparator)
 
-breakAt :: (Char -> Bool) -> Text -> (Text, Text)
+breakAt :: (Char -> Bool) -> SourceText -> (SourceText, SourceText)
 breakAt f = bimap strip strip . break f . strip
 
-sepBy :: (MonadFail m, Parse a) => Text -> Text -> m [a]
+sepBy :: (MonadFail m, Parse a) => SourceText -> SourceText -> m [a]
 sepBy sep = traverse parse . splitOn sep . ignoreSpaces
 
-removeHead :: Char -> Text -> (Bool, Text)
+removeHead :: Char -> SourceText -> (Bool, SourceText)
 removeHead should txt = maybe (False, txt) has (uncons txt)
   where
     has (x, xs)
       | x == should = (True, xs)
       | otherwise = (False, txt)
 
-unconsM :: (MonadFail m) => String -> Text -> m (Text, Text)
+unconsM :: (MonadFail m) => String -> SourceText -> m (SourceText, SourceText)
 unconsM m x = first singleton <$> maybeToError (m <> "<>: " <> toString x) (uncons x)
 
 toError :: (MonadFail m) => ErrorMsg -> Either ErrorMsg a -> m a
 toError label (Left s) = throwError $ label <> ": " <> s
 toError _ (Right a) = pure a
 
-fromToString :: (ToString a) => a -> Text
+fromToString :: (ToString a) => a -> SourceText
 fromToString = pack . toString
