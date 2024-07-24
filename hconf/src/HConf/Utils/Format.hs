@@ -10,7 +10,7 @@ import Data.List (maximum)
 import Data.Text (intercalate, justifyLeft, length, strip, words)
 import Relude hiding (intercalate, length, words)
 
-type Table = [[Text]]
+type Table = [Row]
 
 type Row = [Text]
 
