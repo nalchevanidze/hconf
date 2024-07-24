@@ -16,17 +16,22 @@ module HConf.Utils.Source
     indentText,
     startsLike,
     SourceText,
+    formatTable,
   )
 where
 
 import qualified Data.ByteString.Char8 as BS
 import Data.Char (isSeparator)
+import Data.List (maximum)
 import Data.Text
   ( break,
     concatMap,
     drop,
     head,
+    intercalate,
     isPrefixOf,
+    justifyLeft,
+    length,
     null,
     pack,
     singleton,
@@ -35,6 +40,7 @@ import Data.Text
     strip,
     toLower,
     uncons,
+    words,
   )
 import qualified Data.Text as T
 import HConf.Utils.Class (Parse (..))
@@ -48,9 +54,12 @@ import Relude hiding
     concatMap,
     drop,
     head,
+    intercalate,
     isPrefixOf,
+    length,
     null,
     uncons,
+    words,
   )
 
 -- terms
@@ -111,3 +120,24 @@ toError _ (Right a) = pure a
 
 fromToString :: (ToString a) => a -> SourceText
 fromToString = pack . toString
+
+type Table = [Row]
+
+type Row = [Text]
+
+getSizes :: Table -> [Int]
+getSizes xs = map size (transpose xs)
+  where
+    size :: Row -> Int
+    size = maximum . map length
+
+printRow :: [Int] -> Row -> Text
+printRow sizes ls =
+  strip
+    $ intercalate "  "
+    $ zipWith (\item s -> justifyLeft s ' ' item) ls sizes
+
+formatTable :: [Text] -> [Text]
+formatTable deps = sort $ map (printRow (getSizes table)) table
+  where
+    table = map words deps

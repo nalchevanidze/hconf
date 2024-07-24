@@ -19,8 +19,7 @@ import Data.Map.Strict (traverseWithKey)
 import HConf.Core.Bounds (Bounds)
 import HConf.Utils.Class (Format (format), Parse (..))
 import HConf.Utils.Core (Name, select)
-import HConf.Utils.Format (formatTable)
-import HConf.Utils.Source (firstWord)
+import HConf.Utils.Source (firstWord, formatTable)
 import Relude hiding
   ( Undefined,
     break,
