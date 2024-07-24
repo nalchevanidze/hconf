@@ -12,13 +12,15 @@ import Relude hiding (intercalate, length, words)
 
 type Table = [[Text]]
 
+type Row = [Text]
+
 getSizes :: Table -> [Int]
 getSizes xs = map size (transpose xs)
   where
-    size :: [Text] -> Int
+    size :: Row -> Int
     size = maximum . map length
 
-printRow :: [Int] -> [Text] -> Text
+printRow :: [Int] -> Row -> Text
 printRow sizes ls =
   strip
     $ intercalate "  "
