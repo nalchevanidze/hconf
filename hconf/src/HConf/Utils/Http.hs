@@ -19,7 +19,6 @@ import HConf.Utils.Core
 import Network.HTTP.Req
   ( GET (..),
     LbsResponse,
-    MonadHttp,
     NoReqBody (..),
     Option,
     Req,
@@ -34,7 +33,7 @@ import Network.HTTP.Req
 import Relude hiding (ByteString)
 import Text.URI (mkURI)
 
-getReq :: (MonadHttp m) => (Url s, Option s) -> m LbsResponse
+getReq :: (Url s, Option s) -> Req LbsResponse
 getReq (u, o) = req GET u NoReqBody lbsResponse o
 
 parse :: (MonadFail m) => Text -> m (Req LbsResponse)
