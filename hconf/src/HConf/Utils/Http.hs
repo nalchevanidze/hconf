@@ -22,6 +22,7 @@ import Network.HTTP.Req
     MonadHttp,
     NoReqBody (..),
     Option,
+    Req,
     Url,
     defaultHttpConfig,
     lbsResponse,
@@ -37,7 +38,7 @@ decodeUrl :: (MonadHttp p) => Either (Url s, Option s) (Url s', Option s') -> p 
 decodeUrl (Left (u, o)) = req GET u NoReqBody lbsResponse o
 decodeUrl (Right (u, o)) = req GET u NoReqBody lbsResponse o
 
-parse :: (MonadFail m, MonadHttp p) => Text -> m (p LbsResponse)
+parse :: (MonadFail m) => Text -> m (Req LbsResponse)
 parse url = decodeUrl <$> maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url >>= useURI)
 
 http :: (FromJSON a, HConfIO m) => Text -> m a
