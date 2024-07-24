@@ -37,15 +37,7 @@ import HConf.Core.Dependencies (Dependencies, traverseDeps)
 import HConf.Utils.Class (ReadConf, logDiff, readByKey)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (field)
-import Relude hiding
-  ( Undefined,
-    break,
-    drop,
-    intercalate,
-    isPrefixOf,
-    length,
-    null,
-  )
+import Relude
 
 type Libraries = Map Name Library
 
