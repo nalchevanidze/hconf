@@ -34,12 +34,12 @@ import Control.Exception (tryJust)
 import Data.Aeson (Options (..), Value (..), defaultOptions, encode)
 import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
-import Data.List (elemIndex, intercalate)
+import Data.List (elemIndex)
 import Data.Map (lookup)
 import qualified Data.Map as M
 import Data.Text (toTitle)
 import GHC.IO.Exception (ExitCode (..))
-import Relude hiding (Undefined, intercalate)
+import Relude
 import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
 
