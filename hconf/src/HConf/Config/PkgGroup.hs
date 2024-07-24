@@ -23,12 +23,7 @@ import Data.Aeson.Types
 import Data.Text (isPrefixOf)
 import HConf.Core.PkgDir (PkgDir, pkgDir)
 import HConf.Utils.Core (Name, maybeBool)
-import Relude hiding
-  ( Undefined,
-    group,
-    intercalate,
-    isPrefixOf,
-  )
+import Relude hiding (isPrefixOf)
 
 data PkgGroup = PkgGroup
   { name :: Name,

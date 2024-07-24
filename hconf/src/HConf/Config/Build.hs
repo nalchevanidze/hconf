@@ -49,13 +49,7 @@ import HConf.Utils.Core
     notElemError,
     throwError,
   )
-import Relude hiding
-  ( Undefined,
-    group,
-    intercalate,
-    isPrefixOf,
-  )
-
+import Relude
 type Extras = Map Name Version
 
 data Build = Build

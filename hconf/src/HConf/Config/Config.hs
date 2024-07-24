@@ -29,12 +29,7 @@ import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
 import HConf.Utils.Class (Check (check), HConfIO, ReadConf)
 import HConf.Utils.Core (Name)
-import Relude hiding
-  ( Undefined,
-    group,
-    intercalate,
-    isPrefixOf,
-  )
+import Relude
 
 data Config = Config
   { version :: Version,
