@@ -123,12 +123,12 @@ instance Diff Bounds where
 getBound :: Restriction -> Bounds -> [Bound]
 getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 
-getLatestBound :: (HConfIO m) => Name -> m Bound
-getLatestBound = fmap (Bound Max True . head) . fetchVersions
+getLatest :: (HConfIO m) => Name -> m Bound
+getLatest = fmap (Bound Max True . head) . fetchVersions
 
 updateDepBounds :: (HConfIO m) => Name -> Bounds -> m Bounds
 updateDepBounds name bounds = do
-  latest <- getLatestBound name
+  latest <- getLatest name
   let upper = getBound Max bounds
   let newVersion = maximum (latest : upper)
   if upper == [newVersion] then pure () else field name (show newVersion)
