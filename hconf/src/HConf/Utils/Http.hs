@@ -8,7 +8,6 @@ module HConf.Utils.Http
 where
 
 import Data.Aeson (FromJSON, eitherDecode)
-import Data.Text (intercalate)
 import HConf.Utils.Class (HConfIO)
 import HConf.Utils.Core
   ( Msg (..),
@@ -16,6 +15,7 @@ import HConf.Utils.Core
     maybeToError,
     throwError,
   )
+import HConf.Utils.Source (genUrl)
 import Network.HTTP.Req
   ( GET (..),
     LbsResponse,
@@ -43,4 +43,4 @@ http :: (FromJSON a, HConfIO m) => Text -> m a
 http uri = parse uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig >>= either throwError pure
 
 hackage :: (HConfIO m, FromJSON a) => [Name] -> m a
-hackage path = http ("https://hackage.haskell.org/" <> intercalate "/" path <> ".json")
+hackage path = http (genUrl "https://hackage.haskell.org" path <> ".json")

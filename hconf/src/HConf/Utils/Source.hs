@@ -17,6 +17,7 @@ module HConf.Utils.Source
     startsLike,
     SourceText,
     formatTable,
+    genUrl,
   )
 where
 
@@ -141,3 +142,6 @@ formatTable :: [Text] -> [Text]
 formatTable deps = sort $ map (printRow (getSizes table)) table
   where
     table = map words deps
+
+genUrl :: Text -> [Text] -> Text
+genUrl domain = intercalate "/" . (domain :)
