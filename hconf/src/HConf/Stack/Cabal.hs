@@ -20,7 +20,7 @@ import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..))
 import HConf.Utils.Core (Msg (..), Name, exec, select, throwError, withThrow)
 import HConf.Utils.Log (alert, field, task, warn)
 import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
-import Relude hiding (isPrefixOf)
+import Relude
 
 data Cabal = Cabal
   { name :: Name,

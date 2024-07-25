@@ -27,17 +27,7 @@ import HConf.Utils.Class
   )
 import HConf.Utils.Core (Msg (..), throwError)
 import HConf.Utils.Source (formatList, fromToString, sepBy, toError)
-import Relude hiding
-  ( Undefined,
-    break,
-    drop,
-    fromList,
-    isPrefixOf,
-    length,
-    null,
-    show,
-    toList,
-  )
+import Relude hiding (show)
 
 data Version = Version
   { major :: Int,
