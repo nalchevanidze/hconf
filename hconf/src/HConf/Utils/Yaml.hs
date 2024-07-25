@@ -20,7 +20,7 @@ import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNul
 import HConf.Utils.Class (HConfIO (..))
 import HConf.Utils.Core (compareFields, withThrow)
 import HConf.Utils.Log (logFileChange)
-import Relude hiding (Show, Undefined, intercalate, show)
+import Relude hiding (Show, show)
 import Prelude (Show (..))
 
 serializeYaml :: (ToJSON a) => a -> ByteString

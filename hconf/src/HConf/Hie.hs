@@ -23,7 +23,7 @@ import HConf.Utils.Class (ReadConf, readEnv)
 import HConf.Utils.Core (Name)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
-import Relude hiding (Undefined, intercalate)
+import Relude 
 
 data Component = Component
   { path :: FilePath,

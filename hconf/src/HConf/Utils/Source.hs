@@ -17,6 +17,7 @@ module HConf.Utils.Source
     startsLike,
     SourceText,
     formatTable,
+    formatList,
     genUrl,
   )
 where
@@ -44,7 +45,7 @@ import Data.Text
     words,
   )
 import qualified Data.Text as T
-import HConf.Utils.Class (Parse (..))
+import HConf.Utils.Class (Format (..), Parse (..))
 import HConf.Utils.Core
   ( ErrorMsg,
     maybeToError,
@@ -145,3 +146,6 @@ formatTable deps = sort $ map (printRow (getSizes table)) table
 
 genUrl :: Text -> [Text] -> Text
 genUrl domain = intercalate "/" . (domain :)
+
+formatList :: (Format a) => Text -> [a] -> Text
+formatList x = intercalate x . map format

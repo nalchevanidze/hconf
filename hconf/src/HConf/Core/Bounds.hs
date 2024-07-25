@@ -18,8 +18,6 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum)
-import Data.Text (intercalate)
-import GHC.Show (Show (show))
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
@@ -32,19 +30,8 @@ import HConf.Utils.Class
   )
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
 import HConf.Utils.Log (field)
-import HConf.Utils.Source (fromToString, removeHead, sepBy, unconsM)
-import Relude hiding
-  ( Undefined,
-    break,
-    drop,
-    fromList,
-    intercalate,
-    isPrefixOf,
-    length,
-    null,
-    show,
-    toList,
-  )
+import HConf.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
+import Relude
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
@@ -96,7 +83,7 @@ instance Parse Bounds where
   parse str = Bounds <$> sepBy "&&" str
 
 instance Format Bounds where
-  format (Bounds xs) = intercalate " && " $ map format $ sort xs
+  format (Bounds xs) = formatList " && " $ sort xs
 
 instance ToString Bounds where
   toString = toString . format

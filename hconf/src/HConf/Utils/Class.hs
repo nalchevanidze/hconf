@@ -96,7 +96,6 @@ class (MonadIO m, MonadFail m) => HConfIO m where
   putLine :: String -> m ()
   inside :: (Int -> String) -> m a -> m a
 
-
 instance HConfIO IO where
   read = safeIO . readFile
   write f = safeIO . writeFile f
@@ -106,6 +105,9 @@ instance HConfIO IO where
 
 class Format a where
   format :: a -> Text
+
+instance Format Int where
+  format = show
 
 class Diff a where
   diff :: a -> a -> Maybe String
