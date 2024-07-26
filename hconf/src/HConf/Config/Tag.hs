@@ -12,7 +12,7 @@ import Data.Aeson
     ToJSON (toJSON),
     Value (..),
   )
-import GHC.Show (Show (show))
+import GHC.Show (Show (..))
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Parse (..))
 import HConf.Utils.Source (fromToString)
