@@ -46,7 +46,7 @@ data Config = Config
 
 getRule :: (MonadFail m) => Name -> Config -> m Bounds
 getRule name Config {..}
-  | any (isMember name) groups = pure bounds
+  | isMember name groups = pure bounds
   | otherwise = getBounds name dependencies
 
 instance ToJSON Config where

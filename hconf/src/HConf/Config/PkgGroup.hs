@@ -48,5 +48,7 @@ pkgDirs PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg = pkgDir dir ([name | maybeBool prefix] <> [pkg | pkg /= "."])
 
-isMember :: Name -> PkgGroup -> Bool
-isMember pkgName = (`isPrefixOf` pkgName) . name
+isMember :: Name -> PkgGroups -> Bool
+isMember pkgName = any ((`isPrefixOf` pkgName) . name)
+
+
