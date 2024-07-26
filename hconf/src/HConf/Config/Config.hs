@@ -23,7 +23,7 @@ import Data.Aeson
   )
 import Data.Aeson.Types (defaultOptions)
 import HConf.Config.Build (Builds)
-import HConf.Config.PkgGroup (PkgGroup, PkgGroups, isLocalPackage)
+import HConf.Config.PkgGroup (PkgGroup, isMember)
 import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
@@ -44,12 +44,10 @@ data Config = Config
       Show
     )
 
-getRule :: (ReadConf m PkgGroups) => Name -> Config -> m Bounds
-getRule name Config {..} = do
-  isLocal <- isLocalPackage name
-  if isLocal
-    then pure bounds
-    else getBounds name dependencies
+getRule :: (MonadFail m) => Name -> Config -> m Bounds
+getRule name Config {..}
+  | any (isMember name) groups = pure bounds
+  | otherwise = getBounds name dependencies
 
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}

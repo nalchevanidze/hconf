@@ -8,7 +8,7 @@ module HConf.Config.PkgGroup
   ( PkgGroup ,
     PkgGroups,
     pkgDirs,
-    isLocalPackage,
+    isMember,
   )
 where
 
@@ -23,7 +23,6 @@ import Data.Aeson.Types
   )
 import Data.Text (isPrefixOf)
 import HConf.Core.PkgDir (PkgDir, pkgDir)
-import HConf.Utils.Class (ReadConf, readList)
 import HConf.Utils.Core (Name, maybeBool)
 import Relude hiding (isPrefixOf)
 
@@ -48,9 +47,6 @@ pkgDirs :: PkgGroup -> [PkgDir]
 pkgDirs PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg = pkgDir dir ([name | maybeBool prefix] <> [pkg | pkg /= "."])
-
-isLocalPackage :: (ReadConf m PkgGroups) => Name -> m Bool
-isLocalPackage name = any (isMember name) <$> readList
 
 isMember :: Name -> PkgGroup -> Bool
 isMember pkgName = (`isPrefixOf` pkgName) . name
