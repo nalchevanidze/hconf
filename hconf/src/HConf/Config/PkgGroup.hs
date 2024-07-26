@@ -5,9 +5,10 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Config.PkgGroup
-  ( PkgGroup (..),
+  ( PkgGroup ,
+    PkgGroups,
     pkgDirs,
-    isMember,
+    isLocalPackage,
   )
 where
 
@@ -22,6 +23,7 @@ import Data.Aeson.Types
   )
 import Data.Text (isPrefixOf)
 import HConf.Core.PkgDir (PkgDir, pkgDir)
+import HConf.Utils.Class (ReadConf, readList)
 import HConf.Utils.Core (Name, maybeBool)
 import Relude hiding (isPrefixOf)
 
@@ -37,6 +39,8 @@ data PkgGroup = PkgGroup
       Show
     )
 
+type PkgGroups = [PkgGroup]
+
 instance ToJSON PkgGroup where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
@@ -44,6 +48,9 @@ pkgDirs :: PkgGroup -> [PkgDir]
 pkgDirs PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg = pkgDir dir ([name | maybeBool prefix] <> [pkg | pkg /= "."])
+
+isLocalPackage :: (ReadConf m PkgGroups) => Name -> m Bool
+isLocalPackage name = any (isMember name) <$> readList
 
 isMember :: Name -> PkgGroup -> Bool
 isMember pkgName = (`isPrefixOf` pkgName) . name
