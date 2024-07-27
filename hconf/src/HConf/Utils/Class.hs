@@ -30,7 +30,7 @@ where
 import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDir, PkgDirs)
 import HConf.Utils.Core (maybeToError, safeIO)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
@@ -83,7 +83,7 @@ instance ReadConfFuncDef (m :: Type -> Type) (a :: [Type]) where
 
 type family ReadConfFunc m a where
   ReadConfFunc m '[()] = ReadConfFunc m '[]
-  ReadConfFunc m '[] = ReadFromConf m [PkgDir]
+  ReadConfFunc m '[] = ReadFromConf m PkgDirs
   ReadConfFunc m (x : xs) = (ReadFromConf m x, ReadConfFunc m xs)
 
 class Check m a where

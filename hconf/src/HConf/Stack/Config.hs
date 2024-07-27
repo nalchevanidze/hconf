@@ -16,7 +16,7 @@ import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
 import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDirs)
 import HConf.Utils.Class (Format (..), ReadConf, readEnv)
 import HConf.Utils.Core (Name, aesonYAMLOptions)
 import HConf.Utils.Log (task)
@@ -24,7 +24,7 @@ import HConf.Utils.Yaml (rewrite)
 import Relude
 
 data Stack = Stack
-  { packages :: [PkgDir],
+  { packages :: PkgDirs,
     resolver :: Name,
     allowNewer :: Maybe Bool,
     saveHackageCreds :: Maybe Bool,

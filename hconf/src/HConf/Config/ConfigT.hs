@@ -22,7 +22,7 @@ import HConf.Config.Config (Config (..), getRule)
 import HConf.Config.PkgGroup (pkgDirs)
 import HConf.Core.Bounds (Bounds)
 import HConf.Core.Env (Env (..))
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDir, PkgDirs)
 import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
@@ -89,7 +89,7 @@ save cfg = task "save" $ task "hconf.yaml" $ do
   ctx <- asks id
   rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
 
-instance ReadFromConf ConfigT [PkgDir] where
+instance ReadFromConf ConfigT PkgDirs where
   readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)
 
 instance ReadFromConf ConfigT Builds where

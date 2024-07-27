@@ -5,6 +5,7 @@
 
 module HConf.Core.PkgDir
   ( PkgDir,
+    PkgDirs,
     pkgDir,
     explore,
     packageFile,
@@ -26,6 +27,8 @@ import System.FilePath.Posix
     splitDirectories,
     splitFileName,
   )
+
+type PkgDirs = [PkgDir]
 
 data PkgDir = PkgDir
   { root :: Maybe FilePath,

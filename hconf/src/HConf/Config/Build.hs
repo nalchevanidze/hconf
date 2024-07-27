@@ -32,7 +32,7 @@ import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
 import HConf.Core.HkgRef (HkgRef, hkgRefs)
-import HConf.Core.PkgDir (PkgDir)
+import HConf.Core.PkgDir (PkgDir, PkgDirs)
 import HConf.Core.Version
   ( Version,
   )
@@ -51,15 +51,14 @@ import HConf.Utils.Core
   )
 import Relude
 
-
 type Extras = Map Name Version
 
 data Build = Build
   { ghc :: Tag,
     resolver :: ResolverName,
     extra :: Maybe Extras,
-    include :: Maybe [PkgDir],
-    exclude :: Maybe [PkgDir]
+    include :: Maybe PkgDirs,
+    exclude :: Maybe PkgDirs
   }
   deriving
     ( Generic,
@@ -78,7 +77,7 @@ instance (ReadConf m ()) => Check m Build where
         checkPkgNames exclude
       ]
 
-checkPkgNames :: (ReadConf m ()) => Maybe [PkgDir] -> m ()
+checkPkgNames :: (ReadConf m ()) => Maybe PkgDirs -> m ()
 checkPkgNames ls = do
   known <- readList
   let unknown = maybeList ls \\ known
@@ -105,7 +104,7 @@ getExtras tag =
     . selectBuilds tag
     <$> readList
 
-getPkgs :: (ReadConf m Builds) => Tag -> m [PkgDir]
+getPkgs :: (ReadConf m Builds) => Tag -> m PkgDirs
 getPkgs version = do
   Build {..} <- getBuild version
   pkgs <- readList
