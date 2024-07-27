@@ -32,7 +32,7 @@ import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
 import HConf.Core.HkgRef (HkgRef, hkgRefs)
-import HConf.Core.PkgDir (PkgDir, PkgDirs)
+import HConf.Core.PkgDir (PkgDirs)
 import HConf.Core.Version
   ( Version,
   )

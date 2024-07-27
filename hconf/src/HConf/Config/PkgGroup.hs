@@ -22,7 +22,7 @@ import Data.Aeson.Types
   ( defaultOptions,
   )
 import Data.Text (isPrefixOf)
-import HConf.Core.PkgDir (PkgDir, PkgDirs, pkgDir)
+import HConf.Core.PkgDir (PkgDirs, pkgDir)
 import HConf.Utils.Core (Name, maybeBool)
 import Relude hiding (isPrefixOf)
 

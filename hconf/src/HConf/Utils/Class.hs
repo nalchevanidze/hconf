@@ -30,7 +30,7 @@ where
 import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
-import HConf.Core.PkgDir (PkgDir, PkgDirs)
+import HConf.Core.PkgDir (PkgDirs)
 import HConf.Utils.Core (maybeToError, safeIO)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
