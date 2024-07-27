@@ -31,7 +31,7 @@ import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
 import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDirs)
-import HConf.Utils.Core (maybeToError, safeIO)
+import HConf.Utils.Core (Result, maybeToError, safeIO)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -90,8 +90,8 @@ class Check m a where
   check :: a -> m ()
 
 class (MonadIO m, MonadFail m) => HConfIO m where
-  read :: FilePath -> m (Either String ByteString)
-  write :: FilePath -> ByteString -> m (Either String ())
+  read :: FilePath -> m (Result ByteString)
+  write :: FilePath -> ByteString -> m (Result ())
   remove :: FilePath -> m ()
   putLine :: String -> m ()
   inside :: (Int -> String) -> m a -> m a

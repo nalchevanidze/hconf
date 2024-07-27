@@ -27,6 +27,7 @@ module HConf.Utils.Core
     printException,
     safeIO,
     withThrow,
+    Result,
   )
 where
 
@@ -186,8 +187,10 @@ exec name options = do
 printException :: SomeException -> String
 printException = show
 
-safeIO :: IO a -> IO (Either String a)
+type Result = Either String
+
+safeIO :: IO a -> IO (Result a)
 safeIO = tryJust (Just . printException)
 
-withThrow :: (MonadFail m) => m (Either String a) -> m a
+withThrow :: (MonadFail m) => m (Result a) -> m a
 withThrow x = x >>= either (throwError . msg) pure
