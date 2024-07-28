@@ -28,6 +28,7 @@ module HConf.Utils.Core
     safeIO,
     withThrow,
     Result,
+    getField,
   )
 where
 
@@ -170,6 +171,9 @@ maybeMapToList = maybe [] M.toList
 
 maybeBool :: Maybe Bool -> Bool
 maybeBool = fromMaybe False
+
+getField :: (MonadFail m) => Name -> Map Name a -> m a
+getField = select "Field"
 
 select :: (MonadFail m) => ErrorMsg -> Name -> Map Name a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k

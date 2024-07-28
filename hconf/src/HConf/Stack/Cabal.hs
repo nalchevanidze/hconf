@@ -17,9 +17,29 @@ import Data.Text (pack, unpack)
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
 import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..))
-import HConf.Utils.Core (Msg (..), Name, exec, select, throwError, withThrow)
-import HConf.Utils.Log (alert, field, task, warn)
-import HConf.Utils.Source (fromByteString, ignoreEmpty, indentText, isIndentedLine, parseField, parseLines, startsLike)
+import HConf.Utils.Core
+  ( Msg (..),
+    Name,
+    exec,
+    getField,
+    throwError,
+    withThrow,
+  )
+import HConf.Utils.Log
+  ( alert,
+    field,
+    task,
+    warn,
+  )
+import HConf.Utils.Source
+  ( fromByteString,
+    ignoreEmpty,
+    indentText,
+    isIndentedLine,
+    parseField,
+    parseLines,
+    startsLike,
+  )
 import Relude
 
 data Cabal = Cabal
@@ -27,9 +47,6 @@ data Cabal = Cabal
     version :: Version
   }
   deriving (Eq)
-
-getField :: (MonadFail m) => Name -> Map Name a -> m a
-getField = select "Field"
 
 instance Parse Cabal where
   parse bs =
