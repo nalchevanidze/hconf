@@ -14,8 +14,16 @@ where
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (Check (..), Format (..), HConfIO)
-import HConf.Utils.Core (Name, checkElem, select)
+import HConf.Utils.Class
+  ( Check (..),
+    Format (..),
+    HConfIO,
+  )
+import HConf.Utils.Core
+  ( Name,
+    checkElem,
+    getField,
+  )
 import HConf.Utils.Http (hackage)
 import Relude hiding
   ( Undefined,
@@ -37,7 +45,7 @@ data HkgRef = HkgRef
   }
 
 fetchVersions :: (HConfIO m) => Name -> m Versions
-fetchVersions name = hackage ["package", name, "preferred"] >>= select "Field" "normal-version"
+fetchVersions name = hackage ["package", name, "preferred"] >>= getField "normal-version"
 
 instance (HConfIO m) => Check m HkgRef where
   check HkgRef {..} = fetchVersions name >>= checkElem "version" name version . toList
