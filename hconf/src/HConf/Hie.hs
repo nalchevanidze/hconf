@@ -19,11 +19,11 @@ import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDir, pkgFile)
 import HConf.Stack.Lib (Libraries, Library (..))
 import HConf.Stack.Package (Package (..), resolvePackages)
-import HConf.Utils.Class (ReadConf, readEnv)
 import HConf.Utils.Core (Name)
+import HConf.Utils.FromConf (ReadConf, readEnv)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
-import Relude 
+import Relude
 
 data Component = Component
   { path :: FilePath,
