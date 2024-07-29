@@ -26,10 +26,8 @@ import HConf.Core.PkgDir (PkgDirs)
 import HConf.Core.Version (Version)
 import HConf.Utils.Chalk (Color (Green), chalk)
 import HConf.Utils.Class
-  ( ByKey (..),
-    Check (..),
+  ( Check (..),
     HConfIO (..),
-    ReadFromConf (..),
   )
 import HConf.Utils.Core (Name, printException)
 import HConf.Utils.Log
@@ -38,6 +36,7 @@ import HConf.Utils.Log
   )
 import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude
+import HConf.Utils.FromConf (ReadFromConf (..), ByKey (..))
 
 data HCEnv = HCEnv
   { config :: Config,

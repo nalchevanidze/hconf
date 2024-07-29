@@ -27,9 +27,10 @@ import HConf.Config.PkgGroup (PkgGroup, isMember)
 import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
-import HConf.Utils.Class (Check (check), HConfIO, ReadConf)
+import HConf.Utils.Class (Check (check), HConfIO)
 import HConf.Utils.Core (Name)
 import Relude
+import HConf.Utils.FromConf (ReadConf)
 
 data Config = Config
   { version :: Version,
