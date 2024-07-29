@@ -36,11 +36,7 @@ import HConf.Core.PkgDir (PkgDirs)
 import HConf.Core.Version
   ( Version,
   )
-import HConf.Utils.Class
-  ( Check (..),
-    ReadConf,
-    readList,
-  )
+import HConf.Utils.Class (Check (..))
 import HConf.Utils.Core
   ( Name,
     ResolverName,
@@ -49,6 +45,7 @@ import HConf.Utils.Core
     notElemError,
     throwError,
   )
+import HConf.Utils.FromConf (ReadConf, readList)
 import Relude
 
 type Extras = Map Name Version
