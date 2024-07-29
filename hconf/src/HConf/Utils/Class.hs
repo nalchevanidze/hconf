@@ -63,15 +63,6 @@ readByKey = unpackKey readFromConf
 unpackKey :: (Functor m) => (k -> m (ByKey k a)) -> k -> m a
 unpackKey f k = byKey <$> f k
 
-newtype ByKey k a = ByKey {byKey :: a}
-
-type family Key a :: Type where
-  Key (ByKey k a) = k
-  Key a = ()
-
-class (HConfIO m) => ReadFromConf m a where
-  readFromConf :: Key a -> m a
-
 class ReadConfFuncDef m a where
   type ReadConf m a :: Constraint
 
@@ -85,6 +76,15 @@ type family ReadConfFunc m a where
   ReadConfFunc m '[()] = ReadConfFunc m '[]
   ReadConfFunc m '[] = ReadFromConf m PkgDirs
   ReadConfFunc m (x : xs) = (ReadFromConf m x, ReadConfFunc m xs)
+
+newtype ByKey k a = ByKey {byKey :: a}
+
+type family Key a :: Type where
+  Key (ByKey k a) = k
+  Key a = ()
+
+class (HConfIO m) => ReadFromConf m a where
+  readFromConf :: Key a -> m a
 
 class Check m a where
   check :: a -> m ()
