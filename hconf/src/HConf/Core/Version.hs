@@ -22,10 +22,9 @@ import GHC.Show (Show (..))
 import HConf.Utils.Class
   ( Format (..),
     Parse (..),
-    ReadConf,
-    readFromConf,
   )
 import HConf.Utils.Core (Msg (..), throwError)
+import HConf.Utils.FromConf (ReadConf, readConst)
 import HConf.Utils.Source (formatList, fromToString, sepBy, toError)
 import Relude hiding (show)
 
@@ -40,7 +39,7 @@ data Version = Version
     )
 
 readVersion :: (ReadConf m Version) => m Version
-readVersion = readFromConf ()
+readVersion = readConst
 
 getNumber :: [Int] -> Int
 getNumber (n : _) = n

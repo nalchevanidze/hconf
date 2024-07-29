@@ -48,6 +48,7 @@ library
       HConf.Utils.Chalk
       HConf.Utils.Class
       HConf.Utils.Core
+      HConf.Utils.FromConf
       HConf.Utils.Http
       HConf.Utils.Log
       HConf.Utils.Source

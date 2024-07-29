@@ -7,30 +7,21 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE StarIsType #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HConf.Utils.Class
   ( Parse (..),
     Check (..),
     HConfIO (..),
-    ReadFromConf (..),
     Log (..),
     Format (..),
     Diff (..),
     logDiff,
-    ReadConf,
-    readList,
-    readEnv,
-    readByKey,
-    ByKey (..),
   )
 where
 
 import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
-import HConf.Core.Env (Env)
-import HConf.Core.PkgDir (PkgDirs)
 import HConf.Utils.Core (Result, maybeToError, safeIO)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
@@ -51,40 +42,6 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-readList :: (ReadConf m [a]) => m [a]
-readList = readFromConf ()
-
-readEnv :: (ReadConf m Env) => (Env -> a) -> m a
-readEnv f = f <$> readFromConf ()
-
-readByKey :: (ReadConf m (ByKey k a)) => k -> m a
-readByKey = unpackKey readFromConf
-
-unpackKey :: (Functor m) => (k -> m (ByKey k a)) -> k -> m a
-unpackKey f k = byKey <$> f k
-
-class ReadConfFuncDef m a where
-  type ReadConf m a :: Constraint
-
-instance ReadConfFuncDef (m :: Type -> Type) (a :: Type) where
-  type ReadConf m a = ReadConfFunc m '[a]
-
-instance ReadConfFuncDef (m :: Type -> Type) (a :: [Type]) where
-  type ReadConf m a = ReadConfFunc m a
-
-type family ReadConfFunc m a where
-  ReadConfFunc m '[()] = ReadConfFunc m '[]
-  ReadConfFunc m '[] = ReadFromConf m PkgDirs
-  ReadConfFunc m (x : xs) = (ReadFromConf m x, ReadConfFunc m xs)
-
-newtype ByKey k a = ByKey {byKey :: a}
-
-type family Key a :: Type where
-  Key (ByKey k a) = k
-  Key a = ()
-
-class (HConfIO m) => ReadFromConf m a where
-  readFromConf :: Key a -> m a
 
 class Check m a where
   check :: a -> m ()
