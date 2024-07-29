@@ -16,7 +16,6 @@ module HConf.Utils.FromConf
     readEnv,
     readByKey,
     ByKey (..),
-    readConst,
   )
 where
 
@@ -24,9 +23,6 @@ import HConf.Core.Env (Env)
 import HConf.Core.PkgDir (PkgDirs)
 import HConf.Utils.Class (HConfIO)
 import Relude
-
-readConst :: (ReadConf m a) => m a
-readConst = readFromConf ()
 
 readList :: (ReadConf m [a]) => m [a]
 readList = readFromConf ()

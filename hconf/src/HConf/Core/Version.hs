@@ -24,7 +24,7 @@ import HConf.Utils.Class
     Parse (..),
   )
 import HConf.Utils.Core (Msg (..), throwError)
-import HConf.Utils.FromConf (ReadConf, readConst)
+import HConf.Utils.FromConf (ReadConf, readFromConf)
 import HConf.Utils.Source (formatList, fromToString, sepBy, toError)
 import Relude hiding (show)
 
@@ -39,7 +39,7 @@ data Version = Version
     )
 
 readVersion :: (ReadConf m Version) => m Version
-readVersion = readConst
+readVersion = readFromConf ()
 
 getNumber :: [Int] -> Int
 getNumber (n : _) = n

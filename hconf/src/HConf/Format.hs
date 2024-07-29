@@ -6,8 +6,9 @@ module HConf.Format (format) where
 
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (explore)
-import HConf.Utils.Class (HConfIO, ReadConf, readList)
+import HConf.Utils.Class (HConfIO)
 import HConf.Utils.Core (throwError)
+import HConf.Utils.FromConf (ReadConf, readList)
 import HConf.Utils.Log (task)
 import Ormolu
   ( ColorMode (..),
