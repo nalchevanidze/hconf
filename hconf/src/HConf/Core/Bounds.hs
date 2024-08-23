@@ -17,7 +17,7 @@ import Data.Aeson
     ToJSON (toJSON),
     Value (..),
   )
-import Data.List (maximum)
+import Data.List (maximum, minimum)
 import HConf.Core.HkgRef (fetchVersions)
 import HConf.Core.Version (Version, dropPatch, nextVersion)
 import HConf.Utils.Chalk (Color (Yellow), chalk)
@@ -119,4 +119,14 @@ updateDepBounds name bounds = do
   let upper = getBound Max bounds
   let newVersion = maximum (latest : upper)
   if upper == [newVersion] then pure () else field name (show newVersion)
-  pure (Bounds (getBound Min bounds <> [newVersion]))
+  _min <- initiateMin name bounds
+  pure (Bounds (_min <> [newVersion]))
+
+initiateMin :: (HConfIO f) => Name -> Bounds -> f [Bound]
+initiateMin name bounds = do
+  let mi = getBound Min bounds
+  if null mi
+    then do
+      ls <- fmap (Bound Min True) <$> fetchVersions name
+      pure [minimum ls]
+    else pure mi
