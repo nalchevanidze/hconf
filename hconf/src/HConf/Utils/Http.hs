@@ -30,7 +30,7 @@ import Network.HTTP.Req
     runReq,
     useURI,
   )
-import Relude 
+import Relude
 import Text.URI (mkURI)
 
 getReq :: (Url s, Option s) -> Req LbsResponse

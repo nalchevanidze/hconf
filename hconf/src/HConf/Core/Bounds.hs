@@ -28,10 +28,10 @@ import HConf.Utils.Class
     Parse (..),
   )
 import HConf.Utils.Core (Msg (..), Name, throwError, withString)
+import HConf.Utils.FromConf (ByKey)
 import HConf.Utils.Log (field)
 import HConf.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
 import Relude
-import HConf.Utils.FromConf (ByKey)
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 

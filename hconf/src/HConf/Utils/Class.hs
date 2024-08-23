@@ -42,7 +42,6 @@ instance Parse Int where
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
 
-
 class Check m a where
   check :: a -> m ()
 

@@ -30,13 +30,13 @@ import HConf.Utils.Class
     HConfIO (..),
   )
 import HConf.Utils.Core (Name, printException)
+import HConf.Utils.FromConf (ByKey (..), ReadFromConf (..))
 import HConf.Utils.Log
   ( alert,
     task,
   )
 import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude
-import HConf.Utils.FromConf (ReadFromConf (..), ByKey (..))
 
 data HCEnv = HCEnv
   { config :: Config,
@@ -64,7 +64,7 @@ instance HConfIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
   remove = liftIO . remove
-  putLine txt = asks indention >>= putLine . flip indent txt
+  putLine txt = asks indention >>= liftIO . putLine . flip indent txt
   inside f m = do
     asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
