@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -33,7 +34,7 @@ module HConf.Utils.Core
 where
 
 import Control.Exception (tryJust)
-import Data.Aeson (Options (..), Value (..), defaultOptions, encode)
+import Data.Aeson (FromJSON, Options (..), ToJSON, Value (..), defaultOptions, encode)
 import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex)
@@ -50,7 +51,13 @@ aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
 type Name = Text
 
-type ResolverName = Text
+newtype ResolverName = ResolverName Text
+  deriving
+    ( Generic,
+      FromJSON,
+      ToJSON,
+      Show
+    )
 
 fields :: [Text]
 fields =

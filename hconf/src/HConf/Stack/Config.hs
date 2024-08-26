@@ -18,7 +18,7 @@ import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDirs)
 import HConf.Utils.Class (Format (..))
-import HConf.Utils.Core (Name, aesonYAMLOptions)
+import HConf.Utils.Core (Name, aesonYAMLOptions, ResolverName)
 import HConf.Utils.FromConf (ReadConf, readEnv)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
@@ -26,7 +26,7 @@ import Relude
 
 data Stack = Stack
   { packages :: PkgDirs,
-    resolver :: Name,
+    resolver :: ResolverName,
     allowNewer :: Maybe Bool,
     saveHackageCreds :: Maybe Bool,
     extraDeps :: [Name]
