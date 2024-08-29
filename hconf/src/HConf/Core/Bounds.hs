@@ -27,7 +27,7 @@ import HConf.Utils.Class
     HConfIO,
     Parse (..),
   )
-import HConf.Utils.Core (Msg (..), Name, throwError, withString)
+import HConf.Utils.Core (Msg (..), Name, throwError, withString, DependencyName (..))
 import HConf.Utils.FromConf (ByKey)
 import HConf.Utils.Log (field)
 import HConf.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
@@ -113,8 +113,8 @@ getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 getLatest :: (HConfIO m) => Name -> m Bound
 getLatest = fmap (Bound Max True . head) . fetchVersions
 
-updateDepBounds :: (HConfIO m) => Name -> Bounds -> m Bounds
-updateDepBounds name bounds = do
+updateDepBounds :: (HConfIO m) => DependencyName -> Bounds -> m Bounds
+updateDepBounds (DependencyName name) bounds = do
   latest <- getLatest name
   let upper = getBound Max bounds
   let newVersion = maximum (latest : upper)

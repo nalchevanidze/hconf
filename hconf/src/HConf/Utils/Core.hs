@@ -30,6 +30,8 @@ module HConf.Utils.Core
     withThrow,
     Result,
     getField,
+    DependencyName (..),
+    selectG,
   )
 where
 
@@ -50,6 +52,16 @@ aesonYAMLOptions :: Options
 aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
 type Name = Text
+
+newtype DependencyName = DependencyName Text
+  deriving
+    ( Generic,
+      FromJSON,
+      ToJSON,
+      Show,
+      Ord,
+      Eq
+    )
 
 newtype ResolverName = ResolverName Text
   deriving
@@ -143,6 +155,9 @@ instance Msg Value where
 instance Msg URI where
   msg = ErrorMsg . show
 
+instance Msg DependencyName where
+  msg = ErrorMsg . show
+
 withString :: (MonadFail m) => Text -> (Text -> m a) -> Value -> m a
 withString _ f (String p) = f p
 withString label _ v = throwError ("cant parse" <> msg label <> "expected string got" <> msg v)
@@ -183,7 +198,10 @@ getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
 select :: (MonadFail m) => ErrorMsg -> Name -> Map Name a -> m a
-select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
+select = selectG
+
+selectG :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
+selectG e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 
 exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
 exec name options = do

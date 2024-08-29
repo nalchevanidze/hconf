@@ -18,7 +18,7 @@ import Data.Map (fromList, toList)
 import Data.Map.Strict (traverseWithKey)
 import HConf.Core.Bounds (Bounds)
 import HConf.Utils.Class (Format (format), Parse (..))
-import HConf.Utils.Core (Name, select)
+import HConf.Utils.Core (DependencyName, selectG)
 import HConf.Utils.Source (firstWord, formatTable)
 import Relude hiding
   ( Undefined,
@@ -33,25 +33,25 @@ import Relude hiding
   )
 
 data Dependency = Dependency
-  { name :: Name,
+  { name :: DependencyName,
     bounds :: Bounds
   }
 
 instance Parse Dependency where
   parse =
-    (\(name, txt) -> Dependency name <$> parse txt)
+    (\(name, txt) -> Dependency <$> parse name <*> parse txt)
       . firstWord
 
 instance Format Dependency where
-  format Dependency {..} = name <> " " <> format bounds
+  format Dependency {..} = format name <> " " <> format bounds
 
-newtype Dependencies = Dependencies {unpackDeps :: Map Name Bounds}
+newtype Dependencies = Dependencies {unpackDeps :: Map DependencyName Bounds}
   deriving (Show)
 
-getBounds :: (MonadFail m) => Name -> Dependencies -> m Bounds
-getBounds name = select "Package " name . unpackDeps
+getBounds :: (MonadFail m) => DependencyName -> Dependencies -> m Bounds
+getBounds name = selectG "Package " name . unpackDeps
 
-traverseDeps :: (Applicative f) => (Name -> Bounds -> f Bounds) -> Dependencies -> f Dependencies
+traverseDeps :: (Applicative f) => (DependencyName -> Bounds -> f Bounds) -> Dependencies -> f Dependencies
 traverseDeps f (Dependencies xs) = Dependencies <$> traverseWithKey f xs
 
 initDependencies :: [Dependency] -> Dependencies

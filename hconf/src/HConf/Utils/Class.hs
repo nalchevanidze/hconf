@@ -22,7 +22,7 @@ where
 
 import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
-import HConf.Utils.Core (Result, maybeToError, safeIO)
+import HConf.Utils.Core (DependencyName (..), Result, maybeToError, safeIO)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -41,6 +41,9 @@ instance Parse Int where
     maybeToError
       ("could not parse Int: " <> t <> "'!")
       (readMaybe $ toString t)
+
+instance Parse DependencyName where
+  parse = pure . DependencyName
 
 class Check m a where
   check :: a -> m ()
@@ -64,6 +67,9 @@ class Format a where
 
 instance Format Int where
   format = show
+
+instance Format DependencyName where
+  format (DependencyName x) = x
 
 class Diff a where
   diff :: a -> a -> Maybe String

@@ -27,8 +27,8 @@ import HConf.Config.PkgGroup (PkgGroup, isMember)
 import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
-import HConf.Utils.Class (Check (check), HConfIO)
-import HConf.Utils.Core (Name)
+import HConf.Utils.Class (Check (check), HConfIO, format)
+import HConf.Utils.Core (Name, DependencyName)
 import HConf.Utils.FromConf (ReadConf)
 import Relude
 
@@ -45,9 +45,9 @@ data Config = Config
       Show
     )
 
-getRule :: (MonadFail m) => Name -> Config -> m Bounds
+getRule :: (MonadFail m) => DependencyName -> Config -> m Bounds
 getRule name Config {..}
-  | isMember name groups = pure bounds
+  | isMember (format name) groups = pure bounds
   | otherwise = getBounds name dependencies
 
 instance ToJSON Config where
