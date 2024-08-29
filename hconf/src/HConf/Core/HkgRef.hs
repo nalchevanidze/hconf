@@ -20,7 +20,8 @@ import HConf.Utils.Class
     HConfIO,
   )
 import HConf.Utils.Core
-  ( Name,
+  ( DependencyName (..),
+    Name,
     checkElem,
     getField,
   )
@@ -44,11 +45,11 @@ data HkgRef = HkgRef
     version :: Version
   }
 
-fetchVersions :: (HConfIO m) => Name -> m Versions
-fetchVersions name = hackage ["package", name, "preferred"] >>= getField "normal-version"
+fetchVersions :: (HConfIO m) => DependencyName -> m Versions
+fetchVersions name = hackage ["package", format name, "preferred"] >>= getField "normal-version"
 
 instance (HConfIO m) => Check m HkgRef where
-  check HkgRef {..} = fetchVersions name >>= checkElem "version" name version . toList
+  check HkgRef {..} = fetchVersions (DependencyName name) >>= checkElem "version" name version . toList
 
 hkgRefs :: Map Name Version -> [HkgRef]
 hkgRefs = map (uncurry HkgRef) . M.toList

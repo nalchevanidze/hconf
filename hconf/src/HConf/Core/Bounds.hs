@@ -27,7 +27,7 @@ import HConf.Utils.Class
     HConfIO,
     Parse (..),
   )
-import HConf.Utils.Core (Msg (..), Name, throwError, withString, DependencyName (..))
+import HConf.Utils.Core (DependencyName (..), Msg (..), throwError, withString)
 import HConf.Utils.FromConf (ByKey)
 import HConf.Utils.Log (field)
 import HConf.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
@@ -110,19 +110,19 @@ instance Diff Bounds where
 getBound :: Restriction -> Bounds -> [Bound]
 getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 
-getLatest :: (HConfIO m) => Name -> m Bound
+getLatest :: (HConfIO m) => DependencyName -> m Bound
 getLatest = fmap (Bound Max True . head) . fetchVersions
 
 updateDepBounds :: (HConfIO m) => DependencyName -> Bounds -> m Bounds
-updateDepBounds (DependencyName name) bounds = do
+updateDepBounds name bounds = do
   latest <- getLatest name
   let upper = getBound Max bounds
   let newVersion = maximum (latest : upper)
-  if upper == [newVersion] then pure () else field name (show newVersion)
+  if upper == [newVersion] then pure () else field (format name) (show newVersion)
   _min <- initiateMin name bounds
   pure (Bounds (_min <> [newVersion]))
 
-initiateMin :: (HConfIO f) => Name -> Bounds -> f [Bound]
+initiateMin :: (HConfIO f) => DependencyName -> Bounds -> f [Bound]
 initiateMin name bounds = do
   let mi = getBound Min bounds
   if null mi

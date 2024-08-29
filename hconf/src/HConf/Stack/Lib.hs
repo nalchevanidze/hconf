@@ -34,8 +34,8 @@ import Data.Aeson.Types
 import GHC.Generics (Generic (..))
 import HConf.Core.Bounds (Bounds, BoundsByName)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
-import HConf.Utils.Class (logDiff, format)
-import HConf.Utils.Core (Name, aesonYAMLOptions, DependencyName)
+import HConf.Utils.Class (format, logDiff)
+import HConf.Utils.Core (DependencyName, Name, aesonYAMLOptions)
 import HConf.Utils.FromConf (ReadConf, readByKey)
 import HConf.Utils.Log (field)
 import Relude
