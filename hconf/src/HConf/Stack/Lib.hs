@@ -34,8 +34,8 @@ import Data.Aeson.Types
 import GHC.Generics (Generic (..))
 import HConf.Core.Bounds (Bounds, BoundsByName)
 import HConf.Core.Dependencies (Dependencies, traverseDeps)
-import HConf.Utils.Class (logDiff)
-import HConf.Utils.Core (Name, aesonYAMLOptions)
+import HConf.Utils.Class (logDiff, format)
+import HConf.Utils.Core (Name, aesonYAMLOptions, DependencyName)
 import HConf.Utils.FromConf (ReadConf, readByKey)
 import HConf.Utils.Log (field)
 import Relude
@@ -68,10 +68,10 @@ toObject :: Value -> Object
 toObject (Object x) = delete "__unknown-fields" x
 toObject _ = mempty
 
-updateDependency :: (ReadConf m BoundsByName) => Name -> Bounds -> m Bounds
+updateDependency :: (ReadConf m BoundsByName) => DependencyName -> Bounds -> m Bounds
 updateDependency name oldBounds = do
   bounds <- readByKey name
-  logDiff (field name) oldBounds bounds
+  logDiff (field (format name)) oldBounds bounds
   pure bounds
 
 updateDependencies :: (ReadConf m BoundsByName) => Dependencies -> m Dependencies

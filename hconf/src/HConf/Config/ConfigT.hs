@@ -29,7 +29,7 @@ import HConf.Utils.Class
   ( Check (..),
     HConfIO (..),
   )
-import HConf.Utils.Core (Name, printException, DependencyName (..))
+import HConf.Utils.Core (DependencyName (..), Name, printException)
 import HConf.Utils.FromConf (ByKey (..), ReadFromConf (..))
 import HConf.Utils.Log
   ( alert,
@@ -100,5 +100,5 @@ instance ReadFromConf ConfigT Env where
 instance ReadFromConf ConfigT Version where
   readFromConf = const $ asks (version . config)
 
-instance ReadFromConf ConfigT (ByKey Name Bounds) where
-  readFromConf name = ByKey <$> (asks config >>= getRule (DependencyName name))
+instance ReadFromConf ConfigT (ByKey DependencyName Bounds) where
+  readFromConf name = ByKey <$> (asks config >>= getRule name)

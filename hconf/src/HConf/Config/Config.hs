@@ -28,7 +28,7 @@ import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HConf.Core.Version (Version, nextVersion)
 import HConf.Utils.Class (Check (check), HConfIO, format)
-import HConf.Utils.Core (Name, DependencyName)
+import HConf.Utils.Core (DependencyName)
 import HConf.Utils.FromConf (ReadConf)
 import Relude
 

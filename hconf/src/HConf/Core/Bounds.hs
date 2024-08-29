@@ -76,7 +76,7 @@ instance Parse Bound where
 newtype Bounds = Bounds [Bound]
   deriving (Generic, Show, Eq)
 
-type BoundsByName = ByKey Name Bounds
+type BoundsByName = ByKey DependencyName Bounds
 
 instance Parse Bounds where
   parse "" = pure $ Bounds []
