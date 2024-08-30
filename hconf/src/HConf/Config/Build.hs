@@ -31,15 +31,11 @@ import Data.Aeson.Types
 import Data.List ((\\))
 import qualified Data.Map as M
 import HConf.Config.Tag (Tag)
-import HConf.Core.HkgRef (HkgRef, hkgRefs)
+import HConf.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
 import HConf.Core.PkgDir (PkgDirs)
-import HConf.Core.Version
-  ( Version,
-  )
 import HConf.Utils.Class (Check (..))
 import HConf.Utils.Core
-  ( Name,
-    ResolverName,
+  ( ResolverName,
     maybeList,
     maybeMapToList,
     notElemError,
@@ -48,7 +44,7 @@ import HConf.Utils.Core
 import HConf.Utils.FromConf (ReadConf, readList)
 import Relude
 
-type Extras = Map Name Version
+type Extras = VersionMap
 
 data Build = Build
   { ghc :: Tag,

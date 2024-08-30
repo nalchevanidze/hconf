@@ -8,6 +8,7 @@ module HConf.Core.HkgRef
   ( fetchVersions,
     hkgRefs,
     HkgRef,
+    VersionMap,
   )
 where
 
@@ -20,8 +21,7 @@ import HConf.Utils.Class
     HConfIO,
   )
 import HConf.Utils.Core
-  ( DependencyName (..),
-    Name,
+  ( DependencyName,
     checkElem,
     getField,
   )
@@ -40,8 +40,10 @@ import Relude hiding
 
 type Versions = NonEmpty Version
 
+type VersionMap = Map DependencyName Version
+
 data HkgRef = HkgRef
-  { name :: Name,
+  { name :: DependencyName,
     version :: Version
   }
 
@@ -49,10 +51,10 @@ fetchVersions :: (HConfIO m) => DependencyName -> m Versions
 fetchVersions name = hackage ["package", format name, "preferred"] >>= getField "normal-version"
 
 instance (HConfIO m) => Check m HkgRef where
-  check HkgRef {..} = fetchVersions (DependencyName name) >>= checkElem "version" name version . toList
+  check HkgRef {..} = fetchVersions name >>= checkElem "version" (format name) version . toList
 
-hkgRefs :: Map Name Version -> [HkgRef]
+hkgRefs :: VersionMap -> [HkgRef]
 hkgRefs = map (uncurry HkgRef) . M.toList
 
 instance Format HkgRef where
-  format HkgRef {..} = name <> "-" <> format version
+  format HkgRef {..} = format name <> "-" <> format version

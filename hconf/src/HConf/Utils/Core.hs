@@ -36,7 +36,7 @@ module HConf.Utils.Core
 where
 
 import Control.Exception (tryJust)
-import Data.Aeson (FromJSON, Options (..), ToJSON, Value (..), defaultOptions, encode)
+import Data.Aeson (FromJSON, FromJSONKey, Options (..), ToJSON, ToJSONKey, Value (..), defaultOptions, encode)
 import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Char (isUpper, toLower)
 import Data.List (elemIndex)
@@ -60,7 +60,9 @@ newtype DependencyName = DependencyName Text
       ToJSON,
       Show,
       Ord,
-      Eq
+      Eq,
+      FromJSONKey,
+      ToJSONKey
     )
 
 newtype ResolverName = ResolverName Text
