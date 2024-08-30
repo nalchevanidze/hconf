@@ -11,7 +11,6 @@ import Data.Aeson (FromJSON, eitherDecode)
 import HConf.Utils.Class (HConfIO)
 import HConf.Utils.Core
   ( Msg (..),
-    Name,
     maybeToError,
     throwError,
   )
@@ -42,5 +41,5 @@ parse url = either getReq getReq <$> maybeToError ("Invalid Endpoint: " <> url <
 http :: (FromJSON a, HConfIO m) => Text -> m a
 http uri = parse uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig >>= either throwError pure
 
-hackage :: (HConfIO m, FromJSON a) => [Name] -> m a
+hackage :: (HConfIO m, FromJSON a) => [Text] -> m a
 hackage path = http (genUrl "https://hackage.haskell.org" path <> ".json")
