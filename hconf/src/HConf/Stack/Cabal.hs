@@ -20,10 +20,11 @@ import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..), format
 import HConf.Utils.Core
   ( Msg (..),
     Name,
+    PkgName,
     exec,
     getField,
     throwError,
-    withThrow, PkgName,
+    withThrow,
   )
 import HConf.Utils.Log
   ( alert,

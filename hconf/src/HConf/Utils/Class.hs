@@ -22,7 +22,7 @@ where
 
 import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
-import HConf.Utils.Core (DependencyName (..), Result, maybeToError, safeIO, PkgName (..))
+import HConf.Utils.Core (DependencyName (..), PkgName (..), Result, maybeToError, safeIO)
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
