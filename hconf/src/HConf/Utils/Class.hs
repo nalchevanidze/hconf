@@ -22,7 +22,7 @@ where
 
 import Control.Exception (catch, throwIO)
 import Data.ByteString (readFile, writeFile)
-import HConf.Utils.Core (DependencyName (..), Result, maybeToError, safeIO)
+import HConf.Utils.Core (DependencyName (..), Result, maybeToError, safeIO, PkgName (..))
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
@@ -44,6 +44,9 @@ instance Parse Int where
 
 instance Parse DependencyName where
   parse = pure . DependencyName
+
+instance Parse PkgName where
+  parse = pure . PkgName
 
 class Check m a where
   check :: a -> m ()
@@ -70,6 +73,9 @@ instance Format Int where
 
 instance Format DependencyName where
   format (DependencyName x) = x
+
+instance Format PkgName where
+  format (PkgName x) = x
 
 class Diff a where
   diff :: a -> a -> Maybe String

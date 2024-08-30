@@ -32,6 +32,7 @@ module HConf.Utils.Core
     getField,
     DependencyName (..),
     selectG,
+    PkgName (..),
   )
 where
 
@@ -53,6 +54,19 @@ aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
 
 type Name = Text
 
+newtype PkgName = PkgName Text
+  deriving
+    ( Generic,
+      FromJSON,
+      ToJSON,
+      Show,
+      Ord,
+      Eq,
+      FromJSONKey,
+      ToJSONKey,
+      ToString
+    )
+
 newtype DependencyName = DependencyName Text
   deriving
     ( Generic,
@@ -62,7 +76,8 @@ newtype DependencyName = DependencyName Text
       Ord,
       Eq,
       FromJSONKey,
-      ToJSONKey
+      ToJSONKey,
+      ToString
     )
 
 newtype ResolverName = ResolverName Text
@@ -70,7 +85,12 @@ newtype ResolverName = ResolverName Text
     ( Generic,
       FromJSON,
       ToJSON,
-      Show
+      Show,
+      Ord,
+      Eq,
+      FromJSONKey,
+      ToJSONKey,
+      ToString
     )
 
 fields :: [Text]

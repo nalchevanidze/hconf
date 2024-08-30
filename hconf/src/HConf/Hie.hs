@@ -24,6 +24,7 @@ import HConf.Utils.FromConf (ReadConf, readEnv)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (rewrite)
 import Relude
+import HConf.Utils.Class
 
 data Component = Component
   { path :: FilePath,
@@ -68,7 +69,7 @@ toLib (path, Package {..}) =
     comp tag (Just Library {sourceDirs}) =
       [ Component
           { path = "./" <> pkgFile (toString sourceDirs) path,
-            component = name <:> tag
+            component = format name <:> tag
           }
       ]
     comp _ _ = []

@@ -22,14 +22,14 @@ import HConf.Core.Version (Version, readVersion)
 import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
 import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HConf.Utils.Class (Check (..))
-import HConf.Utils.Core (Name, aesonYAMLOptions, throwError, tupled)
+import HConf.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
 import HConf.Utils.FromConf (ReadConf, readList)
 import HConf.Utils.Log (task)
 import HConf.Utils.Yaml (readYaml, rewrite)
 import Relude hiding (Undefined, length, replicate)
 
 data Package = Package
-  { name :: Name,
+  { name :: PkgName,
     version :: Version,
     library :: Maybe Library,
     dependencies :: Dependencies,

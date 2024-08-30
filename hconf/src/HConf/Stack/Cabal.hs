@@ -16,14 +16,14 @@ where
 import Data.Text (pack, unpack)
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..))
+import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..), format)
 import HConf.Utils.Core
   ( Msg (..),
     Name,
     exec,
     getField,
     throwError,
-    withThrow,
+    withThrow, PkgName,
   )
 import HConf.Utils.Log
   ( alert,
@@ -43,7 +43,7 @@ import HConf.Utils.Source
 import Relude
 
 data Cabal = Cabal
-  { name :: Name,
+  { name :: PkgName,
     version :: Version
   }
   deriving (Eq)
@@ -51,7 +51,7 @@ data Cabal = Cabal
 instance Parse Cabal where
   parse bs =
     Cabal
-      <$> getField "name" fields
+      <$> (getField "name" fields >>= parse)
       <*> (getField "version" fields >>= parse)
     where
       fields =
@@ -101,7 +101,7 @@ data CabalSrc = CabalSrc
   }
 
 instance Log Cabal where
-  log Cabal {..} = field name (show version)
+  log Cabal {..} = field (format name) (show version)
 
 instance (HConfIO m) => Check m CabalSrc where
   check CabalSrc {..} = task "cabal" $ do
