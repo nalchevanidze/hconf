@@ -26,8 +26,8 @@ import System.Exit (ExitCode (..))
 format :: (ReadConf m ()) => Bool -> m ()
 format check = task "ormolu" $ do
   files <- sort . concat <$> (readList >>= traverse explore)
-  errorCodes <- mapMaybe selectFailure <$> mapM (formatFile check) files
-  unless (null errorCodes) (throwError "Error")
+  success <- all isSuccess <$> mapM (formatFile check) files
+  unless success (throwError "Error")
 
 formatFile :: (HConfIO m) => Bool -> FilePath -> m ExitCode
 formatFile check path = liftIO $ withPrettyOrmoluExceptions Always $ do
@@ -52,6 +52,6 @@ formatter path =
 handleDiff :: Maybe TextDiff -> IO ExitCode
 handleDiff = maybe (pure ExitSuccess) (\diff -> runTerm (printTextDiff diff) Always stderr $> ExitFailure 100)
 
-selectFailure :: ExitCode -> Maybe Int
-selectFailure ExitSuccess = Nothing
-selectFailure (ExitFailure n) = Just n
+isSuccess :: ExitCode -> Bool
+isSuccess ExitSuccess = True
+isSuccess ExitFailure {} = False
