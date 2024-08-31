@@ -19,7 +19,6 @@ import HConf.Core.Version (Version)
 import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..), format)
 import HConf.Utils.Core
   ( Msg (..),
-    Name,
     PkgName,
     exec,
     getField,
@@ -70,16 +69,16 @@ stack :: (HConfIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
   (out, success) <- exec "stack" (cmd : (toString pkg : map ("--" <>) options))
   ( if success
-      then printWarnings (pack cmd) (parseWarnings out)
+      then printWarnings cmd (parseWarnings out)
       else alert $ cmd <> ": " <> unpack (indentText $ pack out)
     )
 
 instance Log Warning where
   log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
 
-printWarnings :: (HConfIO m) => Name -> [Warning] -> m ()
-printWarnings cmd [] = field cmd "ok"
-printWarnings cmd xs = task (toString cmd) $ traverse_ log xs
+printWarnings :: (HConfIO m) => String -> [Warning] -> m ()
+printWarnings cmd [] = field (pack cmd) "ok"
+printWarnings cmd xs = task cmd $ traverse_ log xs
 
 parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack

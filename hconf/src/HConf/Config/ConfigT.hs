@@ -29,7 +29,7 @@ import HConf.Utils.Class
   ( Check (..),
     HConfIO (..),
   )
-import HConf.Utils.Core (DependencyName (..), Name, printException)
+import HConf.Utils.Core (DependencyName (..), printException)
 import HConf.Utils.FromConf (ByKey (..), ReadFromConf (..))
 import HConf.Utils.Log
   ( alert,
