@@ -74,7 +74,7 @@ run m env@Env {..} = do
   cfg <- readYaml hconf
   runConfigT (asks config >>= check >> m) env cfg >>= handle
 
-runTask :: Name -> ConfigT () -> Env -> IO ()
+runTask :: String -> ConfigT () -> Env -> IO ()
 runTask name m = run (task name m $> Just (chalk Green "\nOk"))
 
 handle :: (ToString a) => (HConfIO m) => Either String (Maybe a) -> m ()

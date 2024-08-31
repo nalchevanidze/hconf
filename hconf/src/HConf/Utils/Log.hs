@@ -26,7 +26,7 @@ color 1 = Magenta
 color 2 = Cyan
 color _ = Gray
 
-task :: (HConfIO m) => Name -> m a -> m a
+task :: (HConfIO m) => String -> m a -> m a
 task name = inside (\i -> chalk (color i) (li i name))
 
 field :: (HConfIO m) => Name -> String -> m ()

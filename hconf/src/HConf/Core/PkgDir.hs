@@ -48,8 +48,8 @@ resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString dirN
 pkgFile :: FilePath -> PkgDir -> FilePath
 pkgFile f = resolve [f]
 
-instance ToText PkgDir where
-  toText = fromString . resolve []
+instance ToString PkgDir where
+  toString = resolve []
 
 explore :: (MonadIO m) => PkgDir -> m [String]
 explore x = map normalise <$> liftIO (glob (resolve [] x <> "/**/*.hs"))

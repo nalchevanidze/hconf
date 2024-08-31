@@ -79,7 +79,7 @@ rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
 checkPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 checkPackage pkgDir =
-  task (toText pkgDir) $ do
+  task (toString pkgDir) $ do
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 

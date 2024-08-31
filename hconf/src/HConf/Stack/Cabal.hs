@@ -68,7 +68,7 @@ getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (HConfIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  (out, success) <- exec "stack" (cmd : (unpack (toText pkg) : map ("--" <>) options))
+  (out, success) <- exec "stack" (cmd : (toString pkg : map ("--" <>) options))
   ( if success
       then printWarnings (pack cmd) (parseWarnings out)
       else alert $ cmd <> ": " <> unpack (indentText $ pack out)
@@ -79,7 +79,7 @@ instance Log Warning where
 
 printWarnings :: (HConfIO m) => Name -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
-printWarnings cmd xs = task cmd $ traverse_ log xs
+printWarnings cmd xs = task (toString cmd) $ traverse_ log xs
 
 parseWarnings :: String -> [Warning]
 parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
