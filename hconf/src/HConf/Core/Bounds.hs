@@ -118,7 +118,7 @@ updateDepBounds name bounds = do
   latest <- getLatest name
   let upper = getBound Max bounds
   let newVersion = maximum (latest : upper)
-  if upper == [newVersion] then pure () else field (format name) (show newVersion)
+  if upper == [newVersion] then pure () else field name (show newVersion)
   _min <- initiateMin name bounds
   pure (Bounds (_min <> [newVersion]))
 

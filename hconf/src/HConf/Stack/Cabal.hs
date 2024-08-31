@@ -77,7 +77,7 @@ instance Log Warning where
   log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
 
 printWarnings :: (HConfIO m) => String -> [Warning] -> m ()
-printWarnings cmd [] = field (pack cmd) "ok"
+printWarnings cmd [] = field cmd "ok"
 printWarnings cmd xs = task cmd $ traverse_ log xs
 
 parseWarnings :: String -> [Warning]
@@ -101,7 +101,7 @@ data CabalSrc = CabalSrc
   }
 
 instance Log Cabal where
-  log Cabal {..} = field (format name) (show version)
+  log Cabal {..} = field name (show version)
 
 instance (HConfIO m) => Check m CabalSrc where
   check CabalSrc {..} = task "cabal" $ do

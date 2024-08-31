@@ -26,6 +26,7 @@ import HConf.Utils.Core (DependencyName (..), PkgName (..), Result, maybeToError
 import Relude hiding (readFile, writeFile)
 import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
+import Data.Text (pack)
 
 class Log a where
   log :: (HConfIO m) => a -> m ()
@@ -76,6 +77,9 @@ instance Format DependencyName where
 
 instance Format PkgName where
   format (PkgName x) = x
+
+instance Format String where
+  format = pack
 
 class Diff a where
   diff :: a -> a -> Maybe String
