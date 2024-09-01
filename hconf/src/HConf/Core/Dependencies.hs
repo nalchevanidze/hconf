@@ -18,7 +18,7 @@ import Data.Map (fromList, toList)
 import Data.Map.Strict (traverseWithKey)
 import HConf.Core.Bounds (Bounds)
 import HConf.Utils.Class (Format (format), Parse (..))
-import HConf.Utils.Core (DependencyName, selectG)
+import HConf.Utils.Core (DependencyName, select)
 import HConf.Utils.Source (firstWord, formatTable)
 import Relude hiding
   ( Undefined,
@@ -49,7 +49,7 @@ newtype Dependencies = Dependencies {unpackDeps :: Map DependencyName Bounds}
   deriving (Show)
 
 getBounds :: (MonadFail m) => DependencyName -> Dependencies -> m Bounds
-getBounds name = selectG "Package " name . unpackDeps
+getBounds name = select "Package " name . unpackDeps
 
 traverseDeps :: (Applicative f) => (DependencyName -> Bounds -> f Bounds) -> Dependencies -> f Dependencies
 traverseDeps f (Dependencies xs) = Dependencies <$> traverseWithKey f xs

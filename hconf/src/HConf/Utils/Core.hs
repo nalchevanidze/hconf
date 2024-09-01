@@ -22,7 +22,6 @@ module HConf.Utils.Core
     Msg (..),
     ErrorMsg (..),
     withString,
-    select,
     exec,
     ResolverName,
     printException,
@@ -31,7 +30,7 @@ module HConf.Utils.Core
     Result,
     getField,
     DependencyName (..),
-    selectG,
+    select,
     PkgName (..),
   )
 where
@@ -219,11 +218,9 @@ maybeBool = fromMaybe False
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
-select :: (MonadFail m) => ErrorMsg -> Name -> Map Name a -> m a
-select = selectG
 
-selectG :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
-selectG e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
+select :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
+select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 
 exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
 exec name options = do
