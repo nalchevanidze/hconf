@@ -7,7 +7,7 @@ module HConf.Format (format) where
 import qualified Data.Text.IO.Utf8 as T
 import HConf.Core.PkgDir (explore)
 import HConf.Utils.Class (HConfIO)
-import HConf.Utils.Core (throwError)
+import HConf.Utils.Core (throwError, isSuccess)
 import HConf.Utils.FromConf (ReadConf, readList)
 import HConf.Utils.Log (task)
 import Ormolu
@@ -52,6 +52,3 @@ formatter path =
 handleDiff :: Maybe TextDiff -> IO ExitCode
 handleDiff = maybe (pure ExitSuccess) (\diff -> runTerm (printTextDiff diff) Always stderr $> ExitFailure 100)
 
-isSuccess :: ExitCode -> Bool
-isSuccess ExitSuccess = True
-isSuccess ExitFailure {} = False

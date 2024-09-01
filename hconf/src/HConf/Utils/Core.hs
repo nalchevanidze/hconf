@@ -32,6 +32,7 @@ module HConf.Utils.Core
     DependencyName (..),
     select,
     PkgName (..),
+    isSuccess,
   )
 where
 
@@ -224,12 +225,7 @@ select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
 exec name options = do
   (code, _, out) <- liftIO (readProcessWithExitCode name options "")
-  pure
-    ( out,
-      case code of
-        ExitSuccess {} -> True
-        ExitFailure {} -> False
-    )
+  pure (out, isSuccess code)
 
 printException :: SomeException -> String
 printException = show
@@ -241,3 +237,7 @@ safeIO = tryJust (Just . printException)
 
 withThrow :: (MonadFail m) => m (Result a) -> m a
 withThrow x = x >>= either (throwError . msg) pure
+
+isSuccess :: ExitCode -> Bool
+isSuccess ExitSuccess = True
+isSuccess ExitFailure {} = False
