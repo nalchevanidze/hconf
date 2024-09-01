@@ -218,7 +218,6 @@ maybeBool = fromMaybe False
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
-
 select :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 
