@@ -53,7 +53,7 @@ setupStack version =
 updateStack :: (ReadConf m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
   resolver <- getResolver version
-  extraDeps <- sort . map format <$> getExtras version
+  extraDeps <- map format <$> getExtras version
   packages <- getPkgs version
   pure
     Stack

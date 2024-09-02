@@ -46,6 +46,7 @@ data HkgRef = HkgRef
   { name :: DependencyName,
     version :: Version
   }
+  deriving (Eq, Ord)
 
 fetchVersions :: (HConfIO m) => DependencyName -> m Versions
 fetchVersions name = hackage ["package", format name, "preferred"] >>= getField "normal-version"

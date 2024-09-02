@@ -91,7 +91,8 @@ selectBuilds v = sortBy (\a b -> compare (ghc b) (ghc a)) . filter ((v <=) . ghc
 
 getExtras :: (ReadConf m Builds) => Tag -> m [HkgRef]
 getExtras tag =
-  hkgRefs
+  sort
+    . hkgRefs
     . M.fromList
     . concatMap (maybeMapToList . extra)
     . selectBuilds tag
