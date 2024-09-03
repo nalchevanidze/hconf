@@ -40,7 +40,7 @@ instance Msg PkgDir where
   msg = msg . resolve []
 
 pkgDir :: Maybe FilePath -> [Name] -> PkgDir
-pkgDir dir xs = PkgDir (dir >>= resolveDir) (intercalate "-" xs)
+pkgDir dir = PkgDir (dir >>= resolveDir) . intercalate "-"
 
 resolve :: [FilePath] -> PkgDir -> FilePath
 resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString dirName : xs)))
