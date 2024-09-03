@@ -16,7 +16,12 @@ where
 import Data.Text (pack, unpack)
 import HConf.Core.PkgDir (PkgDir, cabalFile)
 import HConf.Core.Version (Version)
-import HConf.Utils.Class (Check (..), HConfIO (..), Log (..), Parse (..), format)
+import HConf.Utils.Class
+  ( Check (..),
+    HConfIO (..),
+    Log (..),
+    Parse (..),
+  )
 import HConf.Utils.Core
   ( Msg (..),
     PkgName,
