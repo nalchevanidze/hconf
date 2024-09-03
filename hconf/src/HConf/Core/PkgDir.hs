@@ -6,7 +6,7 @@
 module HConf.Core.PkgDir
   ( PkgDir,
     PkgDirs,
-    pkgDir,
+    genPkgDir,
     explore,
     packageFile,
     cabalFile,
@@ -39,8 +39,8 @@ data PkgDir = PkgDir
 instance Msg PkgDir where
   msg = msg . resolve []
 
-pkgDir :: Maybe FilePath -> [Name] -> PkgDir
-pkgDir dir = PkgDir (dir >>= resolveDir) . intercalate "-"
+genPkgDir :: Maybe FilePath -> [Name] -> PkgDir
+genPkgDir dir = PkgDir (dir >>= resolveDir) . intercalate "-"
 
 resolve :: [FilePath] -> PkgDir -> FilePath
 resolve xs PkgDir {..} = normalise (joinPath (maybeToList root <> (toString dirName : xs)))
