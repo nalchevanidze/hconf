@@ -157,7 +157,12 @@ toKebabCase = concatMap toKebab
 tupled :: (Functor f) => (t -> f a) -> t -> f (t, a)
 tupled f p = (p,) <$> f p
 
-newtype ErrorMsg = ErrorMsg String deriving (Semigroup, IsString, ToString)
+newtype ErrorMsg = ErrorMsg String
+  deriving
+    ( Semigroup,
+      IsString,
+      ToString
+    )
 
 class Msg a where
   msg :: a -> ErrorMsg
