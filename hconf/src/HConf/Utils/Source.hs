@@ -22,7 +22,7 @@ module HConf.Utils.Source
   )
 where
 
-import qualified Data.ByteString.Char8 as BS
+import Data.ByteString.Char8 (unpack)
 import Data.Char (isSeparator)
 import Data.List (maximum)
 import Data.Text
@@ -91,8 +91,8 @@ parseLines = split (== '\n')
 ignoreEmpty :: [(SourceText, b)] -> [(SourceText, b)]
 ignoreEmpty = filter (not . null . fst)
 
-fromByteString :: BS.ByteString -> SourceText
-fromByteString = pack . BS.unpack
+fromByteString :: ByteString -> SourceText
+fromByteString = pack . unpack
 
 isIndentedLine :: SourceText -> Bool
 isIndentedLine line = head line == ' '
