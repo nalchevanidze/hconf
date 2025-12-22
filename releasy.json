@@ -1,0 +1,10 @@
+{
+  "gh": "nalchevanidze/hconf",
+  "scope": {
+    "hconf": "hconf"
+  },
+  "pkg": "https://hackage.haskell.org/package/{{SCOPE}}",
+  "version": "hconf version",
+  "next": "hconf next",
+  "setup": "hconf setup"
+}

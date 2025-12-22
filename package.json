@@ -8,7 +8,6 @@
   "private": true,
   "scripts": {
     "check:spelling": "cspell --cache --no-progress '**/*.hs'",
-    "release": "ts-node scripts/release.ts",
     "lint": "curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s ."
   },
   "devDependencies": {
