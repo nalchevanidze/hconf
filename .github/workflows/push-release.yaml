@@ -12,7 +12,7 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       tag_name: ${{ steps.describe.outputs.version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hs
 
       - name: Describe
