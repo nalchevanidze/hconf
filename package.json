@@ -11,12 +11,9 @@
     "lint": "curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s ."
   },
   "devDependencies": {
-    "@types/node": "^17.0.23",
     "cspell": "^6.31.1"
   },
   "dependencies": {
-    "gh-rel-easy": "^0.17.0",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.2"
+    "gh-rel-easy": "^0.29.0"
   }
 }
