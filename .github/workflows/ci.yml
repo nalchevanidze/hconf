@@ -37,17 +37,16 @@ jobs:
   build:
     needs: hconf
     strategy:
-      matrix:
-        config:
-          - { plan: "8.4.4", ghc: "8.4.4" }
-          - { plan: "8.6.5", ghc: "8.6.5" }
-          - { plan: "8.8.3", ghc: "8.8.3" }
-          - { plan: "8.10.7", ghc: "8.10.7" }
-          - { plan: "9.0.2", ghc: "9.0.2" }
-          - { plan: "latest", ghc: "9.6.3" }
+      include:
+          - ghc: "8.4.4"
+            plan: "8.4.4"
+          - ghc: "8.10.7"
+            plan: "8.10.7"
+          - ghc: "9.6.3"
+            plan: "latest"
       fail-fast: false
     runs-on: ubuntu-latest
-    name: GHC ${{ matrix.ghc}}
+    name: GHC ${{ matrix.plan }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -58,12 +57,12 @@ jobs:
       - name: Setup file
         run: |
           chmod +x ./cli/hconf
-          ./cli/hconf setup ${{ matrix.config.plan }}
+          ./cli/hconf setup ${{ matrix.plan }}
 
       - name: Setup
         uses: ./.github/actions/setup-hs
         with:
-          ghc: ${{ matrix.config.ghc }}
+          ghc: ${{ matrix.ghc }}
 
       - name: Install dependencies
         run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
