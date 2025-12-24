@@ -13,7 +13,7 @@ module HConf.Stack.Config
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import HConf.Config.Build (Builds, getExtras, getPkgs, getResolver)
+import HConf.Config.Build (Builds, getAllowNewer, getExtras, getPkgs, getResolver, resolveVersion)
 import HConf.Config.Tag (Tag (..))
 import HConf.Core.Env (Env (..))
 import HConf.Core.PkgDir (PkgDirs)
@@ -43,21 +43,22 @@ instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
 setupStack :: (ReadConf m '[Builds, Env]) => Tag -> m ()
-setupStack version =
-  task ("stack(" <> show version <> ")")
+setupStack version = do
+  v <- resolveVersion version
+  task ("stack(" <> show v <> ")")
     $ task "stack.yaml"
     $ do
       p <- readEnv stack
-      rewrite p (updateStack version) $> ()
+      rewrite p (updateStack v) $> ()
 
 updateStack :: (ReadConf m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
   resolver <- getResolver version
   extraDeps <- map format <$> getExtras version
   packages <- getPkgs version
+  allowNewer <- getAllowNewer version
   pure
     Stack
-      { allowNewer = Just (Latest == version),
-        saveHackageCreds = Just False,
+      { saveHackageCreds = Just False,
         ..
       }

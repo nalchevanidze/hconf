@@ -8,36 +8,11 @@ on:
       - main
 
 jobs:
-  scripts:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install
-        shell: bash
-        run: |
-          curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
-          hconf setup
-
-  hconf:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-hs
-      - name: Build
-        run: |
-          stack build hconf
-          mkdir cli
-          cp $(stack exec which hconf) ./cli/hconf
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hconf-cli
-          path: ./cli
-
   build:
     needs: hconf
     strategy:
-      include:
+      matrix:
+        include:
           - ghc: "8.4.4"
             plan: "8.4.4"
           - ghc: "8.10.7"
@@ -49,20 +24,10 @@ jobs:
     name: GHC ${{ matrix.plan }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: hconf-cli
-          path: ./cli
-
-      - name: Setup file
-        run: |
-          chmod +x ./cli/hconf
-          ./cli/hconf setup ${{ matrix.plan }}
-
-      - name: Setup
-        uses: ./.github/actions/setup-hs
+      - uses: ./.github/actions/setup-hs
         with:
           ghc: ${{ matrix.ghc }}
+          plan: ${{ matrix.plan }}
 
       - name: Install dependencies
         run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
