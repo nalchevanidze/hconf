@@ -32,7 +32,7 @@ import qualified Data.Map as M
 import HConf.Config.Tag (Tag (Latest))
 import HConf.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
 import HConf.Core.PkgDir (PkgDirs)
-import HConf.Utils.Class (Check (..), HConfIO (putLine))
+import HConf.Utils.Class (Check (..))
 import HConf.Utils.Core
   ( ResolverName,
     aesonYAMLOptions,
