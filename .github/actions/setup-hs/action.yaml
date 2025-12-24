@@ -3,12 +3,22 @@ inputs:
   ghc:
     description: GHC Version
     required: false
-    default: latest
+    default: 9.6.3
+  plan:
+    description: Stack plan
+    required: false
+    default: "latest"
 
 runs:
   using: "composite"
   steps:
-    - name: Setup Haskell
+    - name: Setup HConf
+      shell: bash
+      run: |
+        curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
+        hconf setup ${{ inputs.plan }}
+
+    - name: Install GHC and Stack
       uses: haskell-actions/setup@v2.9.0
       with:
         ghc-version: ${{ inputs.ghc }}

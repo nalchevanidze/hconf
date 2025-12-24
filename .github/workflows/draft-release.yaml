@@ -11,9 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: "main"
+          ref: main
           fetch-depth: 0
       - uses: ./.github/actions/setup-hs
+      - uses: actions/setup-node@v6
+      - name: Install NPM
+        shell: bash
+        run: npm i
+
       - name: Draft Release
         run: npx releasy open
         env:
