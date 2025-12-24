@@ -36,7 +36,7 @@ builds:
       attoparsec-aeson: 2.1.0.0
       dependent-map: 0.2.4.0
       dependent-sum: "0.4"
-  - ghc: 9.6.3
+  - ghc: latest
     resolver: lts-22.6
     allow-newer: true 
     extra:
