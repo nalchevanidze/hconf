@@ -60,5 +60,6 @@ updateStack version _ = do
   pure
     Stack
       { saveHackageCreds = Just False,
+        allowNewer = Just allowNewer,
         ..
       }

@@ -107,8 +107,8 @@ getPkgs version = do
   pkgs <- readList
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
 
-getAllowNewer :: (ReadConf m Builds) => Tag -> m (Maybe Bool)
-getAllowNewer version = allowNewer <$> getBuild version
+getAllowNewer :: (ReadConf m Builds) => Tag -> m Bool
+getAllowNewer version = fromMaybe False . allowNewer <$> getBuild version
 
 resolveVersion :: (ReadConf m Builds) => Tag -> m Tag
 resolveVersion Latest = do
