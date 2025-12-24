@@ -12,16 +12,10 @@ jobs:
     needs: hconf
     strategy:
       matrix:
-        include:
-          - ghc: "8.4.4"
-            plan: "8.4.4"
-          - ghc: "8.10.7"
-            plan: "8.10.7"
-          - ghc: "9.6.3"
-            plan: "latest"
+        ghc: ["8.4.4", "8.10.7", "9.6.3"]
       fail-fast: false
     runs-on: ubuntu-latest
-    name: GHC ${{ matrix.plan }}
+    name: GHC ${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hs
