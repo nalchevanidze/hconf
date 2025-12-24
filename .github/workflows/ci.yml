@@ -20,7 +20,6 @@ jobs:
       - uses: ./.github/actions/setup-hs
         with:
           ghc: ${{ matrix.ghc }}
-          plan: ${{ matrix.plan }}
 
       - name: Install dependencies
         run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
