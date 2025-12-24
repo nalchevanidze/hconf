@@ -11,8 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        ghc: ["latest"]
-        # ghc: ["8.4.4", "8.10.7", "9.6.3"]
+        ghc: ["8.4.4", "8.10.7", "9.6.3"]
       fail-fast: false
     runs-on: ubuntu-latest
     name: GHC ${{ matrix.ghc }}
