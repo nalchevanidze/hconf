@@ -17,7 +17,7 @@ runs:
     - name: Install GHC and Stack
       uses: haskell-actions/setup@v2.9.0
       with:
-        ghc-version: ${{ inputs.ghc }}
+        ghc-version: 9.6.3
         enable-stack: true
 
     - name: Cache Stack
