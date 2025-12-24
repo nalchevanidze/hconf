@@ -16,6 +16,8 @@ module HConf.Config.Build
     getExtras,
     getPkgs,
     getResolver,
+    getAllowNewer,
+    resolveVersion
   )
 where
 
@@ -25,12 +27,10 @@ import Data.Aeson
     ToJSON (toJSON),
     genericToJSON,
   )
-import Data.Aeson.Types
-  ( defaultOptions,
-  )
+import Data.Foldable (Foldable (..))
 import Data.List ((\\))
 import qualified Data.Map as M
-import HConf.Config.Tag (Tag)
+import HConf.Config.Tag (Tag (Latest))
 import HConf.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
 import HConf.Core.PkgDir (PkgDirs)
 import HConf.Utils.Class (Check (..))
@@ -39,7 +39,7 @@ import HConf.Utils.Core
     maybeList,
     maybeMapToList,
     notElemError,
-    throwError,
+    throwError, aesonYAMLOptions,
   )
 import HConf.Utils.FromConf (ReadConf, readList)
 import Relude
@@ -51,7 +51,8 @@ data Build = Build
     resolver :: ResolverName,
     extra :: Maybe Extras,
     include :: Maybe PkgDirs,
-    exclude :: Maybe PkgDirs
+    exclude :: Maybe PkgDirs,
+    allowNewer :: Maybe Bool
   }
   deriving
     ( Generic,
@@ -60,7 +61,7 @@ data Build = Build
     )
 
 instance ToJSON Build where
-  toJSON = genericToJSON defaultOptions {omitNothingFields = True}
+  toJSON = genericToJSON aesonYAMLOptions {omitNothingFields = True}
 
 instance (ReadConf m ()) => Check m Build where
   check Build {..} =
@@ -103,6 +104,17 @@ getPkgs version = do
   Build {..} <- getBuild version
   pkgs <- readList
   pure ((pkgs <> maybeList include) \\ maybeList exclude)
+
+getAllowNewer :: (ReadConf m Builds) => Tag -> m Bool
+getAllowNewer version = do
+  Build {..} <- getBuild version
+  pure $ fromMaybe False allowNewer
+
+resolveVersion :: (ReadConf m Builds) => Tag -> m Tag
+resolveVersion Latest = do
+  tags <- map ghc <$> readList
+  pure $ maximum tags
+resolveVersion v = pure v
 
 getResolver :: (ReadConf m Builds) => Tag -> m ResolverName
 getResolver version = resolver <$> getBuild version
