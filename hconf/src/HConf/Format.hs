@@ -19,7 +19,6 @@ import Ormolu
   )
 import Ormolu.Diff.Text (TextDiff, diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
-import Relude (readFileText, writeFileText)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
 
