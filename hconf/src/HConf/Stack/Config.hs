@@ -59,7 +59,6 @@ updateStack version _ = do
   allowNewer <- getAllowNewer version
   pure
     Stack
-      { allowNewer = Just allowNewer,
-        saveHackageCreds = Just False,
+      { saveHackageCreds = Just False,
         ..
       }

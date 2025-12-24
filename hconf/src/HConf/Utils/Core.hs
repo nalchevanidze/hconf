@@ -50,7 +50,7 @@ import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
 
 aesonYAMLOptions :: Options
-aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase}
+aesonYAMLOptions = defaultOptions {fieldLabelModifier = toKebabCase, omitNothingFields = True}
 
 type Name = Text
 

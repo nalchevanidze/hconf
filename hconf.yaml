@@ -38,7 +38,7 @@ builds:
       dependent-sum: "0.4"
   - ghc: 9.6.3
     resolver: lts-22.6
-    allows-newer: true
+    allow-newer: true 
     extra:
       fastsum: 0.1.1.1
       type-aligned: 0.9.6
