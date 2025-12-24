@@ -27,7 +27,7 @@ import qualified Paths_hconf as CLI
 import Relude hiding (fix)
 
 data Command
-  = Setup {tag :: Maybe Tag}
+  = Setup {tag :: Tag}
   | Next {isBreaking :: Bool}
   | Update
   | About
