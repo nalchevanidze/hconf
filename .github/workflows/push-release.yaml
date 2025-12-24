@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-      tag_name: ${{ steps.describe.outputs.version }}
+      tag_name: ${{ steps.describe.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hs
@@ -30,3 +30,68 @@ jobs:
           tag_name: ${{ steps.describe.outputs.VERSION }}
           release_name: ${{ steps.describe.outputs.VERSION }}
           body: ${{ github.event.pull_request.body }}
+
+  upload_artifact:
+    needs: publish_release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+            executable: hconf
+          - os: macOS-latest
+            target: mac-os
+            executable: hconf
+          - os: windows-latest
+            target: windows
+            executable: hconf.exe
+    name: Upload Artifacts for ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup-hs
+
+      - name: Build Artifact
+        run: |
+          stack build hconf
+          mkdir out
+          cd ./out
+          cp $(stack exec which hconf) ./${{ matrix.executable }}
+          7z a ../hconf.zip .
+
+      - name: Upload Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.publish_release.outputs.upload_url }}
+          asset_path: hconf.zip
+          asset_name: hconf-${{ matrix.target }}.zip
+          asset_content_type: application/zip
+
+  test_artifact:
+    needs: [publish_release, upload_artifact]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: macOS-latest
+            target: mac-os
+          - os: windows-latest
+            target: windows
+    name: Test Binaries
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and extract Artifact
+        run: |
+          curl -o hconf.zip -LO https://github.com/${{ github.repository }}/releases/download/${{ needs.publish_release.outputs.tag_name }}/hconf-${{ matrix.target }}.zip
+          7z e hconf.zip
+      - name: Test CLI Commands
+        run: ./hconf about
+
