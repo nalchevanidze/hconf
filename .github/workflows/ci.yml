@@ -38,7 +38,13 @@ jobs:
     needs: hconf
     strategy:
       matrix:
-        ghc: ["8.4.4", "8.6.5", "8.8.3", "8.10.7", "9.0.2", "latest"]
+        config:
+          - { plan: "8.4.4", ghc: "8.4.4" }
+          - { plan: "8.6.5", ghc: "8.6.5" }
+          - { plan: "8.8.3", ghc: "8.8.3" }
+          - { plan: "8.10.7", ghc: "8.10.7" }
+          - { plan: "9.0.2", ghc: "9.0.2" }
+          - { plan: "latest", ghc: "9.6.3" }
       fail-fast: false
     runs-on: ubuntu-latest
     name: GHC ${{ matrix.ghc}}
@@ -52,12 +58,12 @@ jobs:
       - name: Setup file
         run: |
           chmod +x ./cli/hconf
-          ./cli/hconf setup ${{ matrix.ghc }}
+          ./cli/hconf setup ${{ matrix.config.plan }}
 
       - name: Setup
         uses: ./.github/actions/setup-hs
         with:
-          ghc: ${{ matrix.ghc }}
+          ghc: ${{ matrix.config.ghc }}
 
       - name: Install dependencies
         run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
@@ -67,7 +73,6 @@ jobs:
 
       - name: Build Bench and Haddock
         run: stack build --fast --no-run-benchmarks --haddock --no-haddock-deps
-
 
   hlint:
     runs-on: ubuntu-latest
