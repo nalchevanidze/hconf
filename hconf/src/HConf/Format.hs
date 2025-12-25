@@ -13,7 +13,6 @@ import Ormolu
   ( ColorMode (..),
     Config (..),
     defaultConfig,
-    detectSourceType,
     ormolu,
     withPrettyOrmoluExceptions,
   )
@@ -39,14 +38,7 @@ formatFile check path = liftIO $ withPrettyOrmoluExceptions Always $ do
       | otherwise = handleDiff (diffText original formatted path)
 
 formatter :: FilePath -> Text -> IO Text
-formatter path =
-  ormolu
-    defaultConfig
-      { cfgCheckIdempotence = True,
-        cfgColorMode = Always,
-        cfgSourceType = detectSourceType path
-      }
-    path
+formatter = ormolu defaultConfig {cfgCheckIdempotence = True, cfgColorMode = Always}
 
 handleDiff :: Maybe TextDiff -> IO ExitCode
 handleDiff = maybe (pure ExitSuccess) (\diff -> runTerm (printTextDiff diff) Always stderr $> ExitFailure 100)
