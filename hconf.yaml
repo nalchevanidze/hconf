@@ -1,4 +1,4 @@
-version: 0.3.1
+version: 0.3.2
 bounds: '>= 0.3.0 && < 0.4.0'
 groups:
 - name: hconf
@@ -21,8 +21,8 @@ builds:
 - ghc: 8.6.5
   resolver: lts-14.14
   extra:
-    req: 3.0.0
     prettyprinter: 1.7.0
+    req: 3.0.0
 - ghc: 8.10.7
   resolver: lts-18.10
   extra:
