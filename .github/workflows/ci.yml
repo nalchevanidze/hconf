@@ -17,9 +17,12 @@ jobs:
     name: GHC ${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-hs
+      - uses: ./.github/actions/ghc
         with:
           ghc: ${{ matrix.ghc }}
+      - uses: ./.github/actions/hconf
+      - name: Setup Stack
+        run: stack setup ${{ matrix.ghc }}
 
       - name: Install dependencies
         run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
@@ -41,11 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install
-        shell: bash
-        run: |
-          curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
-          hconf format --check
+      - uses: ./.github/actions/hconf
+      - name: format
+        run: hconf format --check
 
 concurrency:
   group: ${{ github.ref }}
