@@ -1,6 +1,5 @@
 NAME="hconf"
 EXECUTABLE="$NAME"
-rm -rf out
 
 case "$(uname)" in
     "Darwin")
@@ -15,4 +14,11 @@ if [ "$OS" == "windows" ]; then
   EXECUTABLE="$NAME.exe"
 fi
 
+rm -rf out
+mkdir -p out
+
+7z e "$NAME.zip" -o./out
+
 ./out/$EXECUTABLE about
+
+rm -rf out

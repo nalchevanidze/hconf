@@ -1,6 +1,5 @@
 NAME="hconf"
 EXECUTABLE="$NAME"
-rm -rf out
 
 case "$(uname)" in
     "Darwin")
@@ -16,8 +15,9 @@ if [ "$OS" == "windows" ]; then
 fi
 
 # Build
-stack build hconf
+rm -rf out
 mkdir -p out
+stack build hconf
 cp "$(stack exec which $NAME)" ./out/$EXECUTABLE
 
 if [ "$OS" != "windows" ]; then
@@ -28,3 +28,4 @@ fi
 cd out
 7z a ../hconf.zip .
 cd ..
+rm -rf out
