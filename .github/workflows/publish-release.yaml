@@ -10,26 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-      tag_name: ${{ steps.describe.outputs.VERSION }}
+      tag_name: ${{ steps.create_release.outputs.tag_name }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/ghc
       - uses: ./.github/actions/hconf
-
-      - name: Describe
-        id: describe
-        run: echo "VERSION=$(hconf version)" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.describe.outputs.VERSION }}
-          release_name: ${{ steps.describe.outputs.VERSION }}
+          tag_name: ${{ hconf version }}
+          release_name: ${{ hconf version }}
           body: ${{ github.event.pull_request.body }}
 
   upload_artifact:
