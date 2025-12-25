@@ -54,12 +54,18 @@ jobs:
       - uses: ./.github/actions/ghc
 
       - name: Build Artifact
+        shell: bash  # Forces Windows to use Bash for consistency
         run: |
           stack build hconf
-          mkdir out
-          cd ./out
-          cp $(stack exec which hconf) ./${{ matrix.executable }}
+          mkdir -p out
+          # Get the path and copy it
+          BINARY_PATH=$(stack exec which hconf)
+          cp "$BINARY_PATH" ./out/${{ matrix.executable }}
+          
+          # Zip the contents of the out folder
+          cd out
           7z a ../hconf.zip .
+          cd ..
 
       - name: Upload Artifact
         uses: actions/upload-release-asset@v1
@@ -71,25 +77,18 @@ jobs:
           asset_name: hconf-${{ matrix.target }}.zip
           asset_content_type: application/zip
 
-  test_artifact:
-    needs: [publish_release, upload_artifact]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: linux
-          - os: macOS-latest
-            target: mac-os
-          - os: windows-latest
-            target: windows
-    name: Test Binaries
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
+      - cleanup:
+          run: |
+            rm hconf.zip
+            rm -rf out
+
       - name: Download and extract Artifact
         run: |
+
+          mkdir download
+          cd download
           curl -o hconf.zip -LO https://github.com/${{ github.repository }}/releases/download/${{ needs.publish_release.outputs.tag_name }}/hconf-${{ matrix.target }}.zip
           7z e hconf.zip
+
       - name: Test CLI Commands
         run: ./hconf about
