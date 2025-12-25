@@ -22,9 +22,6 @@ builds:
   resolver: lts-14.14
   extra:
     req: 3.0.0
-- ghc: 8.8.3
-  resolver: lts-16.2
-  extra:
     prettyprinter: 1.7.0
 - ghc: 8.10.7
   resolver: lts-18.10
