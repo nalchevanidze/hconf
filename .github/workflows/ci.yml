@@ -55,7 +55,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-    name: Check Artifacts ${{ matrix.os }}
+    name: Artifact ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +67,8 @@ jobs:
 
       - name: Test Local Binary
         shell: bash
-        run: ./out/$EXECUTABLE about
+        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/test.sh | sh -s .
+
 
 concurrency:
   group: ${{ github.ref }}

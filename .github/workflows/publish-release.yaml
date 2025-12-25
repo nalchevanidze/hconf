@@ -53,29 +53,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/ghc
 
-      - name: Build and Stage
+      - name: Pack
         shell: bash
-        run: |
-          stack build hconf
-          mkdir -p out
-          cp "$(stack exec which hconf)" ./out/${{ matrix.executable }}
+        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/pack.sh | sh -s .
 
       - name: Test Local Binary
         shell: bash
-        run: |
-          # Set permissions for Unix
-          if [ "${{ matrix.os }}" != "windows-latest" ]; then
-            chmod +x ./out/${{ matrix.executable }}
-          fi
-          # Verify the binary works before we waste time zipping/uploading
-          ./out/${{ matrix.executable }} about
-
-      - name: Package
-        shell: bash
-        run: |
-          cd out
-          7z a ../hconf.zip .
-          cd ..
+        run: ./out/${{ matrix.executable }} about
 
       - name: Upload to Release
         uses: actions/upload-release-asset@v1
