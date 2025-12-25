@@ -17,12 +17,11 @@ jobs:
     name: GHC ${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/hconf
+      - run: hconf setup ${{ matrix.ghc }}
       - uses: ./.github/actions/ghc
         with:
           ghc: ${{ matrix.ghc }}
-      - uses: ./.github/actions/hconf
-      - name: Setup Stack
-        run: stack setup ${{ matrix.ghc }}
 
       - name: Install dependencies
         run: stack build --fast --skip-ghc-check --no-terminal --test --only-dependencies
