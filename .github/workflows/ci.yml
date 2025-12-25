@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/pack.sh | sh -s .
 
-      - name: Test Local Binary
+      - name: Test Binary
         shell: bash
         run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/test.sh | sh -s .
 
