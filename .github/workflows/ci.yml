@@ -32,6 +32,9 @@ jobs:
       - name: Build Bench and Haddock
         run: stack build --fast --no-run-benchmarks --haddock --no-haddock-deps
 
+      - name: Execute Tests
+        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/pack.sh | sh -s .
+
   hlint:
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +49,25 @@ jobs:
       - uses: ./.github/actions/hconf
       - name: format
         run: hconf format --check
+
+  artifacts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    name: Upload Artifacts for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ghc
+
+      - name: Pack
+        shell: bash
+        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/pack.sh | sh -s .
+
+      - name: Test Local Binary
+        shell: bash
+        run: ./out/$EXECUTABLE about
 
 concurrency:
   group: ${{ github.ref }}
