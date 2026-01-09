@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           hconf
-version:        0.3.3
+version:        0.3.4
 synopsis:       Stack Config
 description:    cli to manage multiple stack projects
 category:       web
