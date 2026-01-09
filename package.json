@@ -12,8 +12,5 @@
   },
   "devDependencies": {
     "cspell": "^6.31.1"
-  },
-  "dependencies": {
-    "gh-rel-easy": "^0.31.0"
   }
 }
