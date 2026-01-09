@@ -18,6 +18,6 @@ jobs:
       - uses: ./.github/actions/hconf
 
       - name: Draft Release
-        uses: nalchevanidze/rel-easy/actions/draft-release@main
+        uses: nalchevanidze/releasy/actions/draft-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
