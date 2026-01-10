@@ -5,24 +5,22 @@ on:
     types: [closed]
 
 jobs:
-  publish_release:
-    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'publish-release/') && github.event.pull_request.merged == true  }}
+   publish_release:
+    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release-') && github.event.pull_request.merged == true  }}
     runs-on: ubuntu-latest
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      upload_url: ${{ steps.publish.outputs.upload_url }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: ./.github/actions/ghc
       - uses: ./.github/actions/hconf
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+
+      - name: Publish Release
+        uses: nalchevanidze/relasy/actions/publish-release@0.1.5
+        id: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ hconf version }}
-          release_name: ${{ hconf version }}
-          body: ${{ github.event.pull_request.body }}
 
   upload_artifact:
     needs: publish_release
