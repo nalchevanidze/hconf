@@ -5,7 +5,7 @@ on:
     types: [closed]
 
 jobs:
-   publish_release:
+  publish_release:
     if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release-') && github.event.pull_request.merged == true  }}
     runs-on: ubuntu-latest
     outputs:
