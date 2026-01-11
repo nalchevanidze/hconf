@@ -1,10 +1,12 @@
 {
-  "gh": "nalchevanidze/hconf",
   "scope": {
     "hconf": "hconf"
   },
-  "pkg": "https://hackage.haskell.org/package/{{SCOPE}}",
-  "version": "hconf version",
-  "next": "hconf next",
-  "setup": "hconf setup 9.6.3"
+  "project": {
+    "type": "custom",
+    "pkg": "https://hackage.haskell.org/package/{{SCOPE}}",
+    "version": "hconf version",
+    "next": "hconf next",
+    "setup": "hconf setup 9.6.3"
+  }
 }

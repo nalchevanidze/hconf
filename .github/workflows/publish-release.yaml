@@ -17,7 +17,7 @@ jobs:
       - uses: ./.github/actions/hconf
 
       - name: Publish Release
-        uses: nalchevanidze/relasy/actions/publish-release@0.1.5
+        uses: nalchevanidze/relasy/actions/publish-release@0.1.10
         id: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
