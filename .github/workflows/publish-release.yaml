@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: sh ./scripts/test.sh
 
-      - name: Upload to Release
+      - name: Upload Artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
