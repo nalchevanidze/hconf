@@ -1,4 +1,4 @@
-version: 0.3.3
+version: 0.3.4
 bounds: '>= 0.3.0 && < 0.4.0'
 groups:
 - name: hconf
