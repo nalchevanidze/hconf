@@ -14,6 +14,10 @@ runs:
         ghc-version: ${{ inputs.ghc }}
         enable-stack: true
 
+    - name: Install hconf
+      shell: bash
+      run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
+
     - name: Cache
       uses: actions/cache@v5
       with:

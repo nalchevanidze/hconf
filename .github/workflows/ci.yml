@@ -17,10 +17,9 @@ jobs:
     name: GHC ${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/ghc
+      - uses: nalchevanidze/hconf/actions/ghc@main
         with:
           ghc: ${{ matrix.ghc }}
-      - uses: nalchevanidze/hconf/actions/install@main
       - run: hconf setup ${{ matrix.ghc }}
 
       - name: Install dependencies
@@ -31,9 +30,6 @@ jobs:
 
       - name: Build Bench and Haddock
         run: stack build --fast --no-run-benchmarks --haddock --no-haddock-deps
-
-      - name: Execute Tests
-        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/pack.sh | sh -s .
 
   hlint:
     runs-on: ubuntu-latest
@@ -59,7 +55,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/ghc
+      - uses: nalchevanidze/hconf/actions/ghc@main
 
       - name: Pack
         shell: bash
