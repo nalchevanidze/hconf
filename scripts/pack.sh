@@ -11,7 +11,7 @@ case "$(uname)" in
 esac
 
 if [ "$OS" == "windows" ]; then
-  EXECUTABLE="$NAME.exe"
+  EXECUTABLE="$EXECUTABLE.exe"
 fi
 
 # Build
