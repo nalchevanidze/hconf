@@ -17,7 +17,7 @@ fi
 # Build
 rm -rf out
 mkdir -p out
-stack build hconf
+stack build $NAME
 cp "$(stack exec which $NAME)" ./out/$EXECUTABLE
 
 if [ "$OS" != "windows" ]; then
@@ -26,6 +26,6 @@ fi
 
 # Package
 cd out
-7z a ../hconf.zip .
+7z a ../$EXECUTABLE.zip .
 cd ..
 rm -rf out
