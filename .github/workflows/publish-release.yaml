@@ -42,11 +42,11 @@ jobs:
 
       - name: Pack
         shell: bash
-        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/pack.sh | sh -s .
+        run: sh ./scripts/pack.sh
 
       - name: Test Binary
         shell: bash
-        run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/test.sh | sh -s .
+        run: sh ./scripts/test.sh
 
       - name: Upload to Release
         uses: actions/upload-release-asset@v1
