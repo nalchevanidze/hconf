@@ -18,7 +18,7 @@ fi
 rm -rf out
 mkdir -p out
 stack build $NAME
-cp "$(stack exec which $NAME)" ./out/$EXECUTABLE
+cp "$(stack exec which $EXECUTABLE)" ./out/$EXECUTABLE
 
 if [ "$OS" != "windows" ]; then
   chmod +x ./out/$EXECUTABLE
