@@ -1,5 +1,4 @@
-NAME="hconf"
-EXECUTABLE="$NAME"
+EXECUTABLE="hconf"
 
 case "$(uname)" in
     "Darwin")
@@ -11,13 +10,13 @@ case "$(uname)" in
 esac
 
 if [ "$OS" == "windows" ]; then
-  EXECUTABLE="$NAME.exe"
+  EXECUTABLE="$EXECUTABLE.exe"
 fi
 
 rm -rf out
 mkdir -p out
 
-7z e "$NAME.zip" -o./out
+7z e "$EXECUTABLE.zip" -o./out
 
 ./out/$EXECUTABLE about
 
