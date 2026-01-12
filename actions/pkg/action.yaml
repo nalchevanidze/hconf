@@ -1,0 +1,99 @@
+name: "Stack build & zip executable"
+description: "Build a Stack package, collect the executable, and zip it (cross-platform)"
+inputs:
+  package:
+    description: Stack package name to build (e.g. hconf)
+    required: true
+  executable:
+    description: Executable name to fetch from stack exec which (e.g. hconf)
+    required: true
+  zip_name:
+    description: Base name for output zip (default: executable name)
+    required: false
+    default: ""
+  stack_build_args:
+    description: Extra args for `stack build` (optional)
+    required: false
+    default: ""
+  smoke_test:
+    description: "If non-empty, run extracted binary with these args (e.g. 'about' or '--version'). Empty = skip."
+    required: false
+    default: ""
+
+outputs:
+  zip_path:
+    description: Path to the produced zip
+    value: ${{ steps.build.outputs.zip_path }}
+  executable_name:
+    description: Executable filename produced (hconf or hconf.exe)
+    value: ${{ steps.build.outputs.executable_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Stack
+      uses: haskell-actions/setup@v2
+      with:
+        enable-stack: true
+        stack-version: latest
+
+    - name: Cache Stack
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+        key: ${{ runner.os }}-stack-${{ hashFiles('**/stack.yaml', '**/*.cabal', '**/package.yaml', '**/stack.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-
+
+    - name: Install 7-Zip (7z)
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          choco install -y 7zip
+          echo "/c/Program Files/7-Zip" >> "$GITHUB_PATH"
+        elif [[ "$RUNNER_OS" == "macOS" ]]; then
+          brew update
+          brew install p7zip
+        else
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+        fi
+
+    - name: Build & package
+      id: build
+      shell: bash
+      run: |
+        set -euo pipefail
+        chmod +x "${{ github.action_path }}/scripts/build.sh"
+        "${{ github.action_path }}/scripts/build.sh" \
+          --package "${{ inputs.package }}" \
+          --executable "${{ inputs.executable }}" \
+          --zip-name "${{ inputs.zip_name }}" \
+          --stack-build-args "${{ inputs.stack_build_args }}"
+
+
+    - name: Smoke test (unzip + run)
+      if: ${{ inputs.smoke_test != '' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        ZIP_PATH="${{ steps.build.outputs.zip_path }}"
+        BIN="${{ steps.build.outputs.executable_name }}"
+
+        rm -rf out_smoke
+        mkdir -p out_smoke
+
+        7z x "$ZIP_PATH" -o"./out_smoke" -y
+
+        if [[ "$RUNNER_OS" != "Windows" ]]; then
+          chmod +x "./out_smoke/$BIN" || true
+        fi
+
+        # Run with provided smoke-test args
+        "./out_smoke/$BIN" ${{ inputs.smoke_test }}
+
+        rm -rf out_smoke
