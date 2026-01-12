@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# START: Determine Platform
-# ----------------------------
+# ---- SETUP ------------------------
+# Colors 
+if [[ -t 1 ]]; then
+  ALERT='\033[0;31m'
+  STD='\033[0m'
+  INFO='\033[1;36m'
+  WARN='\033[1;33m'
+  SUCCESS='\033[1;32m'
+else
+  ALERT='' STD='' INFO='' WARN='' SUCCESS=''
+fi
 
-# OS tag
+say() { printf "%b\n" "$*"; }
+
+# Platform
+# - OS tag
 case "${RUNNER_OS:-}" in
   Windows) OS_TAG="windows" ;;
   macOS)   OS_TAG="macos" ;;
@@ -19,7 +31,7 @@ case "${RUNNER_OS:-}" in
   *) OS_TAG="$(echo "${RUNNER_OS}" | tr '[:upper:]' '[:lower:]')" ;;
 esac
 
-# Arch tag (prefer Actions envs; otherwise detect locally)
+# - Arch tag (prefer Actions envs; otherwise detect locally)
 ARCH_RAW="${RUNNER_ARCH:-${PROCESSOR_ARCHITECTURE:-}}"
 if [[ -z "${ARCH_RAW}" || "${ARCH_RAW}" == "unknown" ]]; then
   ARCH_RAW="$(uname -m 2>/dev/null || echo unknown)"
