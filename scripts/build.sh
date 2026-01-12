@@ -1,6 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# START: Determine Platform
+# ----------------------------
+
+# OS tag
+case "${RUNNER_OS:-}" in
+  Windows) OS_TAG="windows" ;;
+  macOS)   OS_TAG="macos" ;;
+  Linux)   OS_TAG="linux" ;;
+  "")
+    case "$(uname -s)" in
+      Darwin) OS_TAG="macos" ;;
+      Linux)  OS_TAG="linux" ;;
+      *)      OS_TAG="linux" ;;
+    esac
+    ;;
+  *) OS_TAG="$(echo "${RUNNER_OS}" | tr '[:upper:]' '[:lower:]')" ;;
+esac
+
+# Arch tag (prefer Actions envs; otherwise detect locally)
+ARCH_RAW="${RUNNER_ARCH:-${PROCESSOR_ARCHITECTURE:-}}"
+if [[ -z "${ARCH_RAW}" || "${ARCH_RAW}" == "unknown" ]]; then
+  ARCH_RAW="$(uname -m 2>/dev/null || echo unknown)"
+fi
+
+ARCH_TAG="$(echo "$ARCH_RAW" | tr '[:upper:]' '[:lower:]')"
+case "$ARCH_TAG" in
+  x86_64|x64|amd64) ARCH_TAG="x64" ;;
+  arm64|aarch64)    ARCH_TAG="arm64" ;;
+  *)                ARCH_TAG="unknown" ;;
+esac
+
+PLATFORM_ID="${OS_TAG}-${ARCH_TAG}"
+PLATFORM_SUMMARY="OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
+
+# ----------------------------
+
 PACKAGE=""
 EXECUTABLE=""        # base name, e.g. "hconf"
 ZIP_NAME=""          # optional override; if empty, defaults to EXECUTABLE (base)
@@ -60,36 +96,7 @@ rm -rf "$OUT_DIR"
 
 echo "Produced: $ZIP_FILE"
 
-# Produces: <os>-<arch>
-# Examples: linux-x64, macos-arm64, windows-x64
-
-# OS tag (prefer GitHub RUNNER_OS when available)
-case "${RUNNER_OS:-}" in
-  Windows) OS_TAG="windows" ;;
-  macOS)   OS_TAG="macos" ;;
-  Linux)   OS_TAG="linux" ;;
-  "")
-    # Fallback for local runs
-    case "$(uname)" in
-      Darwin) OS_TAG="macos" ;;
-      *)      OS_TAG="linux" ;;
-    esac
-    ;;
-  *)
-    OS_TAG="$(echo "${RUNNER_OS}" | tr '[:upper:]' '[:lower:]')" ;;
-esac
-
-# Arch tag (prefer GitHub RUNNER_ARCH when available; fallback to common envs)
-ARCH_RAW="${RUNNER_ARCH:-${PROCESSOR_ARCHITECTURE:-unknown}}"
-ARCH_TAG="$(echo "$ARCH_RAW" | tr '[:upper:]' '[:lower:]')"
-
-# Normalize common values
-case "$ARCH_TAG" in
-  x86_64|x64|amd64) ARCH_TAG="x64" ;;
-  aarch64|arm64)    ARCH_TAG="arm64" ;;
-esac
-
-ARTFACT="${ZIP_NAME}${OS_TAG}-${ARCH_TAG}.zip"
+ARTFACT="${ZIP_NAME}${PLATFORM_ID}.zip"
 
 # Always print (nice for local / debugging)
 echo "$ARTFACT"

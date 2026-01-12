@@ -1,6 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# START: Determine Platform
+# ----------------------------
+
+# OS tag
+case "${RUNNER_OS:-}" in
+  Windows) OS_TAG="windows" ;;
+  macOS)   OS_TAG="macos" ;;
+  Linux)   OS_TAG="linux" ;;
+  "")
+    case "$(uname -s)" in
+      Darwin) OS_TAG="macos" ;;
+      Linux)  OS_TAG="linux" ;;
+      *)      OS_TAG="linux" ;;
+    esac
+    ;;
+  *) OS_TAG="$(echo "${RUNNER_OS}" | tr '[:upper:]' '[:lower:]')" ;;
+esac
+
+# Arch tag (prefer Actions envs; otherwise detect locally)
+ARCH_RAW="${RUNNER_ARCH:-${PROCESSOR_ARCHITECTURE:-}}"
+if [[ -z "${ARCH_RAW}" || "${ARCH_RAW}" == "unknown" ]]; then
+  ARCH_RAW="$(uname -m 2>/dev/null || echo unknown)"
+fi
+
+ARCH_TAG="$(echo "$ARCH_RAW" | tr '[:upper:]' '[:lower:]')"
+case "$ARCH_TAG" in
+  x86_64|x64|amd64) ARCH_TAG="x64" ;;
+  arm64|aarch64)    ARCH_TAG="arm64" ;;
+  *)                ARCH_TAG="unknown" ;;
+esac
+
+PLATFORM_ID="${OS_TAG}-${ARCH_TAG}"
+PLATFORM_SUMMARY="OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
+
+# ----------------------------
+
 usage() {
   cat >&2 <<'EOF'
 Usage:
@@ -47,35 +83,7 @@ fi
 
 say() { printf "%b\n" "$*"; }
 
-# OS tag
-case "${RUNNER_OS:-}" in
-  Windows) OS_TAG="windows" ;;
-  macOS)   OS_TAG="macos" ;;
-  Linux)   OS_TAG="linux" ;;
-  "")
-    case "$(uname -s)" in
-      Darwin) OS_TAG="macos" ;;
-      Linux)  OS_TAG="linux" ;;
-      *)      OS_TAG="linux" ;;
-    esac
-    ;;
-  *) OS_TAG="$(echo "${RUNNER_OS}" | tr '[:upper:]' '[:lower:]')" ;;
-esac
 
-# Arch tag (prefer Actions envs; otherwise detect locally)
-ARCH_RAW="${RUNNER_ARCH:-${PROCESSOR_ARCHITECTURE:-}}"
-if [[ -z "${ARCH_RAW}" || "${ARCH_RAW}" == "unknown" ]]; then
-  ARCH_RAW="$(uname -m 2>/dev/null || echo unknown)"
-fi
-
-ARCH_TAG="$(echo "$ARCH_RAW" | tr '[:upper:]' '[:lower:]')"
-case "$ARCH_TAG" in
-  x86_64|x64|amd64) ARCH_TAG="x64" ;;
-  arm64|aarch64)    ARCH_TAG="arm64" ;;
-  *)                ARCH_TAG="unknown" ;;
-esac
-
-SUFFIX="${OS_TAG}-${ARCH_TAG}"
 
 # Binary name inside zip
 BIN_FILE="$APP_NAME"
@@ -98,7 +106,7 @@ WORKDIR="$(mktemp -d 2>/dev/null || (rm -rf .pkg-local && mkdir -p .pkg-local &&
 cleanup() { rm -rf "$WORKDIR" 2>/dev/null || true; }
 trap cleanup EXIT
 
-ASSET="${APP_NAME}-${SUFFIX}.zip"
+ASSET="${APP_NAME}-${PLATFORM_ID}.zip"
 
 url_for_tag() {
   local tag="$1"
@@ -112,7 +120,7 @@ download() {
 
 say "\n${INFO}Installing ${APP_NAME} (tag: ${VERSION})${STD}"
 say " - repo: $REPO"
-say " - detected: OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
+say " - detected: $PLATFORM_SUMMARY"
 say " - asset: $ASSET"
 
 URL="$(url_for_tag "$VERSION")"
