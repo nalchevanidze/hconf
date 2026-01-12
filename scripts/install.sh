@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Arguments / defaults (can be overridden via env)
-VERSION="${VERSION:-0.3.6}"                 # tag name (supports v-prefix fallback)
+# Usage:
+#   curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- <version>
+# Example:
+#   curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- 0.3.6
+
+# Version is REQUIRED as first argument
+VERSION="${1:-}"
+if [[ -z "$VERSION" ]]; then
+  echo "ERROR: version is required." >&2
+  echo "Usage: curl -fsSL <install.sh-url> | bash -s -- <version>" >&2
+  echo "Example: curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- 0.3.6" >&2
+  exit 2
+fi
+
+# Repo/app (override via env if needed)
 REPO="${REPO:-nalchevanidze/hconf}"
 APP_NAME="${APP_NAME:-hconf}"
 
@@ -76,16 +89,18 @@ url_for_tag() {
   local tag="$1"
   echo "https://github.com/$REPO/releases/download/$tag/$ASSET"
 }
-URL="$(url_for_tag "$VERSION")"
-
-say "\n${INFO}Installing $APP_NAME (tag: $VERSION)${STD}"
-say " - detected: OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
-say " - source: $URL"
 
 download() {
   local url="$1"
   curl -fSLsS "$url" -o "$WORKDIR/$APP_NAME.zip"
 }
+
+URL="$(url_for_tag "$VERSION")"
+
+say "\n${INFO}Installing $APP_NAME (tag: $VERSION)${STD}"
+say " - detected: OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
+say " - asset: $ASSET"
+say " - source: $URL"
 
 # Download (fallback to v-prefixed tag if needed)
 if ! download "$URL"; then
