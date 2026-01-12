@@ -102,4 +102,4 @@ runs:
         upload_url: "${{ inputs.upload_url }}"
         asset_path: "${{ steps.build.outputs.zip_path }}"
         asset_name: "${{ format('{0}-{1}.zip', inputs.executable, steps.meta.outputs.suffix) }}"
-        asset_content_type: "${{ inputs.asset_content_type }}"
+        asset_content_type: application/zip
