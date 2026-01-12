@@ -90,8 +90,8 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        chmod +x ./scripts/gen-suffix.sh
-        ./scripts/gen-suffix.sh
+        chmod +x "${{ github.action_path }}/scripts/gen-suffix.sh"
+        "${{ github.action_path }}/scripts/gen-suffix.sh"
 
     - name: Upload Release Asset (optional)
       if: "${{ inputs.upload_url != '' }}"
