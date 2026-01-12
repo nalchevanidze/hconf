@@ -12,12 +12,41 @@ jobs:
   publish_release:
     if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release-') && github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.publish.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nalchevanidze/hconf/actions/ghc@main
+      - id: publish
+        uses: nalchevanidze/relasy/actions/publish-release@0.1.10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload_artifact:
+    needs: publish_release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: macos-latest
+            target: mac-os
+          - os: windows-latest
+            target: windows
+
+    name: Upload Artifact ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
       - uses: nalchevanidze/hconf/actions/ghc@main
 
-      - name: Publish Release
-        uses: nalchevanidze/relasy/actions/publish-release@0.1.10
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package
+        uses: nalchevanidze/hconf/actions/pkg@main
+        with:
+          package: hconf
+          executable: hconf
+          smoke_test: about
+          upload_url: ${{ needs.publish_release.outputs.upload_url }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
