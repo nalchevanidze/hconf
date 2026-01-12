@@ -19,6 +19,18 @@ inputs:
     description: "Optional args for a smoke test run after packaging. Leave empty to skip. Example: 'about' or '--version'"
     required: false
     default: ""
+  upload_url:
+    description: "If provided, uploads the produced zip to this GitHub Release upload_url. Leave empty to skip."
+    required: false
+    default: ""
+  asset_name:
+    description: "Release asset name (e.g. hconf-linux.zip). If empty, defaults to the zip filename."
+    required: false
+    default: ""
+  github_token:
+    description: "Token used to upload the release asset (pass secrets.GITHUB_TOKEN or a PAT). Required if upload_url is set."
+    required: false
+    default: ""
 
 outputs:
   zip_path:
@@ -76,3 +88,14 @@ runs:
 
         "./out_smoke/$BIN" ${{ inputs.smoke_test }}
         rm -rf out_smoke
+
+    - name: Upload Release Asset (optional)
+      if: "${{ inputs.upload_url != '' }}"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: "${{ inputs.github_token }}"
+      with:
+        upload_url: "${{ inputs.upload_url }}"
+        asset_path: "${{ steps.build.outputs.zip_path }}"
+        asset_name: "${{ inputs.asset_name != '' && inputs.asset_name || steps.build.outputs.zip_path }}"
+        asset_content_type: "${{ inputs.asset_content_type }}"
