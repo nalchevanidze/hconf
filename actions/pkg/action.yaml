@@ -59,8 +59,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        chmod +x "${{ github.action_path }}/scripts/build.sh"
-        "${{ github.action_path }}/scripts/build.sh" \
+        ./scripts/build.sh \
           --package "${{ inputs.package }}" \
           --executable "${{ inputs.executable }}" \
           --zip-name "${{ inputs.zip_name }}" \
@@ -85,21 +84,13 @@ runs:
         "./out_smoke/$BIN" ${{ inputs.smoke_test }}
         rm -rf out_smoke
 
-    - name: Compute suffix
-      id: meta
-      shell: bash
-      run: |
-        set -euo pipefail
-        chmod +x "${{ github.action_path }}/scripts/gen-suffix.sh"
-        "${{ github.action_path }}/scripts/gen-suffix.sh"
-
     - name: Upload Release Asset (optional)
       if: "${{ inputs.upload_url != '' }}"
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: "${{ inputs.github_token }}"
       with:
-        upload_url: "${{ inputs.upload_url }}"
-        asset_path: "${{ steps.build.outputs.zip_path }}"
-        asset_name: "${{ format('{0}-{1}.zip', inputs.executable, steps.meta.outputs.suffix) }}"
+        upload_url: ${{ inputs.upload_url }}
+        asset_path: ${{ steps.build.outputs.zip_path }}
+        asset_name: ${{  steps.build.outputs.artifact }}
         asset_content_type: application/zip
