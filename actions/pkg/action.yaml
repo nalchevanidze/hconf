@@ -54,12 +54,12 @@ runs:
           sudo apt-get install -y p7zip-full
         fi
 
+
     - name: Build & package
       id: build
       shell: bash
       run: |
-        set -euo pipefail
-        ./scripts/build.sh \
+        bash ./scripts/build.sh \
           --package "${{ inputs.package }}" \
           --executable "${{ inputs.executable }}" \
           --zip-name "${{ inputs.zip_name }}" \
