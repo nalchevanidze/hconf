@@ -84,7 +84,7 @@ case "$(uname)" in
 esac
 
 # OS-specific binary filename (only this part gets .exe on Windows)
-BIN_NAME="${EXECUTABLE}${EXT}"
+BIN_FILE="${EXECUTABLE}${EXT}"
 
 OUT_DIR="out"
 rm -rf "$OUT_DIR"
@@ -95,10 +95,10 @@ mkdir -p "$OUT_DIR"
 stack build "$PACKAGE" $STACK_BUILD_ARGS
 
 # Copy built executable
-cp "$(stack exec -- which "$BIN_NAME")" "./$OUT_DIR/$BIN_NAME"
+cp "$(stack exec -- which "$BIN_FILE")" "./$OUT_DIR/$BIN_FILE"
 
 if [[ "$OS" != "windows" ]]; then
-  chmod +x "./$OUT_DIR/$BIN_NAME"
+  chmod +x "./$OUT_DIR/$BIN_FILE"
 fi
 
 # Zip name: ALWAYS base executable name by default (=> hconf.zip on all OSes)
@@ -122,5 +122,5 @@ echo "$ARTFACT"
 {
   echo "artifact=$ARTFACT"
   echo "zip_path=$ZIP_FILE"
-  echo "executable_name=$BIN_NAME"
+  echo "executable_name=$BIN_FILE"
 } >> "$GITHUB_OUTPUT"

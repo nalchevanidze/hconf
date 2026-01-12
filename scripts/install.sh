@@ -91,7 +91,7 @@ if [[ -z "$REPO" || -z "$APP_NAME" || -z "$VERSION" ]]; then
 fi
 
 # Binary name inside zip
-BIN_NAME="${APP_NAME}${EXT}"
+BIN_FILE="$APP_NAME${EXT}"
 
 # Default install dir if not provided
 if [[ -z "$BIN_DIR" ]]; then
