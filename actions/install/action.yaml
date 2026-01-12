@@ -5,4 +5,5 @@ runs:
   using: "composite"
   steps:
     - shell: bash
-      run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | sh -s .
+      run: curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash
+
