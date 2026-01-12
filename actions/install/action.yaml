@@ -12,6 +12,5 @@ runs:
     - name: Install hconf
       shell: bash
       run: |
-        chmod +x ${{ github.action_path }}/scripts/install.sh
-        ${{ github.action_path }}/scripts/install.sh --repo nalchevanidze/hconf --app hconf --version ${{ inputs.version }}
+        ./scripts/install.sh --repo nalchevanidze/hconf --app hconf --version ${{ inputs.version }}
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
