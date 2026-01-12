@@ -59,6 +59,7 @@ runs:
       id: build
       shell: bash
       run: |
+        set -euo pipefail
         bash ./scripts/build.sh \
           --package "${{ inputs.package }}" \
           --executable "${{ inputs.executable }}" \
