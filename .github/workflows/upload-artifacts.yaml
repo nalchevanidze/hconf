@@ -40,6 +40,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: morpheus.zip
-          asset_name: morpheus-${{ matrix.target }}.zip
+          asset_path: hconf.zip
+          asset_name: hconf-${{ matrix.target }}.zip
           asset_content_type: application/zip
