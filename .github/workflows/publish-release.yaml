@@ -4,52 +4,20 @@ on:
   pull_request:
     types: [closed]
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   publish_release:
-    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release-') && github.event.pull_request.merged == true  }}
+    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release-') && github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.publish.outputs.upload_url }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: nalchevanidze/hconf/actions/ghc@main
+
       - name: Publish Release
         uses: nalchevanidze/relasy/actions/publish-release@0.1.10
-        id: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  upload_artifact:
-    needs: publish_release
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: linux
-          - os: macOS-latest
-            target: mac-os
-          - os: windows-latest
-            target: windows
-    name: Upload Artifact ${{ matrix.target }}
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: nalchevanidze/hconf/actions/ghc@main
-
-      - name: Binary
-        uses: nalchevanidze/hconf/actions/pkg@main
-        with:
-          package: hconf
-          executable: hconf
-          smoke_test: about
-
-      - name: Upload Artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.publish_release.outputs.upload_url }}
-          asset_path: hconf.zip
-          asset_name: hconf-${{ matrix.target }}.zip
-          asset_content_type: application/zip
