@@ -7,5 +7,5 @@ runs:
     - name: Install hconf
       shell: bash
       run: |
-        bash scripts/install.sh --repo nalchevanidze/hconf --app hconf --version 0.3.6
+        ${{ github.action_path }}/scripts/install.sh --repo nalchevanidze/hconf --app hconf --version 0.3.6
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
