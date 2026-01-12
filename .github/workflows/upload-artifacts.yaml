@@ -32,7 +32,6 @@ jobs:
         with:
           package: hconf
           executable: hconf
-          asset_name: hconf-${{ matrix.target }}.zip
           smoke_test: about
           upload_url: ${{ github.event.release.upload_url }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
