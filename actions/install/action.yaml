@@ -4,7 +4,8 @@ description: Install and setup HConf CLI tool
 runs:
   using: "composite"
   steps:
-    - shell: bash
-      run: curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- 0.3.6
-
-
+    - name: Install hconf
+      shell: bash
+      run: |
+        bash scripts/install.sh --repo nalchevanidze/hconf --app hconf --version 0.3.6
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"

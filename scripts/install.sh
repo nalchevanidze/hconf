@@ -1,23 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage:
-#   curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- <version>
-# Example:
-#   curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- 0.3.6
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  install.sh --repo <owner/repo> --app <name> --version <tag> [--bin-dir <dir>]
 
-# Version is REQUIRED as first argument
-VERSION="${1:-}"
-if [[ -z "$VERSION" ]]; then
-  echo "ERROR: version is required." >&2
-  echo "Usage: curl -fsSL <install.sh-url> | bash -s -- <version>" >&2
-  echo "Example: curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- 0.3.6" >&2
+Notes:
+  - Downloads: https://github.com/<repo>/releases/download/<tag>/<app>-<os>-<arch>.zip
+  - If tag doesn't work, it automatically retries with/without leading 'v'.
+EOF
+}
+
+REPO=""
+APP_NAME=""
+VERSION=""
+BIN_DIR=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo)    REPO="${2:-}"; shift 2;;
+    --app)     APP_NAME="${2:-}"; shift 2;;
+    --version) VERSION="${2:-}"; shift 2;;
+    --bin-dir) BIN_DIR="${2:-}"; shift 2;;
+    -h|--help) usage; exit 0;;
+    *) echo "Unknown arg: $1" >&2; usage; exit 2;;
+  esac
+done
+
+if [[ -z "$REPO" || -z "$APP_NAME" || -z "$VERSION" ]]; then
+  echo "ERROR: --repo, --app, and --version are required." >&2
+  usage
   exit 2
 fi
-
-# Repo/app (override via env if needed)
-REPO="${REPO:-nalchevanidze/hconf}"
-APP_NAME="${APP_NAME:-hconf}"
 
 # Colors (disable if not a TTY)
 if [[ -t 1 ]]; then
@@ -30,7 +45,6 @@ else
   ALERT='' STD='' INFO='' WARN='' SUCCESS=''
 fi
 
-# Portable printf-based output (avoids macOS echo -e quirks)
 say() { printf "%b\n" "$*"; }
 
 # OS tag
@@ -69,15 +83,15 @@ if [[ "$OS_TAG" == "windows" ]]; then
   BIN_FILE="${APP_NAME}.exe"
 fi
 
-# Choose install dir
-if [[ -d "$HOME/bin" ]]; then
-  BIN_DIR="$HOME/bin"
-elif [[ -d "$HOME/.local/bin" ]]; then
-  BIN_DIR="$HOME/.local/bin"
-else
-  BIN_DIR="$HOME/.local/bin"
-  mkdir -p "$BIN_DIR"
+# Default install dir if not provided
+if [[ -z "$BIN_DIR" ]]; then
+  if [[ -d "$HOME/bin" ]]; then
+    BIN_DIR="$HOME/bin"
+  else
+    BIN_DIR="$HOME/.local/bin"
+  fi
 fi
+mkdir -p "$BIN_DIR"
 
 # Temp workdir + cleanup
 WORKDIR="$(mktemp -d 2>/dev/null || (rm -rf .pkg-local && mkdir -p .pkg-local && echo ".pkg-local"))"
@@ -85,6 +99,7 @@ cleanup() { rm -rf "$WORKDIR" 2>/dev/null || true; }
 trap cleanup EXIT
 
 ASSET="${APP_NAME}-${SUFFIX}.zip"
+
 url_for_tag() {
   local tag="$1"
   echo "https://github.com/$REPO/releases/download/$tag/$ASSET"
@@ -95,23 +110,28 @@ download() {
   curl -fSLsS "$url" -o "$WORKDIR/$APP_NAME.zip"
 }
 
-URL="$(url_for_tag "$VERSION")"
-
-say "\n${INFO}Installing $APP_NAME (tag: $VERSION)${STD}"
+say "\n${INFO}Installing ${APP_NAME} (tag: ${VERSION})${STD}"
+say " - repo: $REPO"
 say " - detected: OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
 say " - asset: $ASSET"
+
+URL="$(url_for_tag "$VERSION")"
 say " - source: $URL"
 
-# Download (fallback to v-prefixed tag if needed)
+# Download (auto fallback v-prefix / non-v prefix)
 if ! download "$URL"; then
-  if [[ "$VERSION" != v* ]]; then
-    URL="$(url_for_tag "v$VERSION")"
-    say "${WARN}First download failed; retrying with tag v$VERSION${STD}"
+  if [[ "$VERSION" == v* ]]; then
+    ALT="${VERSION#v}"
+    URL="$(url_for_tag "$ALT")"
+    say "${WARN}First download failed; retrying with tag $ALT${STD}"
     say " - source: $URL"
     download "$URL"
   else
-    say "${ALERT}Download failed for tag $VERSION${STD}" >&2
-    exit 1
+    ALT="v$VERSION"
+    URL="$(url_for_tag "$ALT")"
+    say "${WARN}First download failed; retrying with tag $ALT${STD}"
+    say " - source: $URL"
+    download "$URL"
   fi
 fi
 
@@ -141,7 +161,6 @@ fi
 
 say " - copying binary to $BIN_DIR"
 if command -v install >/dev/null 2>&1; then
-  # install(1) isn't available on all platforms, but is on macOS/Linux
   install -m 755 "./$BIN_FILE" "$BIN_DIR/$BIN_FILE"
 else
   cp "./$BIN_FILE" "$BIN_DIR/$BIN_FILE"
@@ -149,10 +168,18 @@ else
 fi
 
 say ""
-if command -v "$APP_NAME" >/dev/null 2>&1; then
-  say "${SUCCESS}Installation succeeded: $("$APP_NAME" about)${STD}"
+if [[ "$OS_TAG" == "windows" ]]; then
+  # In bash on Windows, `command -v app` won't find app.exe unless PATHEXT is honored;
+  # just check the file exists.
+  if [[ -f "$BIN_DIR/$BIN_FILE" ]]; then
+    say "${SUCCESS}Installation succeeded: $BIN_DIR/$BIN_FILE${STD}"
+  fi
 else
-  say "${WARN}Installed to ${BIN_DIR}${STD}"
-  say "Add it to PATH to run '$APP_NAME'."
+  if command -v "$APP_NAME" >/dev/null 2>&1; then
+    say "${SUCCESS}Installation succeeded: $("$APP_NAME" --version 2>/dev/null || "$APP_NAME" about 2>/dev/null || echo "$APP_NAME installed")${STD}"
+  else
+    say "${WARN}Installed to ${BIN_DIR}${STD}"
+    say "Add it to PATH to run '$APP_NAME'."
+  fi
 fi
 say ""
