@@ -108,7 +108,7 @@ rm -rf "$OUT_DIR"
 
 echo "Produced: $ZIP_FILE"
 
-ARTFACT="${ZIP_NAME}${PLATFORM_ID}.zip"
+ARTFACT="${EXECUTABLE}-${PLATFORM_ID}.zip"
 
 # Always print (nice for local / debugging)
 echo "$ARTFACT"
