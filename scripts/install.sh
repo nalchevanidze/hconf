@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # ---- SETUP ------------------------
+
 # Colors 
 if [[ -t 1 ]]; then
   ALERT='\033[0;31m'
@@ -16,6 +17,7 @@ fi
 say() { printf "%b\n" "$*"; }
 
 # Platform
+
 # - OS tag
 case "${RUNNER_OS:-}" in
   Windows) OS_TAG="windows" ;;
@@ -46,6 +48,12 @@ esac
 
 PLATFORM_ID="${OS_TAG}-${ARCH_TAG}"
 PLATFORM_SUMMARY="OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
+
+# Extension for executables
+EXT=""
+if [[ "$OS_TAG" == "windows" ]]; then
+  EXT=".exe"
+fi
 
 # ----------------------------
 
@@ -83,10 +91,7 @@ if [[ -z "$REPO" || -z "$APP_NAME" || -z "$VERSION" ]]; then
 fi
 
 # Binary name inside zip
-BIN_FILE="$APP_NAME"
-if [[ "$OS_TAG" == "windows" ]]; then
-  BIN_FILE="${APP_NAME}.exe"
-fi
+BIN_NAME="${APP_NAME}${EXT}"
 
 # Default install dir if not provided
 if [[ -z "$BIN_DIR" ]]; then

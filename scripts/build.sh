@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # ---- SETUP ------------------------
+
 # Colors 
 if [[ -t 1 ]]; then
   ALERT='\033[0;31m'
@@ -16,6 +17,7 @@ fi
 say() { printf "%b\n" "$*"; }
 
 # Platform
+
 # - OS tag
 case "${RUNNER_OS:-}" in
   Windows) OS_TAG="windows" ;;
@@ -47,6 +49,12 @@ esac
 PLATFORM_ID="${OS_TAG}-${ARCH_TAG}"
 PLATFORM_SUMMARY="OS=$OS_TAG ARCH=$ARCH_TAG (raw: $ARCH_RAW)"
 
+# Extension for executables
+EXT=""
+if [[ "$OS_TAG" == "windows" ]]; then
+  EXT=".exe"
+fi
+
 # ----------------------------
 
 PACKAGE=""
@@ -76,10 +84,7 @@ case "$(uname)" in
 esac
 
 # OS-specific binary filename (only this part gets .exe on Windows)
-BIN_NAME="$EXECUTABLE"
-if [[ "$OS" == "windows" ]]; then
-  BIN_NAME="${EXECUTABLE}.exe"
-fi
+BIN_NAME="${EXECUTABLE}${EXT}"
 
 OUT_DIR="out"
 rm -rf "$OUT_DIR"
