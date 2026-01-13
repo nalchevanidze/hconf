@@ -32,9 +32,9 @@ outputs:
   zip_path:
     description: "Path to the produced zip file"
     value: "${{ steps.build.outputs.zip_path }}"
-  bin_name:
+  bin_file:
     description: "OS-specific executable filename (adds .exe on Windows)"
-    value: "${{ steps.build.outputs.bin_name }}"
+    value: "${{ steps.build.outputs.bin_file }}"
 
 runs:
   using: "composite"
@@ -72,7 +72,7 @@ runs:
       run: |
         set -euo pipefail
         ZIP_PATH="${{ steps.build.outputs.zip_path }}"
-        BIN="${{ steps.build.outputs.bin_name }}"
+        BIN="${{ steps.build.outputs.bin_file }}"
 
         rm -rf out_smoke
         mkdir -p out_smoke
