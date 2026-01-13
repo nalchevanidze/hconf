@@ -29,9 +29,9 @@ inputs:
     default: ""
 
 outputs:
-  zip_path:
+  zip_file:
     description: "Path to the produced zip file"
-    value: "${{ steps.build.outputs.zip_path }}"
+    value: "${{ steps.build.outputs.zip_file }}"
   bin_file:
     description: "OS-specific executable filename (adds .exe on Windows)"
     value: "${{ steps.build.outputs.bin_file }}"
@@ -71,7 +71,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        ZIP_PATH="${{ steps.build.outputs.zip_path }}"
+        ZIP_PATH="${{ steps.build.outputs.zip_file }}"
         BIN="${{ steps.build.outputs.bin_file }}"
 
         rm -rf out_smoke
@@ -92,6 +92,6 @@ runs:
         GITHUB_TOKEN: "${{ inputs.github_token }}"
       with:
         upload_url: ${{ inputs.upload_url }}
-        asset_path: ${{ steps.build.outputs.zip_path }}
-        asset_name: ${{  steps.build.outputs.artifact }}
+        asset_path: ${{ steps.build.outputs.zip_file }}
+        asset_name: ${{  steps.build.outputs.zip_file }}
         asset_content_type: application/zip

@@ -103,7 +103,7 @@ fi
 
 # Zip name: ALWAYS base executable name by default (=> hconf.zip on all OSes)
 ZIP_BASE="${ZIP_NAME:-$APP_NAME}"
-ZIP_FILE="${ZIP_BASE}.zip"
+ZIP_FILE="${ZIP_BASE}-${PLATFORM_ID}.zip"
 
 pushd "$OUT_DIR" >/dev/null
 7z a "../$ZIP_FILE" .
@@ -113,14 +113,8 @@ rm -rf "$OUT_DIR"
 
 echo "Produced: $ZIP_FILE"
 
-ARTFACT="${APP_NAME}-${PLATFORM_ID}.zip"
-
-# Always print (nice for local / debugging)
-echo "$ARTFACT"
-
 # Outputs for composite action
 {
-  echo "artifact=$ARTFACT"
-  echo "zip_path=$ZIP_FILE"
+  echo "zip_file=$ZIP_FILE"
   echo "bin_file=$BIN_FILE"
 } >> "$GITHUB_OUTPUT"
