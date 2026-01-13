@@ -1,0 +1,16 @@
+name: Install HConf
+description: Install and setup HConf CLI tool
+inputs:
+  version:
+    description: Version of HConf to install
+    required: false
+    default: 0.3.6
+
+runs:
+  using: "composite"
+  steps:
+    uses: nalchevanidze/hconf/actions/install@main
+      with:
+        version: ${{ inputs.version }}
+        repo: nalchevanidze/hconf
+        app: hconf

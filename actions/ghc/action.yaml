@@ -14,7 +14,7 @@ runs:
         ghc-version: ${{ inputs.ghc }}
         enable-stack: true
 
-    - uses: nalchevanidze/hconf/actions/install@main
+    - uses: nalchevanidze/hconf/actions/hconf@main
 
     - name: Cache
       uses: actions/cache@v5
