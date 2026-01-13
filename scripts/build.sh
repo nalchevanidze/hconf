@@ -91,7 +91,7 @@ stack build "$PACKAGE" $STACK_BUILD_ARGS
 # Copy built executable
 cp "$(stack exec -- which "$BIN_FILE")" "./$OUT_DIR/$BIN_FILE"
 
-if [[ "$OS" != "windows" ]]; then
+if [[ "$OS_TAG" != "windows" ]]; then
   chmod +x "./$OUT_DIR/$BIN_FILE"
 fi
 
