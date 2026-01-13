@@ -58,22 +58,22 @@ fi
 # ----------------------------
 
 PACKAGE=""
-EXECUTABLE=""        # base name, e.g. "hconf"
-ZIP_NAME=""          # optional override; if empty, defaults to EXECUTABLE (base)
+APP_NAME=""        # base name, e.g. "hconf"
+ZIP_NAME=""          # optional override; if empty, defaults to APP_NAME (base)
 STACK_BUILD_ARGS=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --package) PACKAGE="$2"; shift 2;;
-    --executable) EXECUTABLE="$2"; shift 2;;
+    --app) APP_NAME="$2"; shift 2;;
     --zip-name) ZIP_NAME="$2"; shift 2;;
     --stack-build-args) STACK_BUILD_ARGS="$2"; shift 2;;
     *) echo "Unknown arg: $1" >&2; exit 1;;
   esac
 done
 
-if [[ -z "$PACKAGE" || -z "$EXECUTABLE" ]]; then
-  echo "Missing required inputs: --package and --executable" >&2
+if [[ -z "$PACKAGE" || -z "$APP_NAME" ]]; then
+  echo "Missing required inputs: --package and --app" >&2
   exit 1
 fi
 
@@ -84,7 +84,7 @@ case "$(uname)" in
 esac
 
 # OS-specific binary filename (only this part gets .exe on Windows)
-BIN_FILE="${EXECUTABLE}${EXT}"
+BIN_FILE="${APP_NAME}${EXT}"
 
 OUT_DIR="out"
 rm -rf "$OUT_DIR"
@@ -102,7 +102,7 @@ if [[ "$OS" != "windows" ]]; then
 fi
 
 # Zip name: ALWAYS base executable name by default (=> hconf.zip on all OSes)
-ZIP_BASE="${ZIP_NAME:-$EXECUTABLE}"
+ZIP_BASE="${ZIP_NAME:-$APP_NAME}"
 ZIP_FILE="${ZIP_BASE}.zip"
 
 pushd "$OUT_DIR" >/dev/null
@@ -113,7 +113,7 @@ rm -rf "$OUT_DIR"
 
 echo "Produced: $ZIP_FILE"
 
-ARTFACT="${EXECUTABLE}-${PLATFORM_ID}.zip"
+ARTFACT="${APP_NAME}-${PLATFORM_ID}.zip"
 
 # Always print (nice for local / debugging)
 echo "$ARTFACT"
