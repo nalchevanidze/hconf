@@ -122,5 +122,5 @@ echo "$ARTFACT"
 {
   echo "artifact=$ARTFACT"
   echo "zip_path=$ZIP_FILE"
-  echo "executable_name=$BIN_FILE"
+  echo "bin_name=$BIN_FILE"
 } >> "$GITHUB_OUTPUT"
