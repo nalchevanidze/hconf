@@ -77,12 +77,6 @@ if [[ -z "$PACKAGE" || -z "$APP_NAME" ]]; then
   exit 1
 fi
 
-case "$(uname)" in
-  Darwin) OS=mac-os;;
-  MINGW64_NT-*|MSYS_NT-*) OS=windows;;
-  *) OS=linux;;
-esac
-
 # OS-specific binary filename (only this part gets .exe on Windows)
 BIN_FILE="${APP_NAME}${EXT}"
 
@@ -101,9 +95,8 @@ if [[ "$OS" != "windows" ]]; then
   chmod +x "./$OUT_DIR/$BIN_FILE"
 fi
 
-# Zip name: ALWAYS base executable name by default (=> hconf.zip on all OSes)
-ZIP_BASE="${ZIP_NAME:-$APP_NAME}"
-ZIP_FILE="${ZIP_BASE}-${PLATFORM_ID}.zip"
+# Zip file: ALWAYS base app name by default
+ZIP_FILE="${ZIP_NAME:-$APP_NAME}-${PLATFORM_ID}.zip"
 
 pushd "$OUT_DIR" >/dev/null
 7z a "../$ZIP_FILE" .
