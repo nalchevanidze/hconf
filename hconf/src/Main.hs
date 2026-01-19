@@ -15,6 +15,7 @@ import HConf
     defaultConfig,
     exec,
   )
+import HConf.Config.Bump (Bump)
 import Options.Applicative
   ( Parser,
     argument,
@@ -63,11 +64,14 @@ class CLIType a where
 instance CLIType Tag where
   cliType = argument (str >>= parse) (metavar "version" <> help "version tag")
 
+instance CLIType Bump where
+  cliType = argument (str >>= parse) (metavar "bump" <> help "bump type (major|minor|patch)")
+
 instance CLIType Command where
   cliType =
     commands
       [ ("setup", "builds Haskell code from GQL source", Setup <$> optional cliType),
-        ("next", "next release", Next <$> switch (long "breaking" <> short 'b')),
+        ("next", "next release", Next <$> cliType),
         ("update", "check/fix upper bounds for dependencies", pure Update),
         ("about", "api information", pure About),
         ("version", "get current version", pure Version),

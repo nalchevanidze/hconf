@@ -29,6 +29,7 @@ executable hconf
   other-modules:
       HConf
       HConf.Config.Build
+      HConf.Config.Bump
       HConf.Config.Config
       HConf.Config.ConfigT
       HConf.Config.PkgGroup

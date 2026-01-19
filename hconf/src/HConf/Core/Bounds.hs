@@ -32,6 +32,7 @@ import HConf.Utils.FromConf (ByKey)
 import HConf.Utils.Log (field)
 import HConf.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
 import Relude
+import HConf.Config.Bump (Bump(Minor))
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 
@@ -98,7 +99,7 @@ versionBounds :: Version -> Bounds
 versionBounds version =
   Bounds
     [ Bound Min True (dropPatch version),
-      Bound Max False (nextVersion True version)
+      Bound Max False (nextVersion Minor version)
     ]
 
 instance Diff Bounds where

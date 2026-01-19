@@ -14,6 +14,7 @@ module HConf
 where
 
 import Data.Version (showVersion)
+import HConf.Config.Bump (Bump (..))
 import HConf.Config.Config (Config (..), nextRelease, updateConfig)
 import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
 import HConf.Config.Tag (Tag (Latest))
@@ -28,7 +29,7 @@ import Relude hiding (fix)
 
 data Command
   = Setup {tag :: Maybe Tag}
-  | Next {isBreaking :: Bool}
+  | Next {bump :: Bump}
   | Update
   | About
   | Version
@@ -45,9 +46,9 @@ exec Setup {tag} =
     setupStack (fromMaybe Latest tag)
     genHie
     checkPackages
-exec Next {isBreaking} =
+exec Next {bump} =
   runTask "next"
-    $ (asks config <&> nextRelease isBreaking)
+    $ (asks config <&> nextRelease bump)
     >>= save
 exec Update =
   runTask "update"

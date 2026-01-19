@@ -19,6 +19,7 @@ import Data.Aeson
     Value (..),
   )
 import GHC.Show (Show (..))
+import HConf.Config.Bump (Bump (..))
 import HConf.Utils.Class
   ( Format (..),
     Parse (..),
@@ -45,10 +46,10 @@ getNumber :: [Int] -> Int
 getNumber (n : _) = n
 getNumber [] = 0
 
-nextVersion :: Bool -> Version -> Version
-nextVersion isBreaking Version {..}
-  | isBreaking = Version {minor = minor + 1, revision = [0], ..}
-  | otherwise = Version {revision = [getNumber revision + 1], ..}
+nextVersion :: Bump -> Version -> Version
+nextVersion Major Version {..} = Version {major = major + 1, minor = 0, revision = [0], ..}
+nextVersion Minor Version {..} = Version {minor = minor + 1, revision = [0], ..}
+nextVersion Patch Version {..} = Version {revision = [getNumber revision + 1], ..}
 
 dropPatch :: Version -> Version
 dropPatch Version {..} = Version {revision = [0], ..}

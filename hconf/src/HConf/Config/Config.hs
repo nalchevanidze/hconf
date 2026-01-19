@@ -31,6 +31,7 @@ import HConf.Utils.Class (Check (check), HConfIO, format)
 import HConf.Utils.Core (DependencyName)
 import HConf.Utils.FromConf (ReadConf)
 import Relude
+import HConf.Config.Bump (Bump)
 
 data Config = Config
   { version :: Version,
@@ -56,9 +57,9 @@ instance ToJSON Config where
 instance (ReadConf m ()) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
-nextRelease :: Bool -> Config -> Config
-nextRelease isBreaking Config {..} =
-  let version' = nextVersion isBreaking version
+nextRelease :: Bump -> Config -> Config
+nextRelease bump Config {..} =
+  let version' = nextVersion bump version
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
