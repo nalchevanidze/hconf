@@ -1,5 +1,5 @@
 {
-  "scope": {
+  "pkgs": {
     "hconf": "hconf"
   },
   "project": {
