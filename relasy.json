@@ -4,9 +4,9 @@
   },
   "project": {
     "type": "custom",
-    "pkg": "https://hackage.haskell.org/package/{{SCOPE}}",
+    "pkg": "https://hackage.haskell.org/package/{{PKG}}",
     "version": "hconf version",
-    "next": "hconf next",
-    "setup": "hconf setup 9.6.3"
+    "bump": "hconf next -b",
+    "postBump": "hconf setup 9.6.3"
   }
 }
