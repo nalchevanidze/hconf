@@ -4,13 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           hconf
+name:           hmm
 version:        0.4.1
-synopsis:       Stack Config
-description:    cli to manage multiple stack projects
+synopsis:       Haskell Monorepo Manager
+description:    CLI tool to manage Haskell monorepos with multi-GHC support
 category:       web
-homepage:       https://github.com/nalchevanidze/hconf#readme
-bug-reports:    https://github.com/nalchevanidze/hconf/issues
+homepage:       https://github.com/nalchevanidze/hmm#readme
+bug-reports:    https://github.com/nalchevanidze/hmm/issues
 author:         Daviti Nalchevanidze
 maintainer:     d.nalchevanidze@gmail.com
 copyright:      (c) 2019 Daviti Nalchevanidze
@@ -22,12 +22,11 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/nalchevanidze/hconf
+  location: https://github.com/nalchevanidze/hmm
 
-executable hconf
+executable hmm
   main-is: Main.hs
   other-modules:
-      HConf
       HConf.Config.Build
       HConf.Config.Bump
       HConf.Config.Config
@@ -54,7 +53,8 @@ executable hconf
       HConf.Utils.Log
       HConf.Utils.Source
       HConf.Utils.Yaml
-      Paths_hconf
+      HMM
+      Paths_hmm
   hs-source-dirs:
       src
   ghc-options: -Wall

@@ -1,14 +1,14 @@
-name: hconf
+name: hmm
 version: 0.4.1
-github: nalchevanidze/hconf
+github: nalchevanidze/hmm
 license: MIT
 author: Daviti Nalchevanidze
 category: web
-synopsis: Stack Config
+synopsis: Haskell Monorepo Manager
 maintainer: d.nalchevanidze@gmail.com
 copyright: (c) 2019 Daviti Nalchevanidze
 license-file: LICENSE
-description: cli to manage multiple stack projects
+description: CLI tool to manage Haskell monorepos with multi-GHC support
 extra-source-files:
 - README.md
 dependencies:
@@ -28,7 +28,7 @@ dependencies:
 - unordered-containers  >=  0.2.8    &&  <   0.3.0
 - yaml                  >=  0.8.32   &&  <   1.0.0
 executables:
-  hconf:
+  hmm:
     main: Main.hs
     source-dirs: src
     ghc-options: -Wall

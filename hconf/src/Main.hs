@@ -7,7 +7,8 @@ module Main
   )
 where
 
-import HConf
+import HConf.Config.Bump (Bump)
+import HMM
   ( Command (..),
     Parse (parse),
     Tag,
@@ -15,7 +16,6 @@ import HConf
     defaultConfig,
     exec,
   )
-import HConf.Config.Bump (Bump)
 import Options.Applicative
   ( Parser,
     argument,
@@ -55,7 +55,7 @@ run app =
     (prefs showHelpOnError)
     ( info
         (helper <*> app)
-        (fullDesc <> progDesc "HConf CLI - manage multi-GHC Haskell project configurations")
+        (fullDesc <> progDesc "HMM CLI - Haskell Monorepo Manager for multi-GHC projects")
     )
 
 class CLIType a where
@@ -85,7 +85,7 @@ data Options = Options
 instance CLIType Options where
   cliType =
     Options
-      <$> flag 'v' "version" "show HConf version number"
+      <$> flag 'v' "version" "show HMM version number"
       <*> flag 's' "silence" "run silently with minimal output"
 
 main :: IO ()
