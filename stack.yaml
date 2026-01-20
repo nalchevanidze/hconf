@@ -1,6 +1,6 @@
 resolver: lts-22.6
 packages:
-- hconf
+- hmm
 allow-newer: true
 save-hackage-creds: false
 extra-deps:

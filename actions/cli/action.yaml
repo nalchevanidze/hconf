@@ -1,0 +1,16 @@
+name: Install HMM
+description: Install and setup HMM CLI tool
+inputs:
+  version:
+    description: Version of HMM to install
+    required: false
+    default: 0.4.0
+
+runs:
+  using: "composite"
+  steps:
+    - uses: nalchevanidze/hconf/actions/install@main
+      with:
+        version: ${{ inputs.version }}
+        repo: nalchevanidze/hconf
+        app: hconf
