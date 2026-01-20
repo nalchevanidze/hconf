@@ -7,7 +7,6 @@ module Main
   )
 where
 
-import HConf.Config.Bump (Bump)
 import HMM
   ( Command (..),
     Parse (parse),
@@ -15,6 +14,7 @@ import HMM
     currentVersion,
     defaultConfig,
     exec,
+    Bump
   )
 import Options.Applicative
   ( Parser,

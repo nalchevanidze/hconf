@@ -1,46 +1,57 @@
-# HConf
+# HMM (Haskell Monorepo Manager)
 
-A powerful command-line tool for managing multiple Haskell Stack projects with ease.
+A powerful command-line tool for managing Haskell monorepos with multi-GHC support.
 
-## What is HConf?
+## What is HMM?
 
-HConf is a specialized CLI tool designed to streamline the development workflow for Haskell projects that need to support multiple GHC versions and Stack resolvers. It provides a unified configuration system that allows you to manage dependencies, version bounds, and build configurations across different compiler versions from a single `hconf.yaml` file.
+HMM (Haskell Monorepo Manager) is a specialized CLI tool designed to streamline the development workflow for Haskell monorepos that need to support multiple GHC versions and Stack resolvers. It provides a unified configuration system that allows you to manage multiple packages, dependencies, version bounds, and build configurations across different compiler versions from a single `hconf.yaml` file.
+
+**Perfect for:**
+- **Multi-package Haskell projects** with shared dependencies
+- **Library authors** supporting multiple GHC versions  
+- **Teams** maintaining consistent build environments
+- **CI/CD pipelines** testing across GHC matrix builds
 
 ## Why does this project exist?
 
-Managing Haskell projects across multiple GHC versions and Stack resolvers can be incredibly tedious and error-prone. Traditional approaches require:
+Managing Haskell monorepos across multiple GHC versions and Stack resolvers can be incredibly tedious and error-prone. Traditional approaches require:
 
 - Manually maintaining separate stack.yaml files for each GHC version
+- Coordinating dependency versions across multiple packages
 - Manually updating dependency bounds when packages change
 - Repeating build configurations across different environments  
 - Time-consuming manual testing across multiple compiler versions
+- Managing inter-package dependencies and version compatibility
 
-HConf solves these problems by providing:
+HMM solves these problems by providing:
 
+✅ **Monorepo Management**: Coordinate multiple packages in a single repository  
 ✅ **Centralized Configuration**: Define all your build matrices, dependencies, and version constraints in one place  
-✅ **Automated Dependency Management**: Automatically check and update dependency bounds  
+✅ **Automated Dependency Management**: Automatically check and update dependency bounds across all packages
 ✅ **Multi-Version Testing**: Easy setup and management of builds across different GHC versions  
-✅ **Version Management**: Automated version bumping and release management  
+✅ **Coordinated Versioning**: Automated version bumping and release management across packages
 ✅ **Code Formatting**: Integrated Ormolu formatting with checking capabilities  
 ✅ **HIE Integration**: Automatic generation of hie.yaml files for IDE support
 
 ## Key Features
 
+- **Monorepo Coordination**: Manage multiple related Haskell packages in a single repository
 - **Multi-Build Management**: Configure builds for different GHC versions and Stack resolvers
+- **Inter-Package Dependencies**: Handle complex dependency relationships between packages
 - **Dependency Bounds Checking**: Automatically verify and update dependency version bounds
-- **Version Bumping**: Semantic versioning with major/minor/patch bump support
-- **Code Formatting**: Built-in Ormolu integration for consistent code style
+- **Coordinated Versioning**: Semantic versioning with coordinated major/minor/patch bumps
+- **Code Formatting**: Built-in Ormolu integration for consistent code style across packages
 - **HIE Generation**: Automatic hie.yaml file generation for Haskell Language Server
 - **Package Validation**: Verify package configurations across all builds
 
 ## Commands
 
-- `hconf setup [version]` - Generate Stack configurations and HIE files for multi-GHC builds
-- `hconf version` - Display current project version and configuration details
-- `hconf version <bump>` - Bump project version (major|minor|patch) and update configurations  
-- `hconf update-deps` - Check and update dependency version bounds
-- `hconf format [--check]` - Format Haskell source files using Ormolu
-- `hconf --version` - Display HConf tool version
+- `hmm setup [version]` - Generate Stack configurations and HIE files for multi-GHC builds
+- `hmm version` - Display current project version and configuration details
+- `hmm version <bump>` - Bump project version (major|minor|patch) and update configurations  
+- `hmm update-deps` - Check and update dependency version bounds
+- `hmm format [--check]` - Format Haskell source files using Ormolu
+- `hmm --version` - Display HMM tool version
 
 ## Installation
 
@@ -50,15 +61,15 @@ Use the provided install script to download the latest binary release:
 
 ```bash
 # Install latest version
-curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- \
-  --repo nalchevanidze/hconf \
-  --app hconf \
+curl -sSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- \
+  --repo nalchevanidze/hmm \
+  --app hmm \
   --version 0.4.1
 
 # Or install specific version
-curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- \
-  --repo nalchevanidze/hconf \
-  --app hconf \
+curl -sSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- \
+  --repo nalchevanidze/hmm \
+  --app hmm \
   --version v0.4.0 \
   --bin-dir ~/.local/bin
 ```
@@ -69,20 +80,20 @@ The installer automatically detects your platform (Linux, macOS, Windows) and ar
 
 For CI/CD, use the pre-built GitHub Actions:
 
-#### Option 1: HConf + GHC Setup (All-in-One)
+#### Option 1: HMM + GHC Setup (All-in-One)
 
 ```yaml
-- name: Setup GHC and HConf
-  uses: nalchevanidze/hconf/actions/ghc@main
+- name: Setup GHC and HMM
+  uses: nalchevanidze/hmm/actions/ghc@main
   with:
     ghc: 9.6.3  # Optional, defaults to 9.6.3
 ```
 
-#### Option 2: HConf Only
+#### Option 2: HMM Only
 
 ```yaml
-- name: Install HConf
-  uses: nalchevanidze/hconf/actions/hconf@main
+- name: Install HMM
+  uses: nalchevanidze/hmm/actions/hmm@main
   with:
     version: 0.4.1  # Optional, defaults to 0.4.0
 ```
@@ -91,12 +102,12 @@ For CI/CD, use the pre-built GitHub Actions:
 
 ```bash
 # Install from source using Stack (slower)
-git clone https://github.com/nalchevanidze/hconf.git
-cd hconf
+git clone https://github.com/nalchevanidze/hmm.git
+cd hmm
 stack install
 
 # Or install directly from Hackage
-stack install hconf
+stack install hmm
 ```
 
 ## Quick Start
@@ -132,7 +143,7 @@ dependencies:
 
 ```bash
 # Generate stack.yaml files for all GHC versions and create HIE configuration
-hconf setup
+hmm setup
 ```
 
 This will create:
@@ -235,10 +246,10 @@ dependencies:
 
 ```bash
 # Setup with latest resolver versions
-hconf setup
+hmm setup
 
 # Setup with specific version tag
-hconf setup 1.0.0
+hmm setup 1.0.0
 
 # What this does:
 # 1. Generates stack-ghc-X.Y.Z.yaml files for each build
@@ -251,22 +262,22 @@ hconf setup 1.0.0
 
 ```bash
 # Show current project version and info
-hconf version
+hmm version
 
 # Bump patch version (1.0.0 -> 1.0.1)
-hconf version patch
+hmm version patch
 
 # Bump minor version (1.0.1 -> 1.1.0)  
-hconf version minor
+hmm version minor
 
 # Bump major version (1.1.0 -> 2.0.0)
-hconf version major
+hmm version major
 
-# Show HConf tool version
-hconf --version
+# Show HMM tool version
+hmm --version
 ```
 
-After running `version <bump>`, HConf will:
+After running `version <bump>`, HMM will:
 - Update the version in `hconf.yaml`
 - Update version bounds accordingly
 - Regenerate all stack configuration files
@@ -275,7 +286,7 @@ After running `version <bump>`, HConf will:
 
 ```bash
 # Check and update dependency bounds
-hconf update-deps
+hmm update-deps
 
 # Example output:
 # Checking bounds for base...        ✓ OK
@@ -288,10 +299,10 @@ hconf update-deps
 
 ```bash
 # Format all Haskell files
-hconf format
+hmm format
 
 # Check formatting without making changes
-hconf format --check
+hmm format --check
 
 # Example output:
 # Formatting src/Main.hs...          ✓ OK
@@ -303,7 +314,7 @@ hconf format --check
 
 ### Stack Configuration Example
 
-When you run `hconf setup`, it generates stack.yaml files like this:
+When you run `hmm setup`, it generates stack.yaml files like this:
 
 ```yaml
 # stack-ghc-9.4.5.yaml
@@ -321,7 +332,7 @@ allow-newer: true
 
 ### HIE Configuration
 
-HConf also generates a `hie.yaml` file for Haskell Language Server:
+HMM also generates a `hie.yaml` file for Haskell Language Server:
 
 ```yaml
 cradle:
@@ -338,7 +349,7 @@ cradle:
 
 ```bash
 # 1. Update dependencies
-hconf update-deps
+hmm update-deps
 
 # 2. Test across all GHC versions
 for f in stack-ghc-*.yaml; do 
@@ -347,11 +358,11 @@ for f in stack-ghc-*.yaml; do
 done
 
 # 3. Format code
-hconf format
+hmm format
 
 # 4. Bump version and regenerate configs
-hconf version minor
-hconf setup
+hmm version minor
+hmm setup
 
 # 5. Build and upload to Hackage
 stack upload .
@@ -376,14 +387,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Use the all-in-one action that sets up both GHC and HConf
-    - name: Setup GHC and HConf  
-      uses: nalchevanidze/hconf/actions/ghc@main
+    # Use the all-in-one action that sets up both GHC and HMM
+    - name: Setup GHC and HMM  
+      uses: nalchevanidze/hmm/actions/ghc@main
       with:
         ghc: ${{ matrix.ghc }}
     
     - name: Setup project
-      run: hconf setup
+      run: hmm setup
       
     - name: Build and Test
       run: |
@@ -396,12 +407,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Just install HConf for formatting
-    - name: Install HConf
-      uses: nalchevanidze/hconf/actions/hconf@main
+    # Just install HMM for formatting
+    - name: Install HMM
+      uses: nalchevanidze/hmm/actions/hmm@main
     
     - name: Check formatting
-      run: hconf format --check
+      run: hmm format --check
 ```
 
 #### Manual Setup (Alternative)
@@ -478,12 +489,12 @@ hconf update-deps
 
 ## Configuration
 
-HConf uses a `hconf.yaml` file to define your project configuration. The file supports:
+HMM uses a `hconf.yaml` file to define your monorepo configuration. The file supports:
 
-- **Package Groups**: Organize related packages together
+- **Package Groups**: Organize related packages together in your monorepo
 - **Build Matrices**: Test across multiple GHC versions and resolvers  
 - **Dependency Management**: Centralized version bounds and constraints
-- **Version Control**: Automated semantic versioning
+- **Version Control**: Automated semantic versioning across all packages
 - **Custom Configurations**: Per-build extra dependencies and settings
 
 See the complete `hconf.yaml` in this repository for a real-world example.

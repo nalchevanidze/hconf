@@ -10,20 +10,21 @@ module HMM
     Command (..),
     currentVersion,
     defaultConfig,
+    Bump (..),
   )
 where
 
 import Data.Version (showVersion)
-import HMM.Config.Bump (Bump (..))
-import HMM.Config.Config (Config (..), nextRelease, updateConfig)
-import HMM.Config.ConfigT (HCEnv (..), run, runTask, save)
-import HMM.Config.Tag (Tag (Latest))
-import HMM.Core.Env (Env (..), defaultConfig)
-import HMM.Format (format)
-import HMM.Hie (genHie)
-import HMM.Stack.Config (setupStack)
-import HMM.Stack.Package (checkPackages)
-import HMM.Utils.Class (Parse (..))
+import HConf.Config.Bump (Bump (..))
+import HConf.Config.Config (Config (..), nextRelease, updateConfig)
+import HConf.Config.ConfigT (HCEnv (..), run, runTask, save)
+import HConf.Config.Tag (Tag (Latest))
+import HConf.Core.Env (Env (..), defaultConfig)
+import HConf.Format (format)
+import HConf.Hie (genHie)
+import HConf.Stack.Config (setupStack)
+import HConf.Stack.Package (checkPackages)
+import HConf.Utils.Class (Parse (..))
 import qualified Paths_hmm as CLI
 import Relude hiding (fix)
 
