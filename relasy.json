@@ -1,6 +1,6 @@
 {
   "pkgs": {
-    "hconf": "hconf"
+    "cli": "hconf"
   },
   "project": {
     "type": "custom",
