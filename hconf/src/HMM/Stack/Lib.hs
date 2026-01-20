@@ -6,7 +6,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Stack.Lib
+module HMM.Stack.Lib
   ( Library (..),
     updateDependencies,
     updateLibrary,
@@ -32,12 +32,12 @@ import Data.Aeson.Types
     withObject,
   )
 import GHC.Generics (Generic (..))
-import HConf.Core.Bounds (Bounds, BoundsByName)
-import HConf.Core.Dependencies (Dependencies, traverseDeps)
-import HConf.Utils.Class (logDiff)
-import HConf.Utils.Core (DependencyName, Name, aesonYAMLOptions)
-import HConf.Utils.FromConf (ReadConf, readByKey)
-import HConf.Utils.Log (field)
+import HMM.Core.Bounds (Bounds, BoundsByName)
+import HMM.Core.Dependencies (Dependencies, traverseDeps)
+import HMM.Utils.Class (logDiff)
+import HMM.Utils.Core (DependencyName, Name, aesonYAMLOptions)
+import HMM.Utils.FromConf (ReadConf, readByKey)
+import HMM.Utils.Log (field)
 import Relude
 
 type Libraries = Map Name Library

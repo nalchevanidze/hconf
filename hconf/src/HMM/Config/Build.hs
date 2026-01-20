@@ -9,7 +9,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Config.Build
+module HMM.Config.Build
   ( Build,
     Builds,
     getExtras,
@@ -29,11 +29,11 @@ import Data.Aeson
 import Data.Foldable (Foldable (..))
 import Data.List ((\\))
 import qualified Data.Map as M
-import HConf.Config.Tag (Tag (Latest))
-import HConf.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
-import HConf.Core.PkgDir (PkgDirs)
-import HConf.Utils.Class (Check (..))
-import HConf.Utils.Core
+import HMM.Config.Tag (Tag (Latest))
+import HMM.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
+import HMM.Core.PkgDir (PkgDirs)
+import HMM.Utils.Class (Check (..))
+import HMM.Utils.Core
   ( ResolverName,
     aesonYAMLOptions,
     maybeList,
@@ -41,7 +41,7 @@ import HConf.Utils.Core
     notElemError,
     throwError,
   )
-import HConf.Utils.FromConf (ReadConf, readList)
+import HMM.Utils.FromConf (ReadConf, readList)
 import Relude
 
 type Extras = VersionMap

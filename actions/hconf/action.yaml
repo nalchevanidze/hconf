@@ -1,8 +1,8 @@
-name: Install HConf
-description: Install and setup HConf CLI tool
+name: Install HMM
+description: Install and setup HMM CLI tool
 inputs:
   version:
-    description: Version of HConf to install
+    description: Version of HMM to install
     required: false
     default: 0.4.0
 

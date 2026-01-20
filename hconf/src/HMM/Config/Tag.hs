@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Config.Tag
+module HMM.Config.Tag
   ( Tag (..),
   )
 where
@@ -13,9 +13,9 @@ import Data.Aeson
     Value (..),
   )
 import GHC.Show (Show (..))
-import HConf.Core.Version (Version)
-import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Source (fromToString)
+import HMM.Core.Version (Version)
+import HMM.Utils.Class (Parse (..))
+import HMM.Utils.Source (fromToString)
 import Relude hiding (show)
 
 data Tag

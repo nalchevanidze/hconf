@@ -7,7 +7,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Config.ConfigT
+module HMM.Config.ConfigT
   ( ConfigT (..),
     HCEnv (..),
     save,
@@ -17,25 +17,25 @@ module HConf.Config.ConfigT
 where
 
 import Control.Exception (tryJust)
-import HConf.Config.Build (Builds)
-import HConf.Config.Config (Config (..), getRule)
-import HConf.Config.PkgGroup (pkgDirs)
-import HConf.Core.Bounds (Bounds)
-import HConf.Core.Env (Env (..))
-import HConf.Core.PkgDir (PkgDirs)
-import HConf.Core.Version (Version)
-import HConf.Utils.Chalk (Color (Green), chalk)
-import HConf.Utils.Class
+import HMM.Config.Build (Builds)
+import HMM.Config.Config (Config (..), getRule)
+import HMM.Config.PkgGroup (pkgDirs)
+import HMM.Core.Bounds (Bounds)
+import HMM.Core.Env (Env (..))
+import HMM.Core.PkgDir (PkgDirs)
+import HMM.Core.Version (Version)
+import HMM.Utils.Chalk (Color (Green), chalk)
+import HMM.Utils.Class
   ( Check (..),
     HConfIO (..),
   )
-import HConf.Utils.Core (DependencyName (..), printException)
-import HConf.Utils.FromConf (ByKey (..), ReadFromConf (..))
-import HConf.Utils.Log
+import HMM.Utils.Core (DependencyName (..), printException)
+import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..))
+import HMM.Utils.Log
   ( alert,
     task,
   )
-import HConf.Utils.Yaml (readYaml, rewrite)
+import HMM.Utils.Yaml (readYaml, rewrite)
 import Relude
 
 data HCEnv = HCEnv

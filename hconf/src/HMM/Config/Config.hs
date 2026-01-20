@@ -7,7 +7,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Config.Config
+module HMM.Config.Config
   ( Config (..),
     getRule,
     nextRelease,
@@ -22,16 +22,16 @@ import Data.Aeson
     genericToJSON,
   )
 import Data.Aeson.Types (defaultOptions)
-import HConf.Config.Build (Builds)
-import HConf.Config.PkgGroup (PkgGroup, isMember)
-import HConf.Core.Bounds (Bounds, updateDepBounds, versionBounds)
-import HConf.Core.Dependencies (Dependencies, getBounds, traverseDeps)
-import HConf.Core.Version (Version, nextVersion)
-import HConf.Utils.Class (Check (check), HConfIO, format)
-import HConf.Utils.Core (DependencyName)
-import HConf.Utils.FromConf (ReadConf)
+import HMM.Config.Build (Builds)
+import HMM.Config.PkgGroup (PkgGroup, isMember)
+import HMM.Core.Bounds (Bounds, updateDepBounds, versionBounds)
+import HMM.Core.Dependencies (Dependencies, getBounds, traverseDeps)
+import HMM.Core.Version (Version, nextVersion)
+import HMM.Utils.Class (Check (check), HConfIO, format)
+import HMM.Utils.Core (DependencyName)
+import HMM.Utils.FromConf (ReadConf)
 import Relude
-import HConf.Config.Bump (Bump)
+import HMM.Config.Bump (Bump)
 
 data Config = Config
   { version :: Version,

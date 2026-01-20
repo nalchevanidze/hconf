@@ -370,7 +370,7 @@ stack upload .
 
 ### CI/CD Integration
 
-#### Complete Workflow with HConf Actions
+#### Complete Workflow with HMM Actions
 
 ```yaml
 # .github/workflows/ci.yml
@@ -440,7 +440,7 @@ jobs:
       with:
         enable-stack: true
     
-    - name: Install HConf
+    - name: Install HMM
       run: |
         curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- \
           --repo nalchevanidze/hconf \

@@ -7,7 +7,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Stack.Package
+module HMM.Stack.Package
   ( Package (..),
     checkPackages,
     resolvePackages,
@@ -15,17 +15,17 @@ module HConf.Stack.Package
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import HConf.Core.Bounds (BoundsByName)
-import HConf.Core.Dependencies (Dependencies)
-import HConf.Core.PkgDir (PkgDir, packageFile)
-import HConf.Core.Version (Version, readVersion)
-import HConf.Stack.Cabal (Cabal (..), CabalSrc (..))
-import HConf.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
-import HConf.Utils.Class (Check (..))
-import HConf.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
-import HConf.Utils.FromConf (ReadConf, readList)
-import HConf.Utils.Log (task)
-import HConf.Utils.Yaml (readYaml, rewrite)
+import HMM.Core.Bounds (BoundsByName)
+import HMM.Core.Dependencies (Dependencies)
+import HMM.Core.PkgDir (PkgDir, packageFile)
+import HMM.Core.Version (Version, readVersion)
+import HMM.Stack.Cabal (Cabal (..), CabalSrc (..))
+import HMM.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
+import HMM.Utils.Class (Check (..))
+import HMM.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
+import HMM.Utils.FromConf (ReadConf, readList)
+import HMM.Utils.Log (task)
+import HMM.Utils.Yaml (readYaml, rewrite)
 import Relude hiding (Undefined, length, replicate)
 
 data Package = Package

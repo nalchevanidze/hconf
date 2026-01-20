@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Core.Version
+module HMM.Core.Version
   ( nextVersion,
     dropPatch,
     Version,
@@ -19,14 +19,14 @@ import Data.Aeson
     Value (..),
   )
 import GHC.Show (Show (..))
-import HConf.Config.Bump (Bump (..))
-import HConf.Utils.Class
+import HMM.Config.Bump (Bump (..))
+import HMM.Utils.Class
   ( Format (..),
     Parse (..),
   )
-import HConf.Utils.Core (Msg (..), throwError)
-import HConf.Utils.FromConf (ReadConf, readFromConf)
-import HConf.Utils.Source (formatList, fromToString, sepBy, toError)
+import HMM.Utils.Core (Msg (..), throwError)
+import HMM.Utils.FromConf (ReadConf, readFromConf)
+import HMM.Utils.Source (formatList, fromToString, sepBy, toError)
 import Relude hiding (show)
 
 data Version = Version

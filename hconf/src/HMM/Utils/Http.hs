@@ -2,19 +2,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.Http
+module HMM.Utils.Http
   ( hackage,
   )
 where
 
 import Data.Aeson (FromJSON, eitherDecode)
-import HConf.Utils.Class (HConfIO)
-import HConf.Utils.Core
+import HMM.Utils.Class (HConfIO)
+import HMM.Utils.Core
   ( Msg (..),
     maybeToError,
     throwError,
   )
-import HConf.Utils.Source (genUrl)
+import HMM.Utils.Source (genUrl)
 import Network.HTTP.Req
   ( GET (..),
     LbsResponse,

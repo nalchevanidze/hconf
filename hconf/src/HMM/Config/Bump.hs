@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Config.Bump
+module HMM.Config.Bump
   ( Bump (..),
   )
 where
@@ -13,8 +13,8 @@ import Data.Aeson
     Value (..),
   )
 import GHC.Show (Show (..))
-import HConf.Utils.Class (Parse (..))
-import HConf.Utils.Source (fromToString)
+import HMM.Utils.Class (Parse (..))
+import HMM.Utils.Source (fromToString)
 import Relude hiding (show)
 
 data Bump

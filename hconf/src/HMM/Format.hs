@@ -2,13 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Format (format) where
+module HMM.Format (format) where
 
-import HConf.Core.PkgDir (explore)
-import HConf.Utils.Class (HConfIO)
-import HConf.Utils.Core (isSuccess, throwError)
-import HConf.Utils.FromConf (ReadConf, readList)
-import HConf.Utils.Log (task)
+import HMM.Core.PkgDir (explore)
+import HMM.Utils.Class (HConfIO)
+import HMM.Utils.Core (isSuccess, throwError)
+import HMM.Utils.FromConf (ReadConf, readList)
+import HMM.Utils.Log (task)
 import Ormolu
   ( ColorMode (..),
     Config (..),

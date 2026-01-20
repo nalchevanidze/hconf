@@ -6,22 +6,22 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Stack.Config
+module HMM.Stack.Config
   ( Stack,
     setupStack,
   )
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import HConf.Config.Build (Builds, getAllowNewer, getExtras, getPkgs, getResolver, resolveVersion)
-import HConf.Config.Tag (Tag (..))
-import HConf.Core.Env (Env (..))
-import HConf.Core.PkgDir (PkgDirs)
-import HConf.Utils.Class (Format (..))
-import HConf.Utils.Core (Name, ResolverName, aesonYAMLOptions)
-import HConf.Utils.FromConf (ReadConf, readEnv)
-import HConf.Utils.Log (task)
-import HConf.Utils.Yaml (rewrite)
+import HMM.Config.Build (Builds, getAllowNewer, getExtras, getPkgs, getResolver, resolveVersion)
+import HMM.Config.Tag (Tag (..))
+import HMM.Core.Env (Env (..))
+import HMM.Core.PkgDir (PkgDirs)
+import HMM.Utils.Class (Format (..))
+import HMM.Utils.Core (Name, ResolverName, aesonYAMLOptions)
+import HMM.Utils.FromConf (ReadConf, readEnv)
+import HMM.Utils.Log (task)
+import HMM.Utils.Yaml (rewrite)
 import Relude
 
 data Stack = Stack

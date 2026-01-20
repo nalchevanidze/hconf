@@ -8,22 +8,22 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Hie
+module HMM.Hie
   ( genHie,
   )
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), Value (..), object)
 import qualified Data.Map as M
-import HConf.Core.Env (Env (..))
-import HConf.Core.PkgDir (PkgDir, pkgFile)
-import HConf.Stack.Lib (Libraries, Library (..))
-import HConf.Stack.Package (Package (..), resolvePackages)
-import HConf.Utils.Class
-import HConf.Utils.Core (Name)
-import HConf.Utils.FromConf (ReadConf, readEnv)
-import HConf.Utils.Log (task)
-import HConf.Utils.Yaml (rewrite)
+import HMM.Core.Env (Env (..))
+import HMM.Core.PkgDir (PkgDir, pkgFile)
+import HMM.Stack.Lib (Libraries, Library (..))
+import HMM.Stack.Package (Package (..), resolvePackages)
+import HMM.Utils.Class
+import HMM.Utils.Core (Name)
+import HMM.Utils.FromConf (ReadConf, readEnv)
+import HMM.Utils.Log (task)
+import HMM.Utils.Yaml (rewrite)
 import Relude
 
 data Component = Component

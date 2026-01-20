@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Config.PkgGroup
+module HMM.Config.PkgGroup
   ( PkgGroup,
     PkgGroups,
     pkgDirs,
@@ -22,8 +22,8 @@ import Data.Aeson.Types
   ( defaultOptions,
   )
 import Data.Text (isPrefixOf)
-import HConf.Core.PkgDir (PkgDirs, genPkgDir)
-import HConf.Utils.Core (Name, maybeBool)
+import HMM.Core.PkgDir (PkgDirs, genPkgDir)
+import HMM.Utils.Core (Name, maybeBool)
 import Relude hiding (isPrefixOf)
 
 data PkgGroup = PkgGroup

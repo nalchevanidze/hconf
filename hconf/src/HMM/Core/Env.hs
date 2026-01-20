@@ -1,4 +1,4 @@
-module HConf.Core.Env
+module HMM.Core.Env
   ( Env (..),
     defaultConfig,
   )

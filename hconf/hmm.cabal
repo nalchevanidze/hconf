@@ -27,33 +27,33 @@ source-repository head
 executable hmm
   main-is: Main.hs
   other-modules:
-      HConf.Config.Build
-      HConf.Config.Bump
-      HConf.Config.Config
-      HConf.Config.ConfigT
-      HConf.Config.PkgGroup
-      HConf.Config.Tag
-      HConf.Core.Bounds
-      HConf.Core.Dependencies
-      HConf.Core.Env
-      HConf.Core.HkgRef
-      HConf.Core.PkgDir
-      HConf.Core.Version
-      HConf.Format
-      HConf.Hie
-      HConf.Stack.Cabal
-      HConf.Stack.Config
-      HConf.Stack.Lib
-      HConf.Stack.Package
-      HConf.Utils.Chalk
-      HConf.Utils.Class
-      HConf.Utils.Core
-      HConf.Utils.FromConf
-      HConf.Utils.Http
-      HConf.Utils.Log
-      HConf.Utils.Source
-      HConf.Utils.Yaml
       HMM
+      HMM.Config.Build
+      HMM.Config.Bump
+      HMM.Config.Config
+      HMM.Config.ConfigT
+      HMM.Config.PkgGroup
+      HMM.Config.Tag
+      HMM.Core.Bounds
+      HMM.Core.Dependencies
+      HMM.Core.Env
+      HMM.Core.HkgRef
+      HMM.Core.PkgDir
+      HMM.Core.Version
+      HMM.Format
+      HMM.Hie
+      HMM.Stack.Cabal
+      HMM.Stack.Config
+      HMM.Stack.Lib
+      HMM.Stack.Package
+      HMM.Utils.Chalk
+      HMM.Utils.Class
+      HMM.Utils.Core
+      HMM.Utils.FromConf
+      HMM.Utils.Http
+      HMM.Utils.Log
+      HMM.Utils.Source
+      HMM.Utils.Yaml
       Paths_hmm
   hs-source-dirs:
       src

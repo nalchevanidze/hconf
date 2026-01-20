@@ -7,22 +7,22 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Stack.Cabal
+module HMM.Stack.Cabal
   ( Cabal (..),
     CabalSrc (..),
   )
 where
 
 import Data.Text (pack, unpack)
-import HConf.Core.PkgDir (PkgDir, cabalFile)
-import HConf.Core.Version (Version)
-import HConf.Utils.Class
+import HMM.Core.PkgDir (PkgDir, cabalFile)
+import HMM.Core.Version (Version)
+import HMM.Utils.Class
   ( Check (..),
     HConfIO (..),
     Log (..),
     Parse (..),
   )
-import HConf.Utils.Core
+import HMM.Utils.Core
   ( Msg (..),
     PkgName,
     exec,
@@ -30,13 +30,13 @@ import HConf.Utils.Core
     throwError,
     withThrow,
   )
-import HConf.Utils.Log
+import HMM.Utils.Log
   ( alert,
     field,
     task,
     warn,
   )
-import HConf.Utils.Source
+import HMM.Utils.Source
   ( fromByteString,
     ignoreEmpty,
     indentText,

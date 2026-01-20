@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.Source
+module HMM.Utils.Source
   ( parseField,
     parseLines,
     ignoreEmpty,
@@ -45,8 +45,8 @@ import Data.Text
     words,
   )
 import qualified Data.Text as T
-import HConf.Utils.Class (Format (..), Parse (..))
-import HConf.Utils.Core
+import HMM.Utils.Class (Format (..), Parse (..))
+import HMM.Utils.Core
   ( ErrorMsg,
     maybeToError,
     throwError,

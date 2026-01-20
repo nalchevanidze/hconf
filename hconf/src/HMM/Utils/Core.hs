@@ -6,7 +6,7 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.Core
+module HMM.Utils.Core
   ( compareFields,
     maybeList,
     toKebabCase,

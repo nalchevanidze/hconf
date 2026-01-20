@@ -9,7 +9,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.FromConf
+module HMM.Utils.FromConf
   ( ReadFromConf (..),
     ReadConf,
     readList,
@@ -19,9 +19,9 @@ module HConf.Utils.FromConf
   )
 where
 
-import HConf.Core.Env (Env)
-import HConf.Core.PkgDir (PkgDirs)
-import HConf.Utils.Class (HConfIO)
+import HMM.Core.Env (Env)
+import HMM.Core.PkgDir (PkgDirs)
+import HMM.Utils.Class (HConfIO)
 import Relude
 
 readList :: (ReadConf m [a]) => m [a]

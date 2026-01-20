@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Core.PkgDir
+module HMM.Core.PkgDir
   ( PkgDir,
     PkgDirs,
     genPkgDir,
@@ -18,7 +18,7 @@ import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
 import Data.List (stripPrefix)
 import Data.Text (intercalate)
-import HConf.Utils.Core (Msg (..), Name, PkgName, withString)
+import HMM.Utils.Core (Msg (..), Name, PkgName, withString)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix

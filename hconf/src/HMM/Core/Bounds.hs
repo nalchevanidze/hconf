@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Core.Bounds
+module HMM.Core.Bounds
   ( Bounds,
     BoundsByName,
     versionBounds,
@@ -18,21 +18,21 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum, minimum)
-import HConf.Core.HkgRef (fetchVersions)
-import HConf.Core.Version (Version, dropPatch, nextVersion)
-import HConf.Utils.Chalk (Color (Yellow), chalk)
-import HConf.Utils.Class
+import HMM.Core.HkgRef (fetchVersions)
+import HMM.Core.Version (Version, dropPatch, nextVersion)
+import HMM.Utils.Chalk (Color (Yellow), chalk)
+import HMM.Utils.Class
   ( Diff (..),
     Format (..),
     HConfIO,
     Parse (..),
   )
-import HConf.Utils.Core (DependencyName (..), Msg (..), throwError, withString)
-import HConf.Utils.FromConf (ByKey)
-import HConf.Utils.Log (field)
-import HConf.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
+import HMM.Utils.Core (DependencyName (..), Msg (..), throwError, withString)
+import HMM.Utils.FromConf (ByKey)
+import HMM.Utils.Log (field)
+import HMM.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
 import Relude
-import HConf.Config.Bump (Bump(Minor))
+import HMM.Config.Bump (Bump(Minor))
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 

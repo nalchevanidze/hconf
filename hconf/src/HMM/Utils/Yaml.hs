@@ -3,7 +3,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.Yaml
+module HMM.Utils.Yaml
   ( readYaml,
     rewrite,
   )
@@ -17,9 +17,9 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
-import HConf.Utils.Class (HConfIO (..))
-import HConf.Utils.Core (compareFields, withThrow)
-import HConf.Utils.Log (logFileChange)
+import HMM.Utils.Class (HConfIO (..))
+import HMM.Utils.Core (compareFields, withThrow)
+import HMM.Utils.Log (logFileChange)
 import Relude hiding (Show, show)
 import Prelude (Show (..))
 

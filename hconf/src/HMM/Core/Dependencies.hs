@@ -2,7 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Core.Dependencies
+module HMM.Core.Dependencies
   ( Dependencies,
     Dependency,
     getBounds,
@@ -16,10 +16,10 @@ import Data.Aeson
   )
 import Data.Map (fromList, toList)
 import Data.Map.Strict (traverseWithKey)
-import HConf.Core.Bounds (Bounds)
-import HConf.Utils.Class (Format (format), Parse (..))
-import HConf.Utils.Core (DependencyName, select)
-import HConf.Utils.Source (firstWord, formatTable)
+import HMM.Core.Bounds (Bounds)
+import HMM.Utils.Class (Format (format), Parse (..))
+import HMM.Utils.Core (DependencyName, select)
+import HMM.Utils.Source (firstWord, formatTable)
 import Relude hiding
   ( Undefined,
     break,

@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Utils.Log
+module HMM.Utils.Log
   ( task,
     warn,
     alert,
@@ -11,8 +11,8 @@ module HConf.Utils.Log
   )
 where
 
-import HConf.Utils.Chalk (Color (..), chalk)
-import HConf.Utils.Class (Format (..), HConfIO (..))
+import HMM.Utils.Chalk (Color (..), chalk)
+import HMM.Utils.Class (Format (..), HConfIO (..))
 import Relude
 
 li :: (ToString a) => Int -> a -> String

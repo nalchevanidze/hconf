@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HConf.Core.HkgRef
+module HMM.Core.HkgRef
   ( fetchVersions,
     hkgRefs,
     HkgRef,
@@ -14,18 +14,18 @@ where
 
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
-import HConf.Core.Version (Version)
-import HConf.Utils.Class
+import HMM.Core.Version (Version)
+import HMM.Utils.Class
   ( Check (..),
     Format (..),
     HConfIO,
   )
-import HConf.Utils.Core
+import HMM.Utils.Core
   ( DependencyName,
     checkElem,
     getField,
   )
-import HConf.Utils.Http (hackage)
+import HMM.Utils.Http (hackage)
 import Relude hiding
   ( Undefined,
     break,

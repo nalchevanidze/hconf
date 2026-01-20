@@ -1,4 +1,4 @@
-module HConf.Utils.Chalk
+module HMM.Utils.Chalk
   ( Color (..),
     chalk,
   )
