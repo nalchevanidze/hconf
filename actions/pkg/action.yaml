@@ -5,7 +5,7 @@ inputs:
     description: "Stack package name to build (e.g. morpheus-graphql-code-gen)"
     required: true
   executable:
-    description: "Executable base name (e.g. hconf)"
+    description: "Executable base name (e.g. hmm)"
     required: true
   zip_name:
     description: "Zip base name (defaults to executable base name). Produces <zip_name>.zip"
