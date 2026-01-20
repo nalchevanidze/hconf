@@ -35,12 +35,12 @@ HConf solves these problems by providing:
 
 ## Commands
 
-- `hconf setup [version]` - Set up Stack configurations and generate HIE files
-- `hconf next <bump>` - Bump version (major|minor|patch) and update configurations  
-- `hconf update` - Check and fix upper bounds for dependencies
-- `hconf format [--check]` - Format Haskell files using Ormolu
-- `hconf version` - Display current version
-- `hconf about` - Show application information
+- `hconf setup [version]` - Generate Stack configurations and HIE files for multi-GHC builds
+- `hconf version` - Display current project version and configuration details
+- `hconf version <bump>` - Bump project version (major|minor|patch) and update configurations  
+- `hconf update-deps` - Check and update dependency version bounds
+- `hconf format [--check]` - Format Haskell source files using Ormolu
+- `hconf --version` - Display HConf tool version
 
 ## Installation
 
@@ -250,17 +250,23 @@ hconf setup 1.0.0
 ### Version Management
 
 ```bash
+# Show current project version and info
+hconf version
+
 # Bump patch version (1.0.0 -> 1.0.1)
-hconf next patch
+hconf version patch
 
 # Bump minor version (1.0.1 -> 1.1.0)  
-hconf next minor
+hconf version minor
 
 # Bump major version (1.1.0 -> 2.0.0)
-hconf next major
+hconf version major
+
+# Show HConf tool version
+hconf --version
 ```
 
-After running `next`, HConf will:
+After running `version <bump>`, HConf will:
 - Update the version in `hconf.yaml`
 - Update version bounds accordingly
 - Regenerate all stack configuration files
@@ -269,7 +275,7 @@ After running `next`, HConf will:
 
 ```bash
 # Check and update dependency bounds
-hconf update
+hconf update-deps
 
 # Example output:
 # Checking bounds for base...        ✓ OK
@@ -332,7 +338,7 @@ cradle:
 
 ```bash
 # 1. Update dependencies
-hconf update
+hconf update-deps
 
 # 2. Test across all GHC versions
 for f in stack-ghc-*.yaml; do 
@@ -343,8 +349,9 @@ done
 # 3. Format code
 hconf format
 
-# 4. Bump version and create release
-hconf next minor
+# 4. Bump version and regenerate configs
+hconf version minor
+hconf setup
 
 # 5. Build and upload to Hackage
 stack upload .
@@ -463,8 +470,8 @@ ls hconf.yaml
 
 **Q: "Dependency conflicts"**
 ```bash
-# Run update to fix bounds
-hconf update
+# Run update-deps to fix bounds
+hconf update-deps
 
 # Or manually edit hconf.yaml to adjust version constraints
 ```

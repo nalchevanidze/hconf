@@ -29,11 +29,10 @@ import Relude hiding (fix)
 
 data Command
   = Setup {tag :: Maybe Tag}
-  | Next {bump :: Bump}
+  | Version {bump :: Maybe Bump}
   | Update
-  | About
-  | Version
   | Format {check :: Bool}
+  | About
   deriving (Show)
 
 currentVersion :: String
@@ -46,7 +45,9 @@ exec Setup {tag} =
     setupStack (fromMaybe Latest tag)
     genHie
     checkPackages
-exec Next {bump} =
+exec Version {bump = Nothing} =
+  run (Just . version <$> asks config)
+exec Version {bump = Just bump} =
   runTask "next"
     $ (asks config <&> nextRelease bump)
     >>= save
@@ -55,7 +56,6 @@ exec Update =
     $ asks config
     >>= updateConfig
     >>= save
-exec Version = run (Just . version <$> asks config)
 exec Format {check} =
   runTask "format"
     $ format check

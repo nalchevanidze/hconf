@@ -71,10 +71,9 @@ instance CLIType Command where
   cliType =
     commands
       [ ("setup", "generate Stack configurations and HIE files for multi-GHC builds", Setup <$> optional cliType),
-        ("bump", "bump project version (major|minor|patch) and update configurations", Next <$> cliType),
-        ("deps", "check and update dependency version bounds", pure Update),
-        ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes")),
-        ("info", "display current project version and configuration details", pure Version)
+        ("version", "show project info, or bump version with: major|minor|patch", Version <$> optional cliType),
+        ("update-deps", "check and update dependency version bounds", pure Update),
+        ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes"))
       ]
 
 data Options = Options
