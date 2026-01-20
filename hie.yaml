@@ -2,5 +2,5 @@ cradle:
   stack:
     stackYaml: ./stack.yaml
     components:
-    - path: ./hconf/src
+    - path: ./hmm/src
       component: hmm:exe:hmm

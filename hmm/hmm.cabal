@@ -17,8 +17,6 @@ copyright:      (c) 2019 Daviti Nalchevanidze
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
-extra-source-files:
-    README.md
 
 source-repository head
   type: git

@@ -9,8 +9,6 @@ maintainer: d.nalchevanidze@gmail.com
 copyright: (c) 2019 Daviti Nalchevanidze
 license-file: LICENSE
 description: CLI tool to manage Haskell monorepos with multi-GHC support
-extra-source-files:
-- README.md
 dependencies:
 - Glob                  >=  0.7.0    &&  <   1.0.0
 - aeson                 >=  1.4.4    &&  <   3.0.0
