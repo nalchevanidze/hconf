@@ -12,5 +12,5 @@ runs:
     - uses: nalchevanidze/hmm/actions/install@main
       with:
         version: ${{ inputs.version }}
-        repo: nalchevanidze/hconf
+        repo: nalchevanidze/hmm
         app: hconf
