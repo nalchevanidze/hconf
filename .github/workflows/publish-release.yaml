@@ -46,8 +46,8 @@ jobs:
       - name: Package
         uses: nalchevanidze/hconf/actions/pkg@main
         with:
-          package: hconf
-          executable: hconf
-          smoke_test: about
+          package: hmm
+          executable: hmm
+          smoke_test: -v
           upload_url: ${{ needs.publish_release.outputs.upload_url }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
