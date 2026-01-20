@@ -62,7 +62,7 @@ jobs:
         with:
           package: hmm
           executable: hmm
-          smoke_test: hmm -v
+          smoke_test: -v
 
 concurrency:
   group: ${{ github.ref }}
