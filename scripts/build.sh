@@ -58,7 +58,7 @@ fi
 # ----------------------------
 
 PACKAGE=""
-APP_NAME=""        # base name, e.g. "hconf"
+APP_NAME=""        # base name, e.g. "hmm"
 ZIP_NAME=""          # optional override; if empty, defaults to APP_NAME (base)
 STACK_BUILD_ARGS=""
 

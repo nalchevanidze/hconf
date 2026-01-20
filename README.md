@@ -4,7 +4,7 @@ A powerful command-line tool for managing Haskell monorepos with multi-GHC suppo
 
 ## What is HMM?
 
-HMM (Haskell Monorepo Manager) is a specialized CLI tool designed to streamline the development workflow for Haskell monorepos that need to support multiple GHC versions and Stack resolvers. It provides a unified configuration system that allows you to manage multiple packages, dependencies, version bounds, and build configurations across different compiler versions from a single `hconf.yaml` file.
+HMM (Haskell Monorepo Manager) is a specialized CLI tool designed to streamline the development workflow for Haskell monorepos that need to support multiple GHC versions and Stack resolvers. It provides a unified configuration system that allows you to manage multiple packages, dependencies, version bounds, and build configurations across different compiler versions from a single `hmm.yaml` file.
 
 **Perfect for:**
 - **Multi-package Haskell projects** with shared dependencies
@@ -112,7 +112,7 @@ stack install hmm
 
 ## Quick Start
 
-1. **Initialize your project** with a `hconf.yaml` configuration file:
+1. **Initialize your project** with a `hmm.yaml` configuration file:
 
 ```yaml
 version: 0.4.1
@@ -278,7 +278,7 @@ hmm --version
 ```
 
 After running `version <bump>`, HMM will:
-- Update the version in `hconf.yaml`
+- Update the version in `hmm.yaml`
 - Update version bounds accordingly
 - Regenerate all stack configuration files
 
@@ -442,9 +442,9 @@ jobs:
     
     - name: Install HMM
       run: |
-        curl -sSL https://raw.githubusercontent.com/nalchevanidze/hconf/main/scripts/install.sh | bash -s -- \
-          --repo nalchevanidze/hconf \
-          --app hconf \
+        curl -sSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- \
+          --repo nalchevanidze/hmm \
+          --app hmm \
           --version 0.4.1
     
     - name: Cache dependencies
@@ -454,7 +454,7 @@ jobs:
         key: ${{ runner.os }}-stack-${{ hashFiles('**/stack.yaml.lock') }}
     
     - name: Setup project
-      run: hconf setup
+      run: hmm setup
     
     - name: Build and Test
       run: |
@@ -466,11 +466,11 @@ jobs:
 
 ### Common Issues
 
-**Q: "Could not find hconf.yaml"**
+**Q: "Could not find hmm.yaml"**
 ```bash
 # Make sure you're in the project root directory
 pwd
-ls hconf.yaml
+ls hmm.yaml
 ```
 
 **Q: "Resolver not found"**
@@ -482,14 +482,14 @@ ls hconf.yaml
 **Q: "Dependency conflicts"**
 ```bash
 # Run update-deps to fix bounds
-hconf update-deps
+hmm update-deps
 
-# Or manually edit hconf.yaml to adjust version constraints
+# Or manually edit hmm.yaml to adjust version constraints
 ```
 
 ## Configuration
 
-HMM uses a `hconf.yaml` file to define your monorepo configuration. The file supports:
+HMM uses a `hmm.yaml` file to define your monorepo configuration. The file supports:
 
 - **Package Groups**: Organize related packages together in your monorepo
 - **Build Matrices**: Test across multiple GHC versions and resolvers  
@@ -497,4 +497,4 @@ HMM uses a `hconf.yaml` file to define your monorepo configuration. The file sup
 - **Version Control**: Automated semantic versioning across all packages
 - **Custom Configurations**: Per-build extra dependencies and settings
 
-See the complete `hconf.yaml` in this repository for a real-world example.
+See the complete `hmm.yaml` in this repository for a real-world example.
