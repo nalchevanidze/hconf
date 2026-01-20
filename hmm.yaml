@@ -1,9 +1,9 @@
 version: 0.4.1
 bounds: '>= 0.4.0 && < 0.5.0'
 groups:
-- name: hconf
+- name: hmm
   packages:
-  - hconf
+  - hmm
   dir: ./
 builds:
 - ghc: 8.4.4
