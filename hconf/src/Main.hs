@@ -55,27 +55,26 @@ run app =
     (prefs showHelpOnError)
     ( info
         (helper <*> app)
-        (fullDesc <> progDesc "HConf CLI - manage multiple haskell projects")
+        (fullDesc <> progDesc "HConf CLI - manage multi-GHC Haskell project configurations")
     )
 
 class CLIType a where
   cliType :: Parser a
 
 instance CLIType Tag where
-  cliType = argument (str >>= parse) (metavar "version" <> help "version tag")
+  cliType = argument (str >>= parse) (metavar "VERSION" <> help "version tag to use for setup")
 
 instance CLIType Bump where
-  cliType = argument (str >>= parse) (metavar "bump" <> help "bump type (major|minor|patch)")
+  cliType = argument (str >>= parse) (metavar "BUMP" <> help "version bump type: major, minor, or patch")
 
 instance CLIType Command where
   cliType =
     commands
-      [ ("setup", "builds Haskell code from GQL source", Setup <$> optional cliType),
-        ("next", "next release versions", Next <$> cliType),
-        ("update", "check/fix upper bounds for dependencies", pure Update),
-        ("about", "api information", pure About),
-        ("version", "get current version", pure Version),
-        ("format", "format files in projects", Format <$> switch (long "check" <> short 'c'))
+      [ ("setup", "generate Stack configurations and HIE files for multi-GHC builds", Setup <$> optional cliType),
+        ("bump", "bump project version (major|minor|patch) and update configurations", Next <$> cliType),
+        ("deps", "check and update dependency version bounds", pure Update),
+        ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes")),
+        ("info", "display current project version and configuration details", pure Version)
       ]
 
 data Options = Options
@@ -87,12 +86,14 @@ data Options = Options
 instance CLIType Options where
   cliType =
     Options
-      <$> flag 'v' "version" "show Version number"
-      <*> flag 's' "silence" "silent"
+      <$> flag 'v' "version" "show HConf version number"
+      <*> flag 's' "silence" "run silently with minimal output"
 
 main :: IO ()
 main = do
-  (cmd, ops) <- run ((,) <$> cliType <*> cliType)
+  (ops, cmd) <- run ((,) <$> cliType <*> optional cliType)
   if optVersion ops
     then putStrLn currentVersion
-    else exec cmd defaultConfig
+    else case cmd of
+      Just c -> exec c defaultConfig
+      Nothing -> putStrLn "Missing: COMMAND\n\nUse --help for available commands."
