@@ -71,7 +71,7 @@ instance HIO ConfigT where
 
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
-  cfg <- readYaml hconf
+  cfg <- readYaml hmm
   runConfigT (asks config >>= check >> m) env cfg >>= handle
 
 runTask :: String -> ConfigT () -> Env -> IO ()
@@ -86,9 +86,9 @@ handle res = case res of
   (Right (Just msg)) -> putLine (toString msg)
 
 save :: Config -> ConfigT ()
-save cfg = task "save" $ task "hconf.yaml" $ do
+save cfg = task "save" $ task "hmm.yaml" $ do
   ctx <- asks id
-  rewrite (hconf $ env ctx) (const $ pure cfg) $> ()
+  rewrite (hmm $ env ctx) (const $ pure cfg) $> ()
 
 instance ReadFromConf ConfigT PkgDirs where
   readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)

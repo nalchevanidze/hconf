@@ -6,7 +6,7 @@ where
 
 data Env = Env
   { hie :: FilePath,
-    hconf :: FilePath,
+    hmm :: FilePath,
     stack :: FilePath,
     silence :: Bool
   }
@@ -14,7 +14,7 @@ data Env = Env
 defaultConfig :: Env
 defaultConfig =
   Env
-    { hconf = "./hconf.yaml",
+    { hmm = "./hmm.yaml",
       hie = "./hie.yaml",
       stack = "./stack.yaml",
       silence = False
