@@ -30,16 +30,14 @@ import Relude hiding (fix)
 data Command
   = Setup {tag :: Maybe Tag}
   | Version {bump :: Maybe Bump}
-  | Update
+  | UpdateDeps
   | Format {check :: Bool}
-  | About
   deriving (Show)
 
 currentVersion :: String
 currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
-exec About = const $ putStrLn $ "Stack Config CLI, version " <> currentVersion
 exec Setup {tag} =
   runTask "setup" $ do
     setupStack (fromMaybe Latest tag)
@@ -48,11 +46,11 @@ exec Setup {tag} =
 exec Version {bump = Nothing} =
   run (Just . version <$> asks config)
 exec Version {bump = Just bump} =
-  runTask "next"
+  runTask "version"
     $ (asks config <&> nextRelease bump)
     >>= save
-exec Update =
-  runTask "update"
+exec UpdateDeps =
+  runTask "update-deps"
     $ asks config
     >>= updateConfig
     >>= save
