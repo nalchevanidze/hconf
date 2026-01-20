@@ -79,7 +79,9 @@ runTask name m = run (task name m $> Just (chalk Green "\nOk"))
 
 handle :: (ToString a) => (HConfIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
-  Left x -> alert ("ERROR: " <> x)
+  Left x -> do
+    alert ("ERROR: " <> x)
+    liftIO exitFailure
   (Right Nothing) -> pure ()
   (Right (Just msg)) -> putLine (toString msg)
 

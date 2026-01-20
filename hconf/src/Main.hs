@@ -95,4 +95,6 @@ main = do
     then putStrLn currentVersion
     else case cmd of
       Just c -> exec c defaultConfig
-      Nothing -> putStrLn "Missing: COMMAND\n\nUse --help for available commands."
+      Nothing -> do
+        putStrLn "Missing: COMMAND\n\nUse --help for available commands."
+        exitFailure
