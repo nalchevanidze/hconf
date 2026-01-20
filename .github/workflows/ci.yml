@@ -17,7 +17,7 @@ jobs:
     name: GHC ${{ matrix.ghc }}
     steps:
       - uses: actions/checkout@v4
-      - uses: nalchevanidze/hconf/actions/ghc@main
+      - uses: nalchevanidze/hmm/actions/ghc@main
         with:
           ghc: ${{ matrix.ghc }}
       - run: hconf setup ${{ matrix.ghc }}
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nalchevanidze/hconf/actions/cli@main
+      - uses: nalchevanidze/hmm/actions/cli@main
       - name: format
         run: hconf format --check
 
@@ -55,10 +55,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: nalchevanidze/hconf/actions/ghc@main
+      - uses: nalchevanidze/hmm/actions/ghc@main
 
       - name: Binary
-        uses: nalchevanidze/hconf/actions/pkg@main
+        uses: nalchevanidze/hmm/actions/pkg@main
         with:
           package: hmm
           executable: hmm

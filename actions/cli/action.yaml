@@ -9,7 +9,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: nalchevanidze/hconf/actions/install@main
+    - uses: nalchevanidze/hmm/actions/install@main
       with:
         version: ${{ inputs.version }}
         repo: nalchevanidze/hconf
