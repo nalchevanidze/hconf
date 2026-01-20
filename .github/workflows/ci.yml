@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nalchevanidze/hconf/actions/hconf@main
+      - uses: nalchevanidze/hconf/actions/cli@main
       - name: format
         run: hconf format --check
 
