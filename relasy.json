@@ -6,7 +6,7 @@
     "type": "custom",
     "pkg": "https://hackage.haskell.org/package/{{PKG}}",
     "version": "hconf version",
-    "bump": "hconf next -b",
+    "bump": "hconf next {{BUMP}}",
     "postBump": "hconf setup 9.6.3"
   }
 }
