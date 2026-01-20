@@ -21,6 +21,7 @@ words:
   - fmap
   - hackage
   - hconf
+  - hmm
   - mconcat
   - mempty
   - metavar
