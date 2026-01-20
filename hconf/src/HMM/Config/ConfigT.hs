@@ -27,7 +27,7 @@ import HMM.Core.Version (Version)
 import HMM.Utils.Chalk (Color (Green), chalk)
 import HMM.Utils.Class
   ( Check (..),
-    HConfIO (..),
+    HIO (..),
   )
 import HMM.Utils.Core (DependencyName (..), printException)
 import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..))
@@ -60,7 +60,7 @@ runConfigT (ConfigT (ReaderT f)) env config = tryJust (Just . printException) (f
 indent :: Int -> String -> String
 indent i = (replicate (i * 2) ' ' <>)
 
-instance HConfIO ConfigT where
+instance HIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
   remove = liftIO . remove
@@ -77,7 +77,7 @@ run m env@Env {..} = do
 runTask :: String -> ConfigT () -> Env -> IO ()
 runTask name m = run (task name m $> Just (chalk Green "\nOk"))
 
-handle :: (ToString a) => (HConfIO m) => Either String (Maybe a) -> m ()
+handle :: (ToString a) => (HIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
   Left x -> do
     alert ("ERROR: " <> x)

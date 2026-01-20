@@ -5,7 +5,7 @@
 module HMM.Format (format) where
 
 import HMM.Core.PkgDir (explore)
-import HMM.Utils.Class (HConfIO)
+import HMM.Utils.Class (HIO)
 import HMM.Utils.Core (isSuccess, throwError)
 import HMM.Utils.FromConf (ReadConf, readList)
 import HMM.Utils.Log (task)
@@ -27,7 +27,7 @@ format check = task "ormolu" $ do
   success <- all isSuccess <$> mapM (formatFile check) files
   unless success (throwError "Error")
 
-formatFile :: (HConfIO m) => Bool -> FilePath -> m ExitCode
+formatFile :: (HIO m) => Bool -> FilePath -> m ExitCode
 formatFile check path = liftIO $ withPrettyOrmoluExceptions Always $ do
   original <- readFileText path
   formatted <- formatter path original

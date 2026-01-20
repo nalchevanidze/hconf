@@ -18,7 +18,7 @@ import HMM.Core.Version (Version)
 import HMM.Utils.Class
   ( Check (..),
     Format (..),
-    HConfIO,
+    HIO,
   )
 import HMM.Utils.Core
   ( DependencyName,
@@ -48,10 +48,10 @@ data HkgRef = HkgRef
   }
   deriving (Eq, Ord)
 
-fetchVersions :: (HConfIO m) => DependencyName -> m Versions
+fetchVersions :: (HIO m) => DependencyName -> m Versions
 fetchVersions name = hackage ["package", format name, "preferred"] >>= getField "normal-version"
 
-instance (HConfIO m) => Check m HkgRef where
+instance (HIO m) => Check m HkgRef where
   check HkgRef {..} = fetchVersions name >>= checkElem "version" (format name) version . toList
 
 hkgRefs :: VersionMap -> [HkgRef]

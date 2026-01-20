@@ -24,7 +24,7 @@ import HMM.Utils.Chalk (Color (Yellow), chalk)
 import HMM.Utils.Class
   ( Diff (..),
     Format (..),
-    HConfIO,
+    HIO,
     Parse (..),
   )
 import HMM.Utils.Core (DependencyName (..), Msg (..), throwError, withString)
@@ -111,10 +111,10 @@ instance Diff Bounds where
 getBound :: Restriction -> Bounds -> [Bound]
 getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 
-getLatest :: (HConfIO m) => DependencyName -> m Bound
+getLatest :: (HIO m) => DependencyName -> m Bound
 getLatest = fmap (Bound Max True . head) . fetchVersions
 
-updateDepBounds :: (HConfIO m) => DependencyName -> Bounds -> m Bounds
+updateDepBounds :: (HIO m) => DependencyName -> Bounds -> m Bounds
 updateDepBounds name bounds = do
   latest <- getLatest name
   let upper = getBound Max bounds
@@ -123,7 +123,7 @@ updateDepBounds name bounds = do
   _min <- initiateMin name bounds
   pure (Bounds (_min <> [newVersion]))
 
-initiateMin :: (HConfIO f) => DependencyName -> Bounds -> f [Bound]
+initiateMin :: (HIO f) => DependencyName -> Bounds -> f [Bound]
 initiateMin name bounds = do
   let mi = getBound Min bounds
   if null mi

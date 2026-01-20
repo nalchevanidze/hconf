@@ -17,7 +17,7 @@ import Data.Aeson
   )
 import Data.Yaml (decodeThrow)
 import Data.Yaml.Pretty (defConfig, encodePretty, setConfCompare, setConfDropNull)
-import HMM.Utils.Class (HConfIO (..))
+import HMM.Utils.Class (HIO (..))
 import HMM.Utils.Core (compareFields, withThrow)
 import HMM.Utils.Log (logFileChange)
 import Relude hiding (Show, show)
@@ -52,10 +52,10 @@ mapYaml :: (Functor m) => (Maybe t -> m t) -> Maybe (Yaml t) -> m (Yaml t)
 mapYaml f (Just (Yaml v props)) = (`Yaml` props) <$> f (Just v)
 mapYaml f Nothing = (`Yaml` mempty) <$> f Nothing
 
-fromEither :: (HConfIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
+fromEither :: (HIO m, FromJSON b) => Either a ByteString -> m (Maybe b)
 fromEither = either (const $ pure Nothing) (fmap Just . liftIO . decodeThrow)
 
-rewrite :: (HConfIO m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
+rewrite :: (HIO m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m t
 rewrite pkg f = do
   original <- read pkg
   yaml <- fromEither original >>= mapYaml f
@@ -64,5 +64,5 @@ rewrite pkg f = do
   withThrow (write pkg newFile)
   pure (getData yaml)
 
-readYaml :: (FromJSON a, HConfIO m) => FilePath -> m a
+readYaml :: (FromJSON a, HIO m) => FilePath -> m a
 readYaml = withThrow . read >=> (liftIO . decodeThrow)

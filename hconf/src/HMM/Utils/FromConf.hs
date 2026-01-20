@@ -21,7 +21,7 @@ where
 
 import HMM.Core.Env (Env)
 import HMM.Core.PkgDir (PkgDirs)
-import HMM.Utils.Class (HConfIO)
+import HMM.Utils.Class (HIO)
 import Relude
 
 readList :: (ReadConf m [a]) => m [a]
@@ -56,5 +56,5 @@ type family Key a :: Type where
   Key (ByKey k a) = k
   Key a = ()
 
-class (HConfIO m) => ReadFromConf m a where
+class (HIO m) => ReadFromConf m a where
   readFromConf :: Key a -> m a

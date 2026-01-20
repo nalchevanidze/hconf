@@ -27,7 +27,7 @@ import HMM.Config.PkgGroup (PkgGroup, isMember)
 import HMM.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HMM.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HMM.Core.Version (Version, nextVersion)
-import HMM.Utils.Class (Check (check), HConfIO, format)
+import HMM.Utils.Class (Check (check), HIO, format)
 import HMM.Utils.Core (DependencyName)
 import HMM.Utils.FromConf (ReadConf)
 import Relude
@@ -63,7 +63,7 @@ nextRelease bump Config {..} =
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
-updateConfig :: (HConfIO m) => Config -> m Config
+updateConfig :: (HIO m) => Config -> m Config
 updateConfig Config {..} = do
   dependencies' <- traverseDeps updateDepBounds dependencies
   pure Config {dependencies = dependencies', ..}

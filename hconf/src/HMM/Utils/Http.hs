@@ -8,7 +8,7 @@ module HMM.Utils.Http
 where
 
 import Data.Aeson (FromJSON, eitherDecode)
-import HMM.Utils.Class (HConfIO)
+import HMM.Utils.Class (HIO)
 import HMM.Utils.Core
   ( Msg (..),
     maybeToError,
@@ -38,8 +38,8 @@ getReq (u, o) = req GET u NoReqBody lbsResponse o
 parse :: (MonadFail m) => Text -> m (Req LbsResponse)
 parse url = either getReq getReq <$> maybeToError ("Invalid Endpoint: " <> url <> "!") (mkURI url >>= useURI)
 
-http :: (FromJSON a, HConfIO m) => Text -> m a
+http :: (FromJSON a, HIO m) => Text -> m a
 http uri = parse uri >>= fmap (first msg . eitherDecode . responseBody) . runReq defaultHttpConfig >>= either throwError pure
 
-hackage :: (HConfIO m, FromJSON a) => [Text] -> m a
+hackage :: (HIO m, FromJSON a) => [Text] -> m a
 hackage path = http (genUrl "https://hackage.haskell.org" path <> ".json")

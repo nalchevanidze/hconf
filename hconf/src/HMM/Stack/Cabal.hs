@@ -18,7 +18,7 @@ import HMM.Core.PkgDir (PkgDir, cabalFile)
 import HMM.Core.Version (Version)
 import HMM.Utils.Class
   ( Check (..),
-    HConfIO (..),
+    HIO (..),
     Log (..),
     Parse (..),
   )
@@ -67,10 +67,10 @@ instance Parse Cabal where
 
 data Warning = Warning Text [Text]
 
-getCabal :: (HConfIO m) => FilePath -> m Cabal
+getCabal :: (HIO m) => FilePath -> m Cabal
 getCabal path = withThrow (read path) >>= parse . fromByteString
 
-stack :: (HConfIO m) => String -> PkgDir -> [String] -> m ()
+stack :: (HIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
   (out, success) <- exec "stack" (cmd : (toString pkg : map ("--" <>) options))
   ( if success
@@ -81,7 +81,7 @@ stack cmd pkg options = do
 instance Log Warning where
   log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
 
-printWarnings :: (HConfIO m) => String -> [Warning] -> m ()
+printWarnings :: (HIO m) => String -> [Warning] -> m ()
 printWarnings cmd [] = field cmd "ok"
 printWarnings cmd xs = task cmd $ traverse_ log xs
 
@@ -108,7 +108,7 @@ data CabalSrc = CabalSrc
 instance Log Cabal where
   log Cabal {..} = field name (show version)
 
-instance (HConfIO m) => Check m CabalSrc where
+instance (HIO m) => Check m CabalSrc where
   check CabalSrc {..} = task "cabal" $ do
     let path = cabalFile (name target) pkgDir
     remove path

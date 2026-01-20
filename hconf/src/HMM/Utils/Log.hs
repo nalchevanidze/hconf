@@ -12,7 +12,7 @@ module HMM.Utils.Log
 where
 
 import HMM.Utils.Chalk (Color (..), chalk)
-import HMM.Utils.Class (Format (..), HConfIO (..))
+import HMM.Utils.Class (Format (..), HIO (..))
 import Relude
 
 li :: (ToString a) => Int -> a -> String
@@ -25,25 +25,25 @@ color 1 = Magenta
 color 2 = Cyan
 color _ = Gray
 
-task :: (HConfIO m) => String -> m a -> m a
+task :: (HIO m) => String -> m a -> m a
 task name = inside (\i -> chalk (color i) (li i name))
 
-field :: (Format a, HConfIO m) => a -> String -> m ()
+field :: (Format a, HIO m) => a -> String -> m ()
 field name = fieldInternal (toString (format name) <> ": ")
 
-fieldInternal :: (HConfIO m) => String -> String -> m ()
+fieldInternal :: (HIO m) => String -> String -> m ()
 fieldInternal name = putLine . ((name <> ": ") <>)
 
-logFileChange :: (HConfIO m) => String -> Bool -> m ()
+logFileChange :: (HIO m) => String -> Bool -> m ()
 logFileChange path noChange
   | noChange = fieldInternal "checked" $ chalk Gray path
   | otherwise = fieldInternal "updated" $ chalk Yellow path
 
-info :: (HConfIO m) => String -> m ()
+info :: (HIO m) => String -> m ()
 info = putLine . chalk Green
 
-warn :: (HConfIO m) => String -> m ()
+warn :: (HIO m) => String -> m ()
 warn = putLine . chalk Yellow
 
-alert :: (HConfIO m) => String -> m ()
+alert :: (HIO m) => String -> m ()
 alert = putLine . chalk Red

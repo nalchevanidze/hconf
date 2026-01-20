@@ -12,7 +12,7 @@
 module HMM.Utils.Class
   ( Parse (..),
     Check (..),
-    HConfIO (..),
+    HIO (..),
     Log (..),
     Format (..),
     Diff (..),
@@ -29,7 +29,7 @@ import System.Directory (removeFile)
 import System.IO.Error (isDoesNotExistError)
 
 class Log a where
-  log :: (HConfIO m) => a -> m ()
+  log :: (HIO m) => a -> m ()
 
 instance (Log a) => Log [a] where
   log = traverse_ log
@@ -52,14 +52,14 @@ instance Parse PkgName where
 class Check m a where
   check :: a -> m ()
 
-class (MonadIO m, MonadFail m) => HConfIO m where
+class (MonadIO m, MonadFail m) => HIO m where
   read :: FilePath -> m (Result ByteString)
   write :: FilePath -> ByteString -> m (Result ())
   remove :: FilePath -> m ()
   putLine :: String -> m ()
   inside :: (Int -> String) -> m a -> m a
 
-instance HConfIO IO where
+instance HIO IO where
   read = safeIO . readFile
   write f = safeIO . writeFile f
   remove file = removeFile file `catch` (\e -> unless (isDoesNotExistError e) (throwIO e))
