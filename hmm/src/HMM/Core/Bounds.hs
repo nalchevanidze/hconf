@@ -18,6 +18,7 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum, minimum)
+import HMM.Config.Bump (Bump (Minor))
 import HMM.Core.HkgRef (fetchVersions)
 import HMM.Core.Version (Version, dropPatch, nextVersion)
 import HMM.Utils.Chalk (Color (Yellow), chalk)
@@ -32,7 +33,6 @@ import HMM.Utils.FromConf (ByKey)
 import HMM.Utils.Log (field)
 import HMM.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
 import Relude
-import HMM.Config.Bump (Bump(Minor))
 
 data Restriction = Min | Max deriving (Show, Eq, Ord)
 

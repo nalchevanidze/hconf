@@ -8,13 +8,13 @@ module Main
 where
 
 import HMM
-  ( Command (..),
+  ( Bump,
+    Command (..),
     Parse (parse),
     Tag,
     currentVersion,
     defaultConfig,
     exec,
-    Bump
   )
 import Options.Applicative
   ( Parser,
