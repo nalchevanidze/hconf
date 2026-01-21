@@ -61,17 +61,10 @@ Use the provided install script to download the latest binary release:
 
 ```bash
 # Install latest version
-curl -sSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- \
-  --repo nalchevanidze/hmm \
-  --app hmm \
-  --version 0.4.1
+curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s --
 
-# Or install specific version
-curl -sSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- \
-  --repo nalchevanidze/hmm \
-  --app hmm \
-  --version v0.4.0 \
-  --bin-dir ~/.local/bin
+# Install specific version
+curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- v0.5.0
 ```
 
 The installer automatically detects your platform (Linux, macOS, Windows) and architecture (x64, arm64).

@@ -54,11 +54,10 @@ runs:
           sudo apt-get install -y p7zip-full
         fi
 
-
     - name: Build & package
       id: build
       shell: bash
-      run: bash ./scripts/build.sh --package "${{ inputs.package }}" --app "${{ inputs.executable }}"
+      run: bash "${{ github.action_path }}/scripts/build.sh" --package "${{ inputs.package }}" --app "${{ inputs.executable }}"
 
     - name: Smoke test (optional)
       if: "${{ inputs.smoke_test != '' }}"
