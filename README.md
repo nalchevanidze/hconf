@@ -88,7 +88,7 @@ For CI/CD, use the pre-built GitHub Actions:
 
 ```yaml
 - name: Install HMM
-  uses: nalchevanidze/hmm/actions/hmm@main
+  uses: nalchevanidze/hmm/actions/cli@main
   with:
     version: 0.4.1  # Optional, defaults to 0.4.0
 ```
