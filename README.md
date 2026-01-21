@@ -60,10 +60,12 @@ HMM solves these problems by providing:
 Use the provided install script to download the latest binary release:
 
 ```bash
-# Install latest version
-curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s --
+curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash
+```
 
-# Install specific version
+Install specific version:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash -s -- v0.5.0
 ```
 
