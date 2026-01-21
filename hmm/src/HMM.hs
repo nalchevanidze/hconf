@@ -38,6 +38,9 @@ data Command
 currentVersion :: String
 currentVersion = showVersion CLI.version
 
+
+
+
 exec :: Command -> Env -> IO ()
 exec Setup {tag} =
   runTask "setup" $ do

@@ -17,6 +17,7 @@ module HMM.Config.Build
     getResolver,
     getAllowNewer,
     resolveVersion,
+    allDeps
   )
 where
 
@@ -34,7 +35,8 @@ import HMM.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
 import HMM.Core.PkgDir (PkgDirs)
 import HMM.Utils.Class (Check (..))
 import HMM.Utils.Core
-  ( ResolverName,
+  ( DependencyName,
+    ResolverName,
     aesonYAMLOptions,
     maybeList,
     maybeMapToList,
@@ -72,6 +74,9 @@ instance (ReadConf m ()) => Check m Build where
         checkPkgNames include,
         checkPkgNames exclude
       ]
+
+allDeps :: Build -> [DependencyName]
+allDeps = M.keys . maybe M.empty id . extra
 
 checkPkgNames :: (ReadConf m ()) => Maybe PkgDirs -> m ()
 checkPkgNames ls = do

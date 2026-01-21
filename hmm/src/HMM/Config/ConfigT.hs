@@ -4,6 +4,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -13,15 +14,19 @@ module HMM.Config.ConfigT
     save,
     run,
     runTask,
+    VersionMap,
   )
 where
 
 import Control.Exception (tryJust)
-import HMM.Config.Build (Builds)
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import HMM.Config.Build (Builds, allDeps)
 import HMM.Config.Config (Config (..), getRule)
 import HMM.Config.PkgGroup (pkgDirs)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
+import HMM.Core.HkgRef (VersionMap, VersionsMap, fetchVersions)
 import HMM.Core.PkgDir (PkgDirs)
 import HMM.Core.Version (Version)
 import HMM.Utils.Chalk (Color (Green), chalk)
@@ -41,7 +46,8 @@ import Relude
 data HCEnv = HCEnv
   { config :: Config,
     env :: Env,
-    indention :: Int
+    indention :: Int,
+    deps :: VersionsMap
   }
 
 newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
@@ -54,8 +60,8 @@ newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
       MonadFail
     )
 
-runConfigT :: ConfigT a -> Env -> Config -> IO (Either String a)
-runConfigT (ConfigT (ReaderT f)) env config = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
+runConfigT :: ConfigT a -> Env -> Config -> VersionsMap -> IO (Either String a)
+runConfigT (ConfigT (ReaderT f)) env config deps = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
 indent :: Int -> String -> String
 indent i = (replicate (i * 2) ' ' <>)
@@ -72,7 +78,10 @@ instance HIO ConfigT where
 run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
 run m env@Env {..} = do
   cfg <- readYaml hmm
-  runConfigT (asks config >>= check >> m) env cfg >>= handle
+  let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
+  ps <- traverse (\key -> (key,) <$> fetchVersions key) extras
+  let cfgDeps = Map.fromList ps
+  runConfigT (asks config >>= check >> m) env cfg cfgDeps >>= handle
 
 runTask :: String -> ConfigT () -> Env -> IO ()
 runTask name m = run (task name m $> Just (chalk Green "\nOk"))

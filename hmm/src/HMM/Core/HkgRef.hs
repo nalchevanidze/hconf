@@ -9,6 +9,7 @@ module HMM.Core.HkgRef
     hkgRefs,
     HkgRef,
     VersionMap,
+    VersionsMap,
   )
 where
 
@@ -18,7 +19,7 @@ import HMM.Core.Version (Version)
 import HMM.Utils.Class
   ( Check (..),
     Format (..),
-    HIO,
+    HIO (..),
   )
 import HMM.Utils.Core
   ( DependencyName,
@@ -26,6 +27,7 @@ import HMM.Utils.Core
     getField,
   )
 import HMM.Utils.Http (hackage)
+import Relude (show)
 import Relude hiding
   ( Undefined,
     break,
@@ -40,6 +42,8 @@ import Relude hiding
 
 type Versions = NonEmpty Version
 
+type VersionsMap = M.Map DependencyName Versions
+
 type VersionMap = Map DependencyName Version
 
 data HkgRef = HkgRef
@@ -49,7 +53,9 @@ data HkgRef = HkgRef
   deriving (Eq, Ord)
 
 fetchVersions :: (HIO m) => DependencyName -> m Versions
-fetchVersions name = hackage ["package", format name, "preferred"] >>= getField "normal-version"
+fetchVersions name = do
+  putLine ("Fetching Versions: " <> show name)
+  hackage ["package", format name, "preferred"] >>= getField "normal-version"
 
 instance (HIO m) => Check m HkgRef where
   check HkgRef {..} = fetchVersions name >>= checkElem "version" (format name) version . toList

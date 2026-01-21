@@ -22,7 +22,8 @@ import Data.Aeson
     genericToJSON,
   )
 import Data.Aeson.Types (defaultOptions)
-import HMM.Config.Build (Builds)
+import qualified Data.Set as Set
+import HMM.Config.Build (Builds, allDeps)
 import HMM.Config.Bump (Bump)
 import HMM.Config.PkgGroup (PkgGroup, isMember)
 import HMM.Core.Bounds (Bounds, updateDepBounds, versionBounds)
@@ -32,6 +33,7 @@ import HMM.Utils.Class (Check (check), HIO, format)
 import HMM.Utils.Core (DependencyName)
 import HMM.Utils.FromConf (ReadConf)
 import Relude
+import HMM.Core.HkgRef (fetchVersions)
 
 data Config = Config
   { version :: Version,
