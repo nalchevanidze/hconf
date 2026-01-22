@@ -21,9 +21,9 @@ import HMM.Config.ConfigT (HCEnv (..), run, runTask, save)
 import HMM.Config.Tag (Tag (Latest))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
-import HMM.Hie (genHie)
+import HMM.Hie (syncHie)
 import HMM.Stack.Config (setupStack)
-import HMM.Stack.Package (checkPackages)
+import HMM.Stack.Package (syncPackages)
 import HMM.Utils.Class (Parse (..))
 import qualified Paths_hmm as CLI
 import Relude hiding (fix)
@@ -41,7 +41,7 @@ currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
 exec Use {tag} = runTask "use" $ setupStack (fromMaybe Latest tag)
-exec Sync = runTask "sync" $ genHie *> checkPackages
+exec Sync = runTask "sync" $ syncHie *> syncPackages
 exec Version {bump = Nothing} = run (Just . version <$> asks config)
 exec Version {bump = Just bump} =
   runTask "version"

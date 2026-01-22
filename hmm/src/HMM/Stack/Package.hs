@@ -9,7 +9,7 @@
 
 module HMM.Stack.Package
   ( Package (..),
-    checkPackages,
+    syncPackages,
     resolvePackages,
   )
 where
@@ -83,5 +83,5 @@ checkPackage pkgDir =
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-checkPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
-checkPackages = task "packages" $ readList >>= traverse_ checkPackage
+syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
+syncPackages = task "packages" $ readList >>= traverse_ checkPackage
