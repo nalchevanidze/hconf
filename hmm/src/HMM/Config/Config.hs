@@ -10,7 +10,7 @@
 module HMM.Config.Config
   ( Config (..),
     getRule,
-    nextRelease,
+    bumpVersion,
     updateConfig,
   )
 where
@@ -22,8 +22,7 @@ import Data.Aeson
     genericToJSON,
   )
 import Data.Aeson.Types (defaultOptions)
-import qualified Data.Set as Set
-import HMM.Config.Build (Builds, allDeps)
+import HMM.Config.Build (Builds)
 import HMM.Config.Bump (Bump)
 import HMM.Config.PkgGroup (PkgGroup, isMember)
 import HMM.Core.Bounds (Bounds, updateDepBounds, versionBounds)
@@ -33,7 +32,6 @@ import HMM.Utils.Class (Check (check), HIO, format)
 import HMM.Utils.Core (DependencyName)
 import HMM.Utils.FromConf (ReadConf)
 import Relude
-import HMM.Core.HkgRef (fetchVersions)
 
 data Config = Config
   { version :: Version,
@@ -59,8 +57,8 @@ instance ToJSON Config where
 instance (ReadConf m ()) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
-nextRelease :: Bump -> Config -> Config
-nextRelease bump Config {..} =
+bumpVersion :: Bump -> Config -> Config
+bumpVersion bump Config {..} =
   let version' = nextVersion bump version
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
