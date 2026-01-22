@@ -40,18 +40,19 @@ currentVersion :: String
 currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
-exec Use {tag} = runTask "use" $ setupStack (fromMaybe Latest tag)
-exec Sync = runTask "sync" $ syncHie *> syncPackages
-exec Version {bump = Nothing} = run (Just . version <$> asks config)
+exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
+exec Sync = runTask False "sync" $ syncHie *> syncPackages
 exec Version {bump = Just bump} =
-  runTask "version"
+  runTask False "version"
     $ (asks config <&> bumpVersion bump)
     >>= save
 exec UpdateDeps =
-  runTask "update-deps"
+  runTask False "update deps"
     $ asks config
     >>= updateConfig
     >>= save
+-- commands that does not need validation and we can run in fast mode
+exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} =
-  runTask "format"
+  runTask True "format"
     $ format check

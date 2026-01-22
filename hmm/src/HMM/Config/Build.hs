@@ -17,7 +17,7 @@ module HMM.Config.Build
     getResolver,
     getAllowNewer,
     resolveVersion,
-    allDeps
+    allDeps,
   )
 where
 

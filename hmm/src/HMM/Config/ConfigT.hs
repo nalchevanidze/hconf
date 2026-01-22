@@ -75,16 +75,24 @@ instance HIO ConfigT where
     asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
 
-run :: (ToString a) => ConfigT (Maybe a) -> Env -> IO ()
-run m env@Env {..} = do
+run :: (ToString a) => Bool -> ConfigT (Maybe a) -> Env -> IO ()
+run fast m env@Env {..} = do
   cfg <- readYaml hmm
-  let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
-  ps <- traverse (\key -> (key,) <$> fetchVersions key) extras
-  let cfgDeps = Map.fromList ps
-  runConfigT (asks config >>= check >> m) env cfg cfgDeps >>= handle
+  deps <- collectDeps cfg
+  runConfigT m' env cfg deps >>= handle
+  where
+    collectDeps cfg
+      | fast = pure Map.empty
+      | otherwise = do
+          let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
+          ps <- traverse (\key -> (key,) <$> fetchVersions key) extras
+          pure (Map.fromList ps)
+    m'
+      | fast = m
+      | otherwise = asks config >>= check >> m
 
-runTask :: String -> ConfigT () -> Env -> IO ()
-runTask name m = run (task name m $> Just (chalk Green "\nOk"))
+runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
+runTask fast name m = run fast (task name m $> Just (chalk Green "\nOk"))
 
 handle :: (ToString a) => (HIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
