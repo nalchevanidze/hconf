@@ -37,10 +37,10 @@ HMM helps you manage a monorepo with multiple internal packages and a compiler m
 - `hmm use <ghc>`  
   Select a build from `hmm.yaml` and generate the active build config:
   - rewrites `stack.yaml` for that GHC/resolver
-  - generates/updates `hie.yaml`
 
 - `hmm sync`  
   Sync package metadata to match `hmm.yaml`:
+  - generates/updates `hie.yaml`
   - regenerates `**/**/package.yaml`
   - validates `**/**/<name>.cabal` against version/bounds policy
 
@@ -68,6 +68,7 @@ HMM helps you manage a monorepo with multiple internal packages and a compiler m
 ```bash
 curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash
 ```
+
 ````
 
 Install a specific version:
@@ -417,3 +418,4 @@ jobs:
       - name: Check formatting
         run: hmm format --check
 ```
+````
