@@ -27,6 +27,7 @@ HMM helps you manage a monorepo with multiple internal packages and a compiler m
 - **Generation + validation:**
   - regenerates `**/**/package.yaml`
   - validates `**/**/<name>.cabal` against bounds/version rules
+  - validates `builds[].extra` versions exist on Hackage (no typos / non-existent releases)
 - **HLS support:** generate/update `hie.yaml`
 - **Formatting:** Ormolu format/check across the repo
 
@@ -43,6 +44,7 @@ HMM helps you manage a monorepo with multiple internal packages and a compiler m
   - generates/updates `hie.yaml`
   - regenerates `**/**/package.yaml`
   - validates `**/**/<name>.cabal` against version/bounds policy
+  - validates `builds[].extra` dependency versions exist on Hackage
 
 - `hmm version`  
   Show current version/config.
@@ -68,8 +70,6 @@ HMM helps you manage a monorepo with multiple internal packages and a compiler m
 ```bash
 curl -fsSL https://raw.githubusercontent.com/nalchevanidze/hmm/main/scripts/install.sh | bash
 ```
-
-````
 
 Install a specific version:
 
@@ -145,8 +145,8 @@ dependencies: # Global dependency bounds applied across packages
 ### 2) Select a build and sync packages
 
 ```bash
-hmm use 9.4.5   # writes stack.yaml + hie.yaml
-hmm sync        # regenerates package.yaml, validates cabal files
+hmm use 9.4.5   # writes stack.yaml for the selected build
+hmm sync        # generates hie.yaml, regenerates **/**/package.yaml, validates cabal files, validates build extras
 ```
 
 ### 3) Build/test with Stack normally
@@ -161,8 +161,8 @@ stack test
 
 ## How `use` and `sync` fit together
 
-- `hmm use <ghc>` is **build selection** (writes `stack.yaml`, updates `hie.yaml`).
-- `hmm sync` is **repo/package synchronization** (regenerates `package.yaml`, validates `.cabal`).
+- `hmm use <ghc>` is **build selection** (writes `stack.yaml`).
+- `hmm sync` is **repo/package synchronization** (regenerates `package.yaml`, validates `.cabal`, generates `hie.yaml`).
 
 “Classic setup” is simply:
 
@@ -184,10 +184,14 @@ hmm use 9.2.7 && stack test
 
 ## Dependency Management (`update-deps`)
 
-`hmm update-deps` reads your `dependencies:` section in `hmm.yaml`, checks Hackage for newer versions, and if updates are available it:
+`hmm update-deps` reads the `dependencies:` section in `hmm.yaml`, queries Hackage, and updates bounds when newer releases exist.
 
-1. updates dependency bounds in `hmm.yaml`
-2. runs a package sync so packages pick up the new bounds (equivalent to `hmm sync`)
+What it does (high level):
+
+1. **Parse and validate bounds** in `dependencies:` (your `>= … && < …` / `<= …` style constraints).
+2. **Check Hackage** for newer released versions of each dependency.
+3. **Update `hmm.yaml`** dependency bounds where appropriate (HMM adjusts version numbers while keeping the intent/shape of your constraints).
+4. **Sync packages automatically** after updating (equivalent to running `hmm sync`) so `**/**/package.yaml` picks up the new bounds and cabal files are re-validated.
 
 Example `dependencies:` format (dense bounds style):
 
@@ -215,6 +219,28 @@ Run it:
 
 ```bash
 hmm update-deps
+```
+
+---
+
+## Build extras validation (`builds[].extra`)
+
+If you specify per-build `extra` dependencies, HMM validates that the pinned versions exist on Hackage (avoids typos / non-existent versions):
+
+```yaml
+builds:
+  - ghc: 8.4.4
+    resolver: lts-12.26
+    extra:
+      aeson: 1.4.4.0
+      base-orphans: 0.8.1
+      fastsum: 0.1.0.0
+      megaparsec: 7.0.5
+      modern-uri: 0.3.0.0
+      relude: 0.3.0
+      retry: 0.8.1.0
+      time-compat: 1.9.2.2
+      websockets: 0.12.6.0
 ```
 
 ---
@@ -335,12 +361,13 @@ dependencies:
 ## Generated / Updated Files
 
 - `stack.yaml` — written by `hmm use <ghc>` (**overwritten each run**)
-- `hie.yaml` — written by `hmm use <ghc>` (**overwritten as needed**)
+- `hie.yaml` — written by `hmm sync` (**overwritten as needed**)
 - `**/**/package.yaml` — written by `hmm sync` (**overwritten as needed**)
 
 Validated (not necessarily rewritten):
 
 - `**/**/<name>.cabal` — checked by `hmm sync` to match bounds/version rules from `hmm.yaml`
+- `builds[].extra` — checked by `hmm sync` to ensure pinned versions exist on Hackage
 
 ---
 
@@ -395,10 +422,10 @@ jobs:
         with:
           ghc: ${{ matrix.ghc }}
 
-      - name: Select build (stack.yaml + hie.yaml)
+      - name: Select build (stack.yaml)
         run: hmm use ${{ matrix.ghc }}
 
-      - name: Sync packages (package.yaml + cabal validation)
+      - name: Sync packages (hie.yaml + package.yaml + validation)
         run: hmm sync
 
       - name: Build
@@ -418,5 +445,3 @@ jobs:
       - name: Check formatting
         run: hmm format --check
 ```
-
-
