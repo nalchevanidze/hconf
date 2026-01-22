@@ -10,6 +10,7 @@ module HMM.Core.HkgRef
     HkgRef,
     VersionMap,
     VersionsMap,
+    Versions,
   )
 where
 

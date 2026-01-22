@@ -26,7 +26,7 @@ import HMM.Config.Config (Config (..), getRule)
 import HMM.Config.PkgGroup (pkgDirs)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
-import HMM.Core.HkgRef (VersionMap, VersionsMap, fetchVersions)
+import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap, fetchVersions)
 import HMM.Core.PkgDir (PkgDirs)
 import HMM.Core.Version (Version)
 import HMM.Utils.Chalk (Color (Green), chalk)
@@ -75,21 +75,21 @@ instance HIO ConfigT where
     asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
 
+prefetchVersionsMap :: (HIO m) => Config -> m VersionsMap
+prefetchVersionsMap cfg = do
+  let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
+  ps <- traverse (\key -> (key,) <$> fetchVersions key) extras
+  pure (Map.fromList ps)
+
 run :: (ToString a) => Bool -> ConfigT (Maybe a) -> Env -> IO ()
-run fast m env@Env {..} = do
-  cfg <- readYaml hmm
-  deps <- collectDeps cfg
-  runConfigT m' env cfg deps >>= handle
-  where
-    collectDeps cfg
-      | fast = pure Map.empty
-      | otherwise = do
-          let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
-          ps <- traverse (\key -> (key,) <$> fetchVersions key) extras
-          pure (Map.fromList ps)
-    m'
-      | fast = m
-      | otherwise = asks config >>= check >> m
+run fast m env@Env {..}
+  | fast = do
+      cfg <- readYaml hmm
+      runConfigT m env cfg Map.empty >>= handle
+  | otherwise = do
+      cfg <- readYaml hmm
+      deps <- prefetchVersionsMap cfg
+      runConfigT (asks config >>= check >> m) env cfg deps >>= handle
 
 runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
 runTask fast name m = run fast (task name m $> Just (chalk Green "\nOk"))

@@ -53,6 +53,4 @@ exec UpdateDeps =
     >>= save
 -- commands that does not need validation and we can run in fast mode
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
-exec Format {check} =
-  runTask True "format"
-    $ format check
+exec Format {check} = runTask True "format" $ format check
