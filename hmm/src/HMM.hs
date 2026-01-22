@@ -43,16 +43,19 @@ sync :: ConfigT ()
 sync = syncHie *> syncPackages
 
 exec :: Command -> Env -> IO ()
+-- commands that must do build validation and require https requests
 exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
-exec Sync = runTask False "sync" sync
 exec UpdateDeps =
   runTask False "update deps"
     $ asks config
     >>= updateConfig
     >>= save
--- commands that does not need build validation and we can run in fast mode
+-- commands that can run in fast mode without build validation
+exec Sync = runTask True "sync" sync
 exec Version {bump = Just bump} =
   runTask True "version"
-    $ (asks config <&> bumpVersion bump) >>= save >> sync
+    $ (asks config <&> bumpVersion bump)
+    >>= save
+    >> sync
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check
