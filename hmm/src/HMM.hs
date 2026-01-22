@@ -29,7 +29,8 @@ import qualified Paths_hmm as CLI
 import Relude hiding (fix)
 
 data Command
-  = Setup {tag :: Maybe Tag}
+  = Use {tag :: Maybe Tag}
+  | Sync
   | Version {bump :: Maybe Bump}
   | UpdateDeps
   | Format {check :: Bool}
@@ -39,13 +40,9 @@ currentVersion :: String
 currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
-exec Setup {tag} =
-  runTask "setup" $ do
-    setupStack (fromMaybe Latest tag)
-    genHie
-    checkPackages
-exec Version {bump = Nothing} =
-  run (Just . version <$> asks config)
+exec Use {tag} = runTask "use" $ setupStack (fromMaybe Latest tag)
+exec Sync = runTask "sync" $ genHie *> checkPackages
+exec Version {bump = Nothing} = run (Just . version <$> asks config)
 exec Version {bump = Just bump} =
   runTask "version"
     $ (asks config <&> bumpVersion bump)
