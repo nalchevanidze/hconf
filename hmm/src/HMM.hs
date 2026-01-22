@@ -17,7 +17,7 @@ where
 import Data.Version (showVersion)
 import HMM.Config.Bump (Bump (..))
 import HMM.Config.Config (Config (..), bumpVersion, updateConfig)
-import HMM.Config.ConfigT (HCEnv (..), run, runTask, save)
+import HMM.Config.ConfigT (ConfigT, HCEnv (..), run, runTask, save)
 import HMM.Config.Tag (Tag (Latest))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
@@ -39,18 +39,20 @@ data Command
 currentVersion :: String
 currentVersion = showVersion CLI.version
 
+sync :: ConfigT ()
+sync = syncHie *> syncPackages
+
 exec :: Command -> Env -> IO ()
 exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
-exec Sync = runTask False "sync" $ syncHie *> syncPackages
-exec Version {bump = Just bump} =
-  runTask False "version"
-    $ (asks config <&> bumpVersion bump)
-    >>= save
+exec Sync = runTask False "sync" sync
 exec UpdateDeps =
   runTask False "update deps"
     $ asks config
     >>= updateConfig
     >>= save
--- commands that does not need validation and we can run in fast mode
+-- commands that does not need build validation and we can run in fast mode
+exec Version {bump = Just bump} =
+  runTask True "version"
+    $ (asks config <&> bumpVersion bump) >>= save >> sync
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check
