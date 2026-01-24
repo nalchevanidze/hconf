@@ -58,7 +58,7 @@ fetchVersions name = do
   putLine ("Fetching Versions: " <> show name)
   hackage ["package", format name, "preferred"] >>= getField "normal-version"
 
-instance (HIO m) => Check m HkgRef where
+instance (HIO m ) => Check m HkgRef where
   check HkgRef {..} = fetchVersions name >>= checkElem "version" (format name) version . toList
 
 hkgRefs :: VersionMap -> [HkgRef]

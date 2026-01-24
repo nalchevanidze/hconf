@@ -76,7 +76,7 @@ instance (ReadConf m ()) => Check m Build where
       ]
 
 allDeps :: Build -> [DependencyName]
-allDeps = M.keys . maybe M.empty id . extra
+allDeps = M.keys . fromMaybe M.empty . extra
 
 checkPkgNames :: (ReadConf m ()) => Maybe PkgDirs -> m ()
 checkPkgNames ls = do

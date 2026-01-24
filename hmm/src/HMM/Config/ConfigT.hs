@@ -26,16 +26,18 @@ import HMM.Config.Config (Config (..), getRule)
 import HMM.Config.PkgGroup (pkgDirs)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
-import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap, fetchVersions)
+import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap)
 import HMM.Core.PkgDir (PkgDirs)
 import HMM.Core.Version (Version)
 import HMM.Utils.Chalk (Color (Green), chalk)
 import HMM.Utils.Class
   ( Check (..),
+    Format (format),
     HIO (..),
   )
-import HMM.Utils.Core (DependencyName (..), printException)
+import HMM.Utils.Core (DependencyName (..), getField, printException)
 import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..))
+import HMM.Utils.Http (hackage)
 import HMM.Utils.Log
   ( alert,
     task,
@@ -75,10 +77,16 @@ instance HIO ConfigT where
     asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
 
+fetchVersions :: (HIO m) => DependencyName -> m (DependencyName, Versions)
+fetchVersions name = do
+  putLine ("Prefetch Versions: " <> show name)
+  vs <- hackage ["package", format name, "preferred"] >>= getField "normal-version"
+  pure (name, vs)
+
 prefetchVersionsMap :: (HIO m) => Config -> m VersionsMap
 prefetchVersionsMap cfg = do
   let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
-  ps <- traverse (\key -> (key,) <$> fetchVersions key) extras
+  ps <- traverse fetchVersions extras
   pure (Map.fromList ps)
 
 run :: (ToString a) => Bool -> ConfigT (Maybe a) -> Env -> IO ()
