@@ -87,7 +87,7 @@ instance CLIType Options where
   cliType =
     Options
       <$> flag 'v' "version" "show HMM version number"
-      <*> flag 's' "silence" "run silently with minimal output"
+      <*> flag 'q' "quiet" "run quietly with minimal output"
 
 main :: IO ()
 main = do
