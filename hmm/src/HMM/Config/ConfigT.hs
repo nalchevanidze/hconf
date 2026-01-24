@@ -4,7 +4,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -49,7 +48,7 @@ data HCEnv = HCEnv
   { config :: Config,
     env :: Env,
     indention :: Int,
-    deps :: VersionsMap
+    versionsMap :: VersionsMap
   }
 
 newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
@@ -63,7 +62,7 @@ newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
     )
 
 runConfigT :: ConfigT a -> Env -> Config -> VersionsMap -> IO (Either String a)
-runConfigT (ConfigT (ReaderT f)) env config deps = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
+runConfigT (ConfigT (ReaderT f)) env config versionsMap = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
 indent :: Int -> String -> String
 indent i = (replicate (i * 2) ' ' <>)
@@ -79,7 +78,6 @@ instance HIO ConfigT where
 
 fetchVersions :: (HIO m) => DependencyName -> m (DependencyName, Versions)
 fetchVersions name = do
-  putLine ("Prefetch Versions: " <> show name)
   vs <- hackage ["package", format name, "preferred"] >>= getField "normal-version"
   pure (name, vs)
 
@@ -129,3 +127,6 @@ instance ReadFromConf ConfigT Version where
 
 instance ReadFromConf ConfigT (ByKey DependencyName Bounds) where
   readFromConf name = ByKey <$> (asks config >>= getRule name)
+
+instance ReadFromConf ConfigT VersionsMap where
+  readFromConf _ = asks versionsMap

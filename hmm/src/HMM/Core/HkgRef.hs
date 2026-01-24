@@ -1,11 +1,13 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HMM.Core.HkgRef
-  ( fetchVersions,
+  ( lookupVersions,
     hkgRefs,
     HkgRef,
     VersionMap,
@@ -27,8 +29,8 @@ import HMM.Utils.Core
     checkElem,
     getField,
   )
+import HMM.Utils.FromConf
 import HMM.Utils.Http (hackage)
-import Relude (show)
 import Relude hiding
   ( Undefined,
     break,
@@ -53,13 +55,15 @@ data HkgRef = HkgRef
   }
   deriving (Eq, Ord)
 
-fetchVersions :: (HIO m) => DependencyName -> m Versions
-fetchVersions name = do
-  putLine ("Fetching Versions: " <> show name)
-  hackage ["package", format name, "preferred"] >>= getField "normal-version"
+lookupVersions :: (HIO m, ReadConf m '[VersionsMap]) => DependencyName -> m Versions
+lookupVersions name = do
+  versionsMap <- readFromConf ()
+  case M.lookup name versionsMap of
+    Just versions -> pure versions
+    Nothing -> hackage ["package", format name, "preferred"] >>= getField "normal-version"
 
-instance (HIO m ) => Check m HkgRef where
-  check HkgRef {..} = fetchVersions name >>= checkElem "version" (format name) version . toList
+instance (HIO m, ReadConf m '[VersionsMap]) => Check m HkgRef where
+  check HkgRef {..} = lookupVersions name >>= checkElem "version" (format name) version . toList
 
 hkgRefs :: VersionMap -> [HkgRef]
 hkgRefs = map (uncurry HkgRef) . M.toList

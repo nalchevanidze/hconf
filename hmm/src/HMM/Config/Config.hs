@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -27,6 +28,7 @@ import HMM.Config.Bump (Bump)
 import HMM.Config.PkgGroup (PkgGroup, isMember)
 import HMM.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HMM.Core.Dependencies (Dependencies, getBounds, traverseDeps)
+import HMM.Core.HkgRef (VersionsMap)
 import HMM.Core.Version (Version, nextVersion)
 import HMM.Utils.Class (Check (check), HIO, format)
 import HMM.Utils.Core (DependencyName)
@@ -54,7 +56,7 @@ getRule name Config {..}
 instance ToJSON Config where
   toJSON = genericToJSON defaultOptions {omitNothingFields = True}
 
-instance (ReadConf m ()) => Check m Config where
+instance (ReadConf m '[VersionsMap]) => Check m Config where
   check Config {..} = traverse_ check (toList builds)
 
 bumpVersion :: Bump -> Config -> Config
@@ -63,7 +65,7 @@ bumpVersion bump Config {..} =
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
-updateConfig :: (HIO m) => Config -> m Config
+updateConfig :: (HIO m, ReadConf m '[VersionsMap]) => Config -> m Config
 updateConfig Config {..} = do
   dependencies' <- traverseDeps updateDepBounds dependencies
   pure Config {dependencies = dependencies', ..}

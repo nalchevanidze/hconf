@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -19,7 +20,7 @@ import Data.Aeson
   )
 import Data.List (maximum, minimum)
 import HMM.Config.Bump (Bump (Minor))
-import HMM.Core.HkgRef (fetchVersions)
+import HMM.Core.HkgRef (VersionsMap, lookupVersions)
 import HMM.Core.Version (Version, dropPatch, nextVersion)
 import HMM.Utils.Chalk (Color (Yellow), chalk)
 import HMM.Utils.Class
@@ -29,7 +30,7 @@ import HMM.Utils.Class
     Parse (..),
   )
 import HMM.Utils.Core (DependencyName (..), Msg (..), throwError, withString)
-import HMM.Utils.FromConf (ByKey)
+import HMM.Utils.FromConf (ByKey, ReadConf)
 import HMM.Utils.Log (field)
 import HMM.Utils.Source (formatList, fromToString, removeHead, sepBy, unconsM)
 import Relude
@@ -111,10 +112,10 @@ instance Diff Bounds where
 getBound :: Restriction -> Bounds -> [Bound]
 getBound v (Bounds xs) = maybeToList $ find (\Bound {..} -> restriction == v) xs
 
-getLatest :: (HIO m) => DependencyName -> m Bound
-getLatest = fmap (Bound Max True . head) . fetchVersions
+getLatest :: (HIO m, ReadConf m '[VersionsMap]) => DependencyName -> m Bound
+getLatest = fmap (Bound Max True . head) . lookupVersions
 
-updateDepBounds :: (HIO m) => DependencyName -> Bounds -> m Bounds
+updateDepBounds :: (HIO m, ReadConf m '[VersionsMap]) => DependencyName -> Bounds -> m Bounds
 updateDepBounds name bounds = do
   latest <- getLatest name
   let upper = getBound Max bounds
@@ -123,11 +124,11 @@ updateDepBounds name bounds = do
   _min <- initiateMin name bounds
   pure (Bounds (_min <> [newVersion]))
 
-initiateMin :: (HIO f) => DependencyName -> Bounds -> f [Bound]
+initiateMin :: (HIO f, ReadConf f '[VersionsMap]) => DependencyName -> Bounds -> f [Bound]
 initiateMin name bounds = do
   let mi = getBound Min bounds
   if null mi
     then do
-      ls <- fmap (Bound Min True) <$> fetchVersions name
+      ls <- fmap (Bound Min True) <$> lookupVersions name
       pure [minimum ls]
     else pure mi
