@@ -11,6 +11,7 @@ module HMM.Config.ConfigT
   ( ConfigT (..),
     HCEnv (..),
     save,
+    saveWithHash,
     run,
     runTask,
     VersionMap,
@@ -18,8 +19,12 @@ module HMM.Config.ConfigT
 where
 
 import Control.Exception (tryJust)
+import qualified Crypto.Hash.SHA256 as SHA256
+import qualified Data.ByteString.Base16 as Base16
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import HMM.Config.Build (Builds, allDeps)
 import HMM.Config.Config (Config (..), getRule)
 import HMM.Config.PkgGroup (pkgDirs)
@@ -87,6 +92,30 @@ prefetchVersionsMap cfg = do
   ps <- traverse fetchVersions extras
   pure (Map.fromList ps)
 
+computeConfigHash :: Config -> Text
+computeConfigHash cfg =
+  let hashInput = T.encodeUtf8 (T.pack (show cfg))
+      hashBytes = SHA256.hash hashInput
+   in T.decodeUtf8 (Base16.encode hashBytes)
+
+extractHashFromFile :: FilePath -> IO (Maybe Text)
+extractHashFromFile filePath = do
+  content <- T.decodeUtf8 <$> readFileBS filePath
+  case T.lines content of
+    (firstLine : _) ->
+      case T.stripPrefix "# hash: " firstLine of
+        Just hash -> pure (Just hash)
+        Nothing -> pure Nothing
+    [] -> pure Nothing
+
+isConfigChanged :: Config -> FilePath -> IO Bool
+isConfigChanged cfg filePath = do
+  storedHash <- extractHashFromFile filePath
+  let currentHash = computeConfigHash cfg
+  case storedHash of
+    Nothing -> pure True -- No hash means we should do full check
+    Just hash -> pure (hash /= currentHash)
+
 run :: (ToString a) => Bool -> ConfigT (Maybe a) -> Env -> IO ()
 run fast m env@Env {..}
   | fast = do
@@ -94,8 +123,15 @@ run fast m env@Env {..}
       runConfigT m env cfg Map.empty >>= handle
   | otherwise = do
       cfg <- readYaml hmm
-      deps <- prefetchVersionsMap cfg
-      runConfigT (asks config >>= check >> m) env cfg deps >>= handle
+      changed <- isConfigChanged cfg hmm
+      if changed
+        then do
+          -- Config changed, do full check with HTTP calls
+          deps <- prefetchVersionsMap cfg
+          runConfigT (asks config >>= check >> saveWithHash >> m) env cfg deps >>= handle
+        else do
+          -- Config unchanged, skip expensive operations
+          runConfigT m env cfg Map.empty >>= handle
 
 runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
 runTask fast name m = run fast (task name m $> Just (chalk Green "\nOk"))
@@ -112,6 +148,19 @@ save :: Config -> ConfigT ()
 save cfg = task "save" $ task "hmm.yaml" $ do
   ctx <- asks id
   rewrite (hmm $ env ctx) (const $ pure cfg) $> ()
+
+saveWithHash :: ConfigT ()
+saveWithHash = task "save" $ task "hmm.yaml" $ do
+  cfg <- asks config
+  ctx <- asks id
+  let hash = computeConfigHash cfg
+      filePath = hmm $ env ctx
+  -- Write the config normally first
+  rewrite filePath (const $ pure cfg) $> ()
+  -- Then prepend the hash comment
+  content <- liftIO $ T.decodeUtf8 <$> readFileBS filePath
+  let contentWithHash = "# hash: " <> hash <> "\n" <> content
+  liftIO $ writeFileBS filePath (T.encodeUtf8 contentWithHash)
 
 instance ReadFromConf ConfigT PkgDirs where
   readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)
