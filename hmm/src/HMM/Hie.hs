@@ -9,7 +9,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HMM.Hie
-  ( genHie,
+  ( syncHie,
   )
 where
 
@@ -74,8 +74,8 @@ toLib (path, Package {..}) =
       ]
     comp _ _ = []
 
-genHie :: (ReadConf m Env) => m ()
-genHie = task "hie" $ task "hie.yaml" $ do
+syncHie :: (ReadConf m Env) => m ()
+syncHie = task "hie" $ task "hie.yaml" $ do
   Env {..} <- readEnv id
   components <- concatMap toLib <$> resolvePackages
   rewrite hie (const $ pure $ packHie Components {stackYaml = stack, components}) $> ()

@@ -70,7 +70,8 @@ instance CLIType Bump where
 instance CLIType Command where
   cliType =
     commands
-      [ ("setup", "generate Stack configurations and HIE files for multi-GHC builds", Setup <$> optional cliType),
+      [ ("use", "select a build from hmm.yaml and generate the active build config", Use <$> optional cliType),
+        ("sync", "sync package metadata to match hmm.yaml", pure Sync),
         ("version", "show project info, or bump version with: major|minor|patch", Version <$> optional cliType),
         ("update-deps", "check and update dependency version bounds", pure UpdateDeps),
         ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes"))
@@ -86,7 +87,7 @@ instance CLIType Options where
   cliType =
     Options
       <$> flag 'v' "version" "show HMM version number"
-      <*> flag 's' "silence" "run silently with minimal output"
+      <*> flag 'q' "quiet" "run quietly with minimal output"
 
 main :: IO ()
 main = do

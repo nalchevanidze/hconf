@@ -17,6 +17,7 @@ module HMM.Config.Build
     getResolver,
     getAllowNewer,
     resolveVersion,
+    allDeps,
   )
 where
 
@@ -30,11 +31,12 @@ import Data.Foldable (Foldable (..))
 import Data.List ((\\))
 import qualified Data.Map as M
 import HMM.Config.Tag (Tag (Latest))
-import HMM.Core.HkgRef (HkgRef, VersionMap, hkgRefs)
+import HMM.Core.HkgRef (HkgRef, VersionMap, VersionsMap, hkgRefs)
 import HMM.Core.PkgDir (PkgDirs)
 import HMM.Utils.Class (Check (..))
 import HMM.Utils.Core
-  ( ResolverName,
+  ( DependencyName,
+    ResolverName,
     aesonYAMLOptions,
     maybeList,
     maybeMapToList,
@@ -65,7 +67,7 @@ instance FromJSON Build where
 instance ToJSON Build where
   toJSON = genericToJSON aesonYAMLOptions
 
-instance (ReadConf m ()) => Check m Build where
+instance (ReadConf m '[VersionsMap]) => Check m Build where
   check Build {..} =
     sequence_
       [ checkExtraDeps extra,
@@ -73,13 +75,16 @@ instance (ReadConf m ()) => Check m Build where
         checkPkgNames exclude
       ]
 
+allDeps :: Build -> [DependencyName]
+allDeps = M.keys . fromMaybe M.empty . extra
+
 checkPkgNames :: (ReadConf m ()) => Maybe PkgDirs -> m ()
 checkPkgNames ls = do
   known <- readList
   let unknown = maybeList ls \\ known
   unless (null unknown) (throwError ("unknown packages: " <> show unknown))
 
-checkExtraDeps :: (ReadConf m ()) => Maybe Extras -> m ()
+checkExtraDeps :: (ReadConf m '[VersionsMap]) => Maybe Extras -> m ()
 checkExtraDeps = traverse_ check . maybe [] hkgRefs
 
 type Builds = [Build]
