@@ -46,16 +46,24 @@ exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
 exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
 exec UpdateDeps =
-  runTask False "update deps"
-    $ asks config
-    >>= updateConfig
-    >>= save
+  runTask
+    False
+    "update deps"
+    ( do
+        cfg <- asks config
+        updatedCfg <- updateConfig cfg
+        local (\env -> env {config = updatedCfg}) save
+    )
 -- commands that can run in fast mode without build validation
 exec Sync = runTask True "sync" sync
 exec Version {bump = Just bump} =
-  runTask True "version"
-    $ (asks config <&> bumpVersion bump)
-    >>= save
-    >> sync
+  runTask
+    True
+    "version"
+    ( do
+        cfg <- asks config
+        let bumpedCfg = bumpVersion bump cfg
+        local (\env -> env {config = bumpedCfg}) (save >> sync)
+    )
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check

@@ -11,7 +11,6 @@ module HMM.Config.ConfigT
   ( ConfigT (..),
     HCEnv (..),
     save,
-    saveWithHash,
     run,
     runTask,
     VersionMap,
@@ -128,7 +127,7 @@ run fast m env@Env {..}
         then do
           -- Config changed, do full check with HTTP calls
           deps <- prefetchVersionsMap cfg
-          runConfigT (asks config >>= check >> saveWithHash >> m) env cfg deps >>= handle
+          runConfigT (asks config >>= check >> save >> m) env cfg deps >>= handle
         else do
           -- Config unchanged, skip expensive operations
           runConfigT m env cfg Map.empty >>= handle
@@ -144,13 +143,8 @@ handle res = case res of
   (Right Nothing) -> pure ()
   (Right (Just msg)) -> putLine (toString msg)
 
-save :: Config -> ConfigT ()
-save cfg = task "save" $ task "hmm.yaml" $ do
-  ctx <- asks id
-  rewrite (hmm $ env ctx) (const $ pure cfg) $> ()
-
-saveWithHash :: ConfigT ()
-saveWithHash = task "save" $ task "hmm.yaml" $ do
+save :: ConfigT ()
+save = task "save" $ task "hmm.yaml" $ do
   cfg <- asks config
   ctx <- asks id
   let hash = computeConfigHash cfg
