@@ -1,6 +1,5 @@
-# hash: 966716cc1cf3111788e13edc6c38ccd8e7cfaa2a75cf9c329e3a856a3e12ca9d
-version: 0.5.0
-bounds: '>= 0.5.0 && < 0.6.0'
+version: 1.0.0
+bounds: '>= 1.0.0 && < 1.1.0'
 groups:
 - name: hmm
   packages:
