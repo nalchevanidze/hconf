@@ -42,6 +42,17 @@ currentVersion = showVersion CLI.version
 sync :: ConfigT ()
 sync = syncHie *> syncPackages
 
+withUpdatedConfig :: (Config -> Config) -> ConfigT ()
+withUpdatedConfig f = do
+  cfg <- asks config
+  local (\h -> h {config = f cfg}) (pure ())
+
+localConfig :: (Config -> ConfigT Config) -> ConfigT ()
+localConfig f = do
+  cfg <- asks config
+  updatedCfg <- f cfg
+  local (\env -> env {config = updatedCfg}) (pure ())
+
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
 exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
@@ -49,21 +60,13 @@ exec UpdateDeps =
   runTask
     False
     "update deps"
-    ( do
-        cfg <- asks config
-        updatedCfg <- updateConfig cfg
-        local (\env -> env {config = updatedCfg}) save
-    )
+    (localConfig updateConfig >> save)
 -- commands that can run in fast mode without build validation
 exec Sync = runTask True "sync" sync
 exec Version {bump = Just bump} =
   runTask
     True
     "version"
-    ( do
-        cfg <- asks config
-        let bumpedCfg = bumpVersion bump cfg
-        local (\env -> env {config = bumpedCfg}) (save >> sync)
-    )
+    (withUpdatedConfig (bumpVersion bump) >> sync >> save)
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check
