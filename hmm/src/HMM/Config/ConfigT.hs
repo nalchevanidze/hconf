@@ -115,7 +115,7 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run :: Bool -> ConfigT (Maybe String) -> Env -> IO ()
+run :: ToString a => Bool -> ConfigT (Maybe a) -> Env -> IO ()
 run fast m env@Env {..}
   | fast = do
       cfg <- readYaml hmm
@@ -139,7 +139,7 @@ runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
 runTask fast name m = run fast (asTask name m)
 
 runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
-runUpdate fast name f m = run fast (asTask name localConfig )
+runUpdate fast name f m = run fast (asTask name localConfig)
   where
     localConfig = do
       cfg <- asks config
