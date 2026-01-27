@@ -79,7 +79,7 @@ instance CLIType Command where
 
 data Options = Options
   { optVersion :: Bool,
-    optSilence :: Bool
+    optQuiet :: Bool
   }
   deriving (Show)
 

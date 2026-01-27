@@ -8,7 +8,7 @@ data Env = Env
   { hie :: FilePath,
     hmm :: FilePath,
     stack :: FilePath,
-    silence :: Bool
+    quiet :: Bool
   }
 
 defaultConfig :: Env
@@ -17,5 +17,5 @@ defaultConfig =
     { hmm = "./hmm.yaml",
       hie = "./hie.yaml",
       stack = "./stack.yaml",
-      silence = False
+      quiet = False
     }
