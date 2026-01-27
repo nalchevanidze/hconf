@@ -10,6 +10,7 @@ where
 import HMM
   ( Bump,
     Command (..),
+    Env (..),
     Parse (parse),
     Tag,
     currentVersion,
@@ -95,7 +96,7 @@ main = do
   if optVersion ops
     then putStrLn currentVersion
     else case cmd of
-      Just c -> exec c defaultConfig
+      Just c -> exec c (defaultConfig {quiet = optQuiet ops})
       Nothing -> do
         putStrLn "Missing: COMMAND\n\nUse --help for available commands."
         exitFailure
