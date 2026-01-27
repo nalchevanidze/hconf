@@ -8,7 +8,7 @@
 
 module HMM.Stack.Config
   ( Stack,
-    genStack,
+    syncStackYaml,
   )
 where
 
@@ -42,8 +42,8 @@ instance FromJSON Stack where
 instance ToJSON Stack where
   toJSON = genericToJSON aesonYAMLOptions
 
-genStack :: (ReadConf m '[Builds, Env]) => Maybe Tag -> m ()
-genStack tag = do
+syncStackYaml :: (ReadConf m '[Builds, Env]) => Maybe Tag -> m ()
+syncStackYaml tag = do
   let version = fromMaybe Latest tag
   v <- resolveVersion version
   task ("stack(" <> show v <> ")")

@@ -22,7 +22,7 @@ import HMM.Config.Tag (Tag (Latest))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
 import HMM.Hie (syncHie)
-import HMM.Stack.Config (genStack)
+import HMM.Stack.Config (syncStackYaml)
 import HMM.Stack.Package (syncPackages)
 import HMM.Utils.Class (Parse (..))
 import qualified Paths_hmm as CLI
@@ -44,7 +44,7 @@ sync = syncHie *> syncPackages
 
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
-exec Use {tag} = runTask False "use" $ genStack tag
+exec Use {tag} = runTask False "use" $ syncStackYaml tag
 exec UpdateDeps = runUpdate False "update deps" updateConfig syncPackages
 exec Version {bump = Just bump} = runUpdate True "version" (pure . bumpVersion bump) sync
 -- commands that can run in fast mode without build validation
