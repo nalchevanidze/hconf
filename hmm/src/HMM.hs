@@ -17,7 +17,7 @@ where
 import Data.Version (showVersion)
 import HMM.Config.Bump (Bump (..))
 import HMM.Config.Config (Config (..), bumpVersion, updateConfig)
-import HMM.Config.ConfigT (ConfigT, HCEnv (..), localConfig, run, runTask)
+import HMM.Config.ConfigT (ConfigT, HCEnv (..), run, runTask, runUpdate)
 import HMM.Config.Tag (Tag (Latest))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
@@ -45,9 +45,9 @@ sync = syncHie *> syncPackages
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
 exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
-exec UpdateDeps = runTask False "update deps" (localConfig updateConfig)
+exec UpdateDeps = runUpdate False "update deps" updateConfig syncPackages
 -- commands that can run in fast mode without build validation
 exec Sync = runTask True "sync" sync
-exec Version {bump = Just bump} = runTask True "version" (localConfig (pure . bumpVersion bump) >> sync)
+exec Version {bump = Just bump} = runUpdate True "version" (pure . bumpVersion bump) sync
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check

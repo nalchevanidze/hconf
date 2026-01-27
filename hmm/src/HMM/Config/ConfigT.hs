@@ -12,8 +12,8 @@ module HMM.Config.ConfigT
     HCEnv (..),
     run,
     runTask,
+    runUpdate,
     VersionMap,
-    localConfig,
   )
 where
 
@@ -134,6 +134,9 @@ run fast m env@Env {..}
 
 runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
 runTask fast name m = run fast (task name m $> Just (chalk Green "\nOk"))
+
+runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
+runUpdate fast name f m = run fast (task name (localConfig f >> m) $> Just (chalk Green "\nOk"))
 
 handle :: (ToString a) => (HIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
