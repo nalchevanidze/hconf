@@ -54,10 +54,6 @@ exec Use {tag} = runTask False "use" $ setupStack (fromMaybe Latest tag)
 exec UpdateDeps = runTask False "update deps" (localConfig updateConfig)
 -- commands that can run in fast mode without build validation
 exec Sync = runTask True "sync" sync
-exec Version {bump = Just bump} =
-  runTask
-    True
-    "version"
-    (localConfig (pure . bumpVersion bump) >> sync)
+exec Version {bump = Just bump} = runTask True "version" (localConfig (pure . bumpVersion bump) >> sync)
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check
