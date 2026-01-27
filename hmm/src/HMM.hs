@@ -46,5 +46,5 @@ exec UpdateDeps = run False (Just "update deps") (Just updateConfig) syncPackage
 exec Version {bump = Just bump} = run True (Just "version") (Just (pure . bumpVersion bump)) syncPackages
 -- commands that can run in fast mode without build validation
 exec Sync = run True (Just "sync") Nothing (syncHie *> syncPackages)
-exec Version {bump = Nothing} = run True (Just "version") Nothing (version <$> asks config)
+exec Version {bump = Nothing} = run True Nothing Nothing (version <$> asks config)
 exec Format {check} = run True (Just "format") Nothing (format check)
