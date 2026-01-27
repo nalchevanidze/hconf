@@ -152,16 +152,16 @@ instance (ToString a) => ParseResponse (Maybe a) where
   parseResponse Nothing = Nothing
   parseResponse (Just x) = Just $ toString x
 
-asTask :: (HIO f) => Env -> String -> f a -> f (Maybe String)
-asTask env name m
-  | quiet env = task name m $> Nothing
-  | otherwise = task name m $> Just (chalk Green "\nOk")
+ptintOk :: (HIO f) => Env -> f ()
+ptintOk env
+  | quiet env = pure ()
+  | otherwise = putLine (chalk Green "\nOk")
 
 runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
-runTask fast name m env = run fast (asTask env name m) env
+runTask fast name m env = run fast (task name m >> ptintOk env) env
 
 runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
-runUpdate fast name f m env = run fast (asTask env name localConfig) env
+runUpdate fast name f m env = run fast (task name localConfig >> ptintOk env) env
   where
     localConfig = do
       cfg <- asks config
