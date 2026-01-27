@@ -148,9 +148,6 @@ instance ParseResponse Version where
 instance ParseResponse () where
   parseResponse _ = Nothing
 
-instance (ToString a) => ParseResponse (Maybe a) where
-  parseResponse Nothing = Nothing
-  parseResponse (Just x) = Just $ toString x
 
 ptintOk :: (HIO f) => Env -> f ()
 ptintOk env
