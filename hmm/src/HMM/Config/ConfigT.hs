@@ -136,7 +136,12 @@ runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
 runTask fast name m = run fast (task name m $> Just (chalk Green "\nOk"))
 
 runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
-runUpdate fast name f m = run fast (task name (localConfig f >> m) $> Just (chalk Green "\nOk"))
+runUpdate fast name f m = run fast (task name localConfig $> Just (chalk Green "\nOk"))
+  where
+    localConfig = do
+      cfg <- asks config
+      updatedCfg <- f cfg
+      local (\env -> env {config = updatedCfg}) (save >> m)
 
 handle :: (ToString a) => (HIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
@@ -158,12 +163,6 @@ save = task "save" $ task "hmm.yaml" $ do
   content <- liftIO $ T.decodeUtf8 <$> readFileBS filePath
   let contentWithHash = "# hash: " <> hash <> "\n" <> content
   liftIO $ writeFileBS filePath (T.encodeUtf8 contentWithHash)
-
-localConfig :: (Config -> ConfigT Config) -> ConfigT ()
-localConfig f = do
-  cfg <- asks config
-  updatedCfg <- f cfg
-  local (\env -> env {config = updatedCfg}) save
 
 instance ReadFromConf ConfigT PkgDirs where
   readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)
