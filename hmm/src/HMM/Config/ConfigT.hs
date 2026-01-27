@@ -11,7 +11,6 @@ module HMM.Config.ConfigT
   ( ConfigT (..),
     HCEnv (..),
     run,
-    runTask,
     runUpdate,
     VersionMap,
   )
@@ -119,8 +118,8 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run :: (ParseResponse a) => Bool -> ConfigT a -> Env -> IO ()
-run fast m env@Env {..}
+run_ :: (ParseResponse a) => Bool -> ConfigT a -> Env -> IO ()
+run_ fast m env@Env {..}
   | fast = do
       cfg <- readYaml hmm
       runConfigT m env cfg Map.empty >>= handle
@@ -148,17 +147,17 @@ instance ParseResponse Version where
 instance ParseResponse () where
   parseResponse _ = Nothing
 
-
 ptintOk :: (HIO f) => Env -> f ()
 ptintOk env
   | quiet env = pure ()
   | otherwise = putLine (chalk Green "\nOk")
 
-runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
-runTask fast name m env = run fast (task name m >> ptintOk env) env
+run :: Bool -> Maybe String -> ConfigT () -> Env -> IO ()
+run fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
+run fast Nothing m env = run_ fast m env
 
 runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
-runUpdate fast name f m env = run fast (task name localConfig >> ptintOk env) env
+runUpdate fast name f m env = run_ fast (task name localConfig >> ptintOk env) env
   where
     localConfig = do
       cfg <- asks config
