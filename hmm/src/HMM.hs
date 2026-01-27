@@ -17,7 +17,7 @@ where
 import Data.Version (showVersion)
 import HMM.Config.Bump (Bump (..))
 import HMM.Config.Config (Config (..), bumpVersion, updateConfig)
-import HMM.Config.ConfigT (HCEnv (..), run, runTask, runUpdate)
+import HMM.Config.ConfigT (HCEnv (..), run)
 import HMM.Config.Tag (Tag (Latest))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
@@ -41,10 +41,10 @@ currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
-exec Use {tag} = run False (Just "use") $ syncStackYaml tag
-exec UpdateDeps = runUpdate False "update deps" updateConfig syncPackages
-exec Version {bump = Just bump} = runUpdate True "version" (pure . bumpVersion bump) syncPackages
+exec Use {tag} = run False (Just "use") Nothing $ syncStackYaml tag
+exec UpdateDeps = run False (Just "update deps") (Just updateConfig) syncPackages
+exec Version {bump = Just bump} = run True (Just "version") (Just (pure . bumpVersion bump)) syncPackages
 -- commands that can run in fast mode without build validation
-exec Sync = run True (Just "sync") (syncHie *> syncPackages)
-exec Version {bump = Nothing} = run True (Just "version") (version <$> asks config)
-exec Format {check} = run True (Just "format") $ format check
+exec Sync = run True (Just "sync") Nothing (syncHie *> syncPackages)
+exec Version {bump = Nothing} = run True (Just "version") Nothing (version <$> asks config)
+exec Format {check} = run True (Just "format") Nothing (format check)

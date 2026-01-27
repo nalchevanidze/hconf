@@ -11,7 +11,6 @@ module HMM.Config.ConfigT
   ( ConfigT (..),
     HCEnv (..),
     run,
-    runUpdate,
     VersionMap,
   )
 where
@@ -152,12 +151,13 @@ ptintOk env
   | quiet env = pure ()
   | otherwise = putLine (chalk Green "\nOk")
 
-run :: Bool -> Maybe String -> ConfigT () -> Env -> IO ()
-run fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
-run fast Nothing m env = run_ fast m env
+run' ::(ParseResponse a) => Bool -> Maybe String -> ConfigT a -> Env -> IO ()
+run' fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
+run' fast Nothing m env = run_ fast m env
 
-runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
-runUpdate fast name f m env = run_ fast (task name localConfig >> ptintOk env) env
+run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
+run fast name Nothing m = run' fast name m
+run fast name (Just f) m = run' fast name localConfig
   where
     localConfig = do
       cfg <- asks config
