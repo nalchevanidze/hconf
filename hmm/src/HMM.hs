@@ -45,7 +45,7 @@ sync = syncHie *> syncPackages
 withUpdatedConfig :: (Config -> Config) -> ConfigT ()
 withUpdatedConfig f = do
   cfg <- asks config
-  local (\h -> h {config = f cfg}) (pure ())
+  local (\h -> h {config = f cfg}) save
 
 localConfig :: (Config -> ConfigT Config) -> ConfigT ()
 localConfig f = do
@@ -60,13 +60,13 @@ exec UpdateDeps =
   runTask
     False
     "update deps"
-    (localConfig updateConfig >> save)
+    (localConfig updateConfig)
 -- commands that can run in fast mode without build validation
 exec Sync = runTask True "sync" sync
 exec Version {bump = Just bump} =
   runTask
     True
     "version"
-    (withUpdatedConfig (bumpVersion bump) >> sync >> save)
+    (withUpdatedConfig (bumpVersion bump) >> sync)
 exec Version {bump = Nothing} = run True (Just . version <$> asks config)
 exec Format {check} = runTask True "format" $ format check
