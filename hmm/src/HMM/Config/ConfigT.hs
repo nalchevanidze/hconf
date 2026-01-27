@@ -75,7 +75,11 @@ instance HIO ConfigT where
   read = liftIO . read
   write f = liftIO . write f
   remove = liftIO . remove
-  putLine txt = asks indention >>= liftIO . putLine . flip indent txt
+  putLine txt = do
+    q <- asks (quiet . env)
+    unless q $ do
+      i <- asks indention
+      liftIO $ putLine $ indent i txt
   inside f m = do
     asks indention >>= putLine . f
     local (\c -> c {indention = indention c + 1}) m
@@ -115,7 +119,7 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run :: ToString a => Bool -> ConfigT (Maybe a) -> Env -> IO ()
+run :: (ToString a) => Bool -> ConfigT (Maybe a) -> Env -> IO ()
 run fast m env@Env {..}
   | fast = do
       cfg <- readYaml hmm
