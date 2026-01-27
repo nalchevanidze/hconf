@@ -136,19 +136,21 @@ run fast m env@Env {..}
           -- Config unchanged, skip expensive operations
           runConfigT m env cfg Map.empty >>= handle
 
-asTask :: (HIO f) => String -> f a -> f (Maybe String)
-asTask name m = task name m $> Just (chalk Green "\nOk")
+asTask :: (HIO f) => Env -> String -> f a -> f (Maybe String)
+asTask env name m
+  | quiet env = task name m $> Nothing
+  | otherwise = task name m $> Just (chalk Green "\nOk")
 
 runTask :: Bool -> String -> ConfigT () -> Env -> IO ()
-runTask fast name m = run fast (asTask name m)
+runTask fast name m env = run fast (asTask env name m) env
 
 runUpdate :: Bool -> String -> (Config -> ConfigT Config) -> ConfigT () -> Env -> IO ()
-runUpdate fast name f m = run fast (asTask name localConfig)
+runUpdate fast name f m env = run fast (asTask env name localConfig) env
   where
     localConfig = do
       cfg <- asks config
       updatedCfg <- f cfg
-      local (\env -> env {config = updatedCfg}) (save >> m)
+      local (\env' -> env' {config = updatedCfg}) (save >> m)
 
 handle :: (ToString a) => (HIO m) => Either String (Maybe a) -> m ()
 handle res = case res of
