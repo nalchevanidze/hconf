@@ -119,7 +119,7 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run :: (ToString a) => Bool -> ConfigT (Maybe a) -> Env -> IO ()
+run :: (ParseResponse a) => Bool -> ConfigT a -> Env -> IO ()
 run fast m env@Env {..}
   | fast = do
       cfg <- readYaml hmm
@@ -135,6 +135,22 @@ run fast m env@Env {..}
         else do
           -- Config unchanged, skip expensive operations
           runConfigT m env cfg Map.empty >>= handle
+
+class ParseResponse a where
+  parseResponse :: a -> Maybe String
+
+instance ParseResponse String where
+  parseResponse = Just
+
+instance ParseResponse Version where
+  parseResponse = Just . toString
+
+instance ParseResponse () where
+  parseResponse _ = Nothing
+
+instance (ToString a) => ParseResponse (Maybe a) where
+  parseResponse Nothing = Nothing
+  parseResponse (Just x) = Just $ toString x
 
 asTask :: (HIO f) => Env -> String -> f a -> f (Maybe String)
 asTask env name m
@@ -152,13 +168,14 @@ runUpdate fast name f m env = run fast (asTask env name localConfig) env
       updatedCfg <- f cfg
       local (\env' -> env' {config = updatedCfg}) (save >> m)
 
-handle :: (ToString a) => (HIO m) => Either String (Maybe a) -> m ()
+handle :: (ParseResponse a, HIO m) => Either String a -> m ()
 handle res = case res of
   Left x -> do
     alert ("ERROR: " <> x)
     liftIO exitFailure
-  (Right Nothing) -> pure ()
-  (Right (Just msg)) -> putLine (toString msg)
+  (Right x) -> case parseResponse x of
+    Nothing -> pure ()
+    Just msg -> putLine (toString msg)
 
 save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
