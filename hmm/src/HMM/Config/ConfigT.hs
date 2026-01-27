@@ -10,10 +10,10 @@
 module HMM.Config.ConfigT
   ( ConfigT (..),
     HCEnv (..),
-    save,
     run,
     runTask,
     VersionMap,
+    localConfig,
   )
 where
 
@@ -155,6 +155,12 @@ save = task "save" $ task "hmm.yaml" $ do
   content <- liftIO $ T.decodeUtf8 <$> readFileBS filePath
   let contentWithHash = "# hash: " <> hash <> "\n" <> content
   liftIO $ writeFileBS filePath (T.encodeUtf8 contentWithHash)
+
+localConfig :: (Config -> ConfigT Config) -> ConfigT ()
+localConfig f = do
+  cfg <- asks config
+  updatedCfg <- f cfg
+  local (\env -> env {config = updatedCfg}) save
 
 instance ReadFromConf ConfigT PkgDirs where
   readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)

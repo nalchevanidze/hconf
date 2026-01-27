@@ -17,7 +17,7 @@ where
 import Data.Version (showVersion)
 import HMM.Config.Bump (Bump (..))
 import HMM.Config.Config (Config (..), bumpVersion, updateConfig)
-import HMM.Config.ConfigT (ConfigT, HCEnv (..), run, runTask, save)
+import HMM.Config.ConfigT (ConfigT, HCEnv (..), localConfig, run, runTask)
 import HMM.Config.Tag (Tag (Latest))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
@@ -41,12 +41,6 @@ currentVersion = showVersion CLI.version
 
 sync :: ConfigT ()
 sync = syncHie *> syncPackages
-
-localConfig :: (Config -> ConfigT Config) -> ConfigT ()
-localConfig f = do
-  cfg <- asks config
-  updatedCfg <- f cfg
-  local (\env -> env {config = updatedCfg}) save
 
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
