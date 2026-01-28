@@ -151,7 +151,7 @@ ptintOk env
   | quiet env = pure ()
   | otherwise = putLine (chalk Green "\nOk")
 
-run' ::(ParseResponse a) => Bool -> Maybe String -> ConfigT a -> Env -> IO ()
+run' :: (ParseResponse a) => Bool -> Maybe String -> ConfigT a -> Env -> IO ()
 run' fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
 run' fast Nothing m env = run_ fast m env
 
