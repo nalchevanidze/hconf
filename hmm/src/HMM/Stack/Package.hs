@@ -87,12 +87,10 @@ checkPackage pkgDir =
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = task "packages" $ readList >>= traverse_ checkPackage
 
-    
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
   Package {name} <- readYaml $ packageFile $ path
-  stack "upload" path []
-  task (show $ format name) $ pure ()
+  task (show $ format name) $ stack "upload" path []
 
 publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 publishPackages = task "packages" $ readList >>= traverse_ publishPackage
