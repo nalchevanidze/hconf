@@ -10,6 +10,7 @@
 module HMM.Stack.Cabal
   ( Cabal (..),
     CabalSrc (..),
+    stack,
   )
 where
 

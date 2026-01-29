@@ -20,7 +20,7 @@ import HMM.Core.Bounds (BoundsByName)
 import HMM.Core.Dependencies (Dependencies)
 import HMM.Core.PkgDir (PkgDir, packageFile)
 import HMM.Core.Version (Version, readVersion)
-import HMM.Stack.Cabal (Cabal (..), CabalSrc (..))
+import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), stack)
 import HMM.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HMM.Utils.Class (Check (..), format)
 import HMM.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
@@ -87,11 +87,13 @@ checkPackage pkgDir =
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = task "packages" $ readList >>= traverse_ checkPackage
 
+    
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = task "package" $ do
   Package {name} <- readYaml $ packageFile $ path
   -- Here you would add the logic to actually publish the package,
   -- e.g., by calling an external command or API.
+  stack "upload" path []
   task (show $ format name) $ pure ()
 
 publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
