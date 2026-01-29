@@ -11,6 +11,7 @@ module HMM.Stack.Cabal
   ( Cabal (..),
     CabalSrc (..),
     stack,
+    upload,
   )
 where
 
@@ -77,6 +78,14 @@ stack cmd pkg options = do
   ( if success
       then printWarnings cmd (parseWarnings out)
       else alert $ cmd <> ": " <> unpack (indentText $ pack out)
+    )
+
+upload :: (HIO m) => PkgName -> [String] -> m ()
+upload pkg options = do
+  (out, success) <- exec "stack" ("upload" : (toString pkg : map ("--" <>) options))
+  ( if success
+      then printWarnings "upload" (parseWarnings out)
+      else alert $ "upload" <> ": " <> unpack (indentText $ pack out)
     )
 
 instance Log Warning where

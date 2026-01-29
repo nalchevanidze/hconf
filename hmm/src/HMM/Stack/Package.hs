@@ -20,7 +20,7 @@ import HMM.Core.Bounds (BoundsByName)
 import HMM.Core.Dependencies (Dependencies)
 import HMM.Core.PkgDir (PkgDir, packageFile)
 import HMM.Core.Version (Version, readVersion)
-import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), stack)
+import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), upload)
 import HMM.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HMM.Utils.Class (Check (..), format)
 import HMM.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
@@ -89,8 +89,8 @@ syncPackages = task "packages" $ readList >>= traverse_ checkPackage
 
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
-  Package {name} <- readYaml $ packageFile $ path
-  task (show $ format name) $ stack "upload" path []
+  Package {name} <- readYaml $ packageFile path
+  task (show $ format name) $ upload name []
 
 publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 publishPackages = task "packages" $ readList >>= traverse_ publishPackage
