@@ -90,7 +90,7 @@ syncPackages = task "packages" $ readList >>= traverse_ checkPackage
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
   Package {name} <- readYaml $ packageFile path
-  task (show $ format name) $ upload name []
+  task (toString name) $ upload name []
 
 publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 publishPackages = task "packages" $ readList >>= traverse_ publishPackage
