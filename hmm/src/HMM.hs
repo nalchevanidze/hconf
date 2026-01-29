@@ -34,6 +34,7 @@ data Command
   | Version {bump :: Maybe Bump}
   | UpdateDeps
   | Format {check :: Bool}
+  | Publish {}
   deriving (Show)
 
 currentVersion :: String
@@ -41,6 +42,7 @@ currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
+exec Publish {} = run False (Just "publish") Nothing $ pure ()
 exec Use {tag} = run False (Just "use") Nothing $ syncStackYaml tag
 exec UpdateDeps = run False (Just "update deps") (Just updateConfig) syncPackages
 exec Version {bump = Just bump} = run True (Just "version") (Just (pure . bumpVersion bump)) syncPackages

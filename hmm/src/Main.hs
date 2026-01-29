@@ -75,7 +75,8 @@ instance CLIType Command where
         ("sync", "sync package metadata to match hmm.yaml", pure Sync),
         ("version", "show project info, or bump version with: major|minor|patch", Version <$> optional cliType),
         ("update-deps", "check and update dependency version bounds", pure UpdateDeps),
-        ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes"))
+        ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes")),
+        ("publish", "publish packages to Hackage", pure Publish)
       ]
 
 data Options = Options
