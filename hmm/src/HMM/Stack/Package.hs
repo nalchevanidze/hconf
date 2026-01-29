@@ -11,6 +11,7 @@ module HMM.Stack.Package
   ( Package (..),
     syncPackages,
     resolvePackages,
+    publishPackages,
   )
 where
 
@@ -85,3 +86,6 @@ checkPackage pkgDir =
 
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = task "packages" $ readList >>= traverse_ checkPackage
+
+publishPackages :: (ReadConf m ()) => m ()
+publishPackages = task "packages" $ pure ()
