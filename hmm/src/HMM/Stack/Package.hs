@@ -87,5 +87,12 @@ checkPackage pkgDir =
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = task "packages" $ readList >>= traverse_ checkPackage
 
-publishPackages :: (ReadConf m ()) => m ()
-publishPackages = task "packages" $ pure ()
+publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
+publishPackage path = task "package" $ do
+  Package {name} <- readYaml $  packageFile $ path
+  -- Here you would add the logic to actually publish the package,
+  -- e.g., by calling an external command or API.
+  task (format name) $ pure ()
+
+publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
+publishPackages = task "packages" $ readList >>= traverse_ publishPackage
