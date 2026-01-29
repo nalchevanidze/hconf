@@ -1,5 +1,5 @@
-# hash: 5de52d9ec780a3b2befdf3fc91b9d9d7e14068bb2954067d51be8fa7c5d62368
-version: 1.0.0
+# hash: f4bc95be96425edd79bb99ff8aaad576e1f16278f359c97a897a77ca56086faa
+version: 1.0.1
 bounds: '>= 1.0.0 && < 1.1.0'
 groups:
 - name: hmm
