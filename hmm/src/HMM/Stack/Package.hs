@@ -90,7 +90,7 @@ publishPackage path = do
   task (toString name) $ upload name []
 
 forPackages :: (ReadConf m ()) => (PkgDir -> m b) -> m ()
-forPackages f = task "pkgGroups" $ readList >>= traverse_ f
+forPackages f = task "packages" $ readList >>= traverse_ f
 
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = forPackages checkPackage
