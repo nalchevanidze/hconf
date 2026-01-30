@@ -84,13 +84,13 @@ checkPackage pkgDir =
     Package {..} <- rewritePackage pkgDir
     check CabalSrc {pkgDir, target = Cabal {..}}
 
-syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
-syncPackages = task "packages" $ readList >>= traverse_ checkPackage
-
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
   Package {name} <- readYaml $ packageFile path
   task (toString name) $ upload name []
+
+syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
+syncPackages = task "packages" $ readList >>= traverse_ checkPackage
 
 publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 publishPackages = task "packages" $ readList >>= traverse_ publishPackage
