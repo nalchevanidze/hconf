@@ -27,7 +27,7 @@ import HMM.Utils.Class
 import HMM.Utils.Core
   ( Msg (..),
     PkgName,
-    exec,
+    execCommand,
     getField,
     throwError,
     withThrow,
@@ -74,19 +74,17 @@ getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (HIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  (out, success) <- exec "stack" (cmd : (toString pkg : map ("--" <>) options))
-  ( if success
-      then printWarnings cmd (parseWarnings out)
-      else alert $ cmd <> ": " <> unpack (indentText $ pack out)
-    )
+  result <- execCommand "stack" [cmd, toString pkg] options
+  case result of
+    Left out -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
+    Right out -> printWarnings cmd (parseWarnings out)
 
-upload :: (HIO m) => PkgName -> [String] -> m ()
-upload pkg options = do
-  (out, success) <- exec "stack" ("upload" : (toString pkg : map ("--" <>) options))
-  ( if success
-      then printWarnings "upload" (parseWarnings out)
-      else fail $ "upload" <> ": " <> unpack (indentText $ pack out)
-    )
+upload :: (HIO m) => PkgName -> m ()
+upload pkg = do
+  result <- execCommand "stack" ["upload", toString pkg] []
+  case result of
+    Left out -> fail $ "upload: " <> unpack (indentText $ pack out)
+    Right out -> printWarnings "upload" (parseWarnings out)
 
 instance Log Warning where
   log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls

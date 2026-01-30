@@ -86,7 +86,7 @@ checkPackage pkgDir = do
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
   Package {name} <- readYaml $ packageFile path
-  upload name []
+  upload name
 
 forPackages :: (ReadConf m ()) => (PkgDir -> m b) -> m ()
 forPackages f =

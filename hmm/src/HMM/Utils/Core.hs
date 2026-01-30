@@ -22,7 +22,7 @@ module HMM.Utils.Core
     Msg (..),
     ErrorMsg (..),
     withString,
-    exec,
+    execCommand,
     ResolverName,
     printException,
     safeIO,
@@ -227,10 +227,13 @@ getField = select "Field"
 select :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 
-exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
-exec name options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode name options "")
-  pure (out, isSuccess code)
+execCommand :: (MonadIO m) => FilePath -> [String] -> [String] -> m (Either String String)
+execCommand name args options = do
+  (code, _, out) <- liftIO (readProcessWithExitCode name (args <> map ("--" <>) options) "")
+  pure
+    $ if isSuccess code
+      then Right out
+      else Left out
 
 printException :: SomeException -> String
 printException = show
