@@ -89,8 +89,11 @@ publishPackage path = do
   Package {name} <- readYaml $ packageFile path
   task (toString name) $ upload name []
 
+forPackages :: (ReadConf m ()) => (PkgDir -> m b) -> m ()
+forPackages f = task "packages" $ readList >>= traverse_ f
+
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
-syncPackages = task "packages" $ readList >>= traverse_ checkPackage
+syncPackages = forPackages checkPackage
 
 publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
-publishPackages = task "packages" $ readList >>= traverse_ publishPackage
+publishPackages = forPackages publishPackage
