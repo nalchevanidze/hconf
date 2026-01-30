@@ -79,10 +79,9 @@ rewritePackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
 checkPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
-checkPackage pkgDir =
-  task (toString pkgDir) $ do
-    Package {..} <- rewritePackage pkgDir
-    check CabalSrc {pkgDir, target = Cabal {..}}
+checkPackage pkgDir = do
+  Package {..} <- rewritePackage pkgDir
+  check CabalSrc {pkgDir, target = Cabal {..}}
 
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
@@ -90,7 +89,10 @@ publishPackage path = do
   task (toString name) $ upload name []
 
 forPackages :: (ReadConf m ()) => (PkgDir -> m b) -> m ()
-forPackages f = task "packages" $ readList >>= traverse_ f
+forPackages f =
+  task "packages"
+    $ readList
+    >>= traverse_ (\p -> task (toString p) (f p))
 
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = forPackages checkPackage
