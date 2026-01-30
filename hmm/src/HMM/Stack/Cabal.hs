@@ -85,7 +85,7 @@ upload pkg options = do
   (out, success) <- exec "stack" ("upload" : (toString pkg : map ("--" <>) options))
   ( if success
       then printWarnings "upload" (parseWarnings out)
-      else alert $ "upload" <> ": " <> unpack (indentText $ pack out)
+      else fail $ "upload" <> ": " <> unpack (indentText $ pack out)
     )
 
 instance Log Warning where
