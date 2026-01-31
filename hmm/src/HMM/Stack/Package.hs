@@ -94,10 +94,12 @@ syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = forPackages checkPackage
 
 publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Name -> m ()
-publishPackages name = task "packages" $ do
+publishPackages name = task (maybe "" toString name <> " packages") $ do
   groups <- readList
-  let pkgs = concatMap pkgDirs groups
-  traverse_ (\p -> task (toString p) (publishPackage p)) pkgs
+  traverse_ publihsGroup groups
+
+publihsGroup :: (ReadConf m '[Version, BoundsByName]) => PkgGroup -> m ()
+publihsGroup g = traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)
 
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
