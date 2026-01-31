@@ -45,7 +45,7 @@ instance ToJSON Stack where
 syncStackYaml :: (ReadConf m '[Builds, Env]) => Maybe Tag -> m ()
 syncStackYaml tag = do
   version <- resolveVersion (fromMaybe Latest tag)
-  task ("stack(" <> show version <> ")")
+  task ("ghc-" <> show version <> "")
     $ task "stack.yaml"
     $ do
       p <- readEnv stack
