@@ -90,4 +90,4 @@ newtype Pkg = Pkg {name :: PkgName}
   deriving (Generic, FromJSON, Show, ToJSON)
 
 resolvePkg :: (HIO m) => PkgDir -> m Pkg
-resolvePkg dir = trace (packageFile dir) $ readYaml $ packageFile dir
+resolvePkg = readYaml . packageFile 
