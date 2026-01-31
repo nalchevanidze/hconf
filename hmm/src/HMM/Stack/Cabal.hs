@@ -31,21 +31,18 @@ import HMM.Utils.Core
     throwError,
     withThrow,
   )
-import HMM.Utils.Execute (execute)
+import HMM.Utils.Execute (execute, parseWarnings, printWarnings)
 import HMM.Utils.Log
   ( alert,
     field,
     task,
-    warn,
   )
 import HMM.Utils.Source
   ( fromByteString,
     ignoreEmpty,
     indentText,
-    isIndentedLine,
     parseField,
     parseLines,
-    startsLike,
   )
 import Relude
 
@@ -67,8 +64,6 @@ instance Parse Cabal where
           $ map parseField
           $ parseLines bs
 
-data Warning = Warning Text [Text]
-
 getCabal :: (HIO m) => FilePath -> m Cabal
 getCabal path = withThrow (read path) >>= parse . fromByteString
 
@@ -85,28 +80,6 @@ upload pkg = do
   case result of
     Left out -> fail $ "upload: " <> unpack (indentText $ pack out)
     Right out -> printWarnings "upload" (parseWarnings out)
-
-instance Log Warning where
-  log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
-
-printWarnings :: (HIO m) => String -> [Warning] -> m ()
-printWarnings cmd [] = field cmd "ok"
-printWarnings cmd xs = task cmd $ traverse_ log xs
-
-parseWarnings :: String -> [Warning]
-parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
-
-toWarning :: [Text] -> Maybe Warning
-toWarning (h : lns) | startsLike "warning" h = Just $ Warning h $ takeWhile isIndentedLine lns
-toWarning _ = Nothing
-
-groupTopics :: [Text] -> [[Text]]
-groupTopics = regroup . break emptyLine
-  where
-    emptyLine = (== "")
-    regroup (h, t)
-      | null t = [h]
-      | otherwise = h : groupTopics (dropWhile emptyLine t)
 
 data CabalSrc = CabalSrc
   { pkgDir :: PkgDir,
