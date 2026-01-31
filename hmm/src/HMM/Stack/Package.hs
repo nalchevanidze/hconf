@@ -21,7 +21,7 @@ import HMM.Core.Bounds (BoundsByName)
 import HMM.Core.Dependencies (Dependencies)
 import HMM.Core.PkgDir (PkgDir, packageFile)
 import HMM.Core.Version (Version, readVersion)
-import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), upload)
+import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), prePublish, upload)
 import HMM.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HMM.Utils.Class (Check (..))
 import HMM.Utils.Core (Name, PkgName, aesonYAMLOptions, throwError, tupled)
@@ -94,13 +94,14 @@ syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = forPackages checkPackage
 
 publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Name -> m ()
-publishPackages (Just x) = task ("group " <> toString x) $ do
+publishPackages (Just x) = task ("group(" <> toString x <> ")") $ do
+  prePublish
   groups <- readList
   g <- case filter ((== x) . pkgGroupName) groups of
     [] -> fail $ "Package group \"" <> toString x <> "\" not found! available groups: " <> intercalate ", " (map (show . pkgGroupName) groups)
     (g : _) -> pure g
   publishGroup g
-publishPackages Nothing = task "groups" $ readList >>= traverse_ publishGroup
+publishPackages Nothing = prePublish >> task "groups" (readList >>= traverse_ publishGroup)
 
 publishGroup :: (ReadConf m '[Version, BoundsByName]) => PkgGroup -> m ()
 publishGroup g = task (toString $ pkgGroupName g) $ traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)

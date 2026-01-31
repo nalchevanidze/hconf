@@ -24,7 +24,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import HMM.Config.Build (Builds, allDeps)
 import HMM.Config.Config (Config (..), getRule)
-import HMM.Config.PkgGroup (PkgGroup, pkgDirs)
+import HMM.Config.PkgGroup (PkgGroup, PkgRegistry, pkgDirs, pkgRegistry)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
 import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap)
@@ -50,7 +50,8 @@ data HCEnv = HCEnv
   { config :: Config,
     env :: Env,
     indention :: Int,
-    versionsMap :: VersionsMap
+    versionsMap :: VersionsMap,
+    pkgs :: PkgRegistry
   }
 
 newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
@@ -64,7 +65,9 @@ newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
     )
 
 runConfigT :: ConfigT a -> Env -> Config -> VersionsMap -> IO (Either String a)
-runConfigT (ConfigT (ReaderT f)) env config versionsMap = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
+runConfigT (ConfigT (ReaderT f)) env config versionsMap = do
+  pkgs <- pkgRegistry (groups config)
+  tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
 indent :: Int -> String -> String
 indent i = (replicate (i * 2) ' ' <>)
@@ -199,7 +202,9 @@ instance ReadFromConf ConfigT Version where
   readFromConf = const $ asks (version . config)
 
 instance ReadFromConf ConfigT (ByKey DependencyName Bounds) where
-  readFromConf name = ByKey <$> (asks config >>= getRule name)
+  readFromConf name = do
+    ps <- asks pkgs
+    ByKey <$> (asks config >>= getRule ps name)
 
 instance ReadFromConf ConfigT VersionsMap where
   readFromConf _ = asks versionsMap

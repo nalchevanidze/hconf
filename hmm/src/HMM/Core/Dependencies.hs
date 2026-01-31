@@ -25,7 +25,6 @@ import Relude hiding
     break,
     drop,
     fromList,
-    isPrefixOf,
     length,
     null,
     show,

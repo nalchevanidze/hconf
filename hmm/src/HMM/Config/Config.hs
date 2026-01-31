@@ -24,13 +24,13 @@ import Data.Aeson
   )
 import Data.Aeson.Types (defaultOptions)
 import HMM.Config.Build (Builds)
-import HMM.Config.PkgGroup (PkgGroup, isMember)
+import HMM.Config.PkgGroup (PkgGroup, PkgRegistry, isMember)
 import HMM.Core.Bounds (Bounds, updateDepBounds, versionBounds)
 import HMM.Core.Bump (Bump)
 import HMM.Core.Dependencies (Dependencies, getBounds, traverseDeps)
 import HMM.Core.HkgRef (VersionsMap)
 import HMM.Core.Version (Version, nextVersion)
-import HMM.Utils.Class (Check (check), HIO, format)
+import HMM.Utils.Class (Check (..), HIO)
 import HMM.Utils.Core (DependencyName)
 import HMM.Utils.FromConf (ReadConf)
 import Relude
@@ -48,9 +48,9 @@ data Config = Config
       Show
     )
 
-getRule :: (MonadFail m) => DependencyName -> Config -> m Bounds
-getRule name Config {..}
-  | isMember (format name) groups = pure bounds
+getRule :: (MonadFail m) => PkgRegistry -> DependencyName -> Config -> m Bounds
+getRule ps name Config {..}
+  | isMember name ps = pure bounds
   | otherwise = getBounds name dependencies
 
 instance ToJSON Config where

@@ -12,6 +12,7 @@ module HMM.Stack.Cabal
     CabalSrc (..),
     stack,
     upload,
+    prePublish,
   )
 where
 
@@ -80,6 +81,13 @@ upload pkg = do
   case result of
     Left out -> fail $ "upload: " <> unpack (indentText $ pack out)
     Right out -> printWarnings "upload" (parseWarnings out)
+
+prePublish :: (HIO m) => m ()
+prePublish = do
+  result <- execute "stack" ["sdist"] []
+  case result of
+    Left out -> fail $ "sdist: " <> unpack (indentText $ pack out)
+    Right out -> printWarnings "sdist" (parseWarnings out)
 
 data CabalSrc = CabalSrc
   { pkgDir :: PkgDir,
