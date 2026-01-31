@@ -97,7 +97,7 @@ publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Na
 publishPackages (Just x) = task ("group " <> toString x) $ do
   groups <- readList
   g <- case filter ((== x) . pkgGroupName) groups of
-    [] -> fail $ "Package group \"" <> toString x <> "\" not found!"
+    [] -> fail $ "Package group \"" <> toString x <> "\" not found! available groups: " <> intercalate ", " (map (show . pkgGroupName) groups)
     (g : _) -> pure g
   publishGroup g
 publishPackages Nothing = task "groups" $ readList >>= traverse_ publishGroup
