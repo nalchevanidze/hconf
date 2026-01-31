@@ -7,6 +7,7 @@ module HMM.Format (format) where
 import HMM.Core.PkgDir (explore)
 import HMM.Utils.Class (HIO)
 import HMM.Utils.Core (throwError)
+import HMM.Utils.Execute (isSuccess)
 import HMM.Utils.FromConf (ReadConf, readList)
 import HMM.Utils.Log (task)
 import Ormolu
@@ -20,7 +21,6 @@ import Ormolu.Diff.Text (TextDiff, diffText, printTextDiff)
 import Ormolu.Terminal (runTerm)
 import Relude hiding (exitWith, fix)
 import System.Exit (ExitCode (..))
-import HMM.Utils.Execute (isSuccess)
 
 format :: (ReadConf m ()) => Bool -> m ()
 format check = task "ormolu" $ do
