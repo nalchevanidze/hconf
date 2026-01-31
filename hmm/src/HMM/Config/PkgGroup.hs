@@ -9,6 +9,7 @@ module HMM.Config.PkgGroup
     PkgGroups,
     pkgDirs,
     isMember,
+    pkgGroupName,
   )
 where
 
@@ -50,3 +51,6 @@ pkgDirs PkgGroup {..} = map pkgPath packages
 
 isMember :: Name -> PkgGroups -> Bool
 isMember pkgName = any ((`isPrefixOf` pkgName) . name)
+
+pkgGroupName :: PkgGroup -> Name
+pkgGroupName PkgGroup {..} = name

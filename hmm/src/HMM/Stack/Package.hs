@@ -16,7 +16,7 @@ module HMM.Stack.Package
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
-import HMM.Config.PkgGroup
+import HMM.Config.PkgGroup (PkgGroup (..), pkgDirs, pkgGroupName)
 import HMM.Core.Bounds (BoundsByName)
 import HMM.Core.Dependencies (Dependencies)
 import HMM.Core.PkgDir (PkgDir, packageFile)
@@ -99,7 +99,7 @@ publishPackages name = task (maybe "" toString name <> " packages") $ do
   traverse_ publihsGroup groups
 
 publihsGroup :: (ReadConf m '[Version, BoundsByName]) => PkgGroup -> m ()
-publihsGroup g = traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)
+publihsGroup g = task (toString $ pkgGroupName g) $ traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)
 
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
