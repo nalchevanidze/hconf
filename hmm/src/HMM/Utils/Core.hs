@@ -22,7 +22,6 @@ module HMM.Utils.Core
     Msg (..),
     ErrorMsg (..),
     withString,
-    execCommand,
     ResolverName,
     printException,
     safeIO,
@@ -32,7 +31,6 @@ module HMM.Utils.Core
     DependencyName (..),
     select,
     PkgName (..),
-    isSuccess,
   )
 where
 
@@ -44,9 +42,7 @@ import Data.List (elemIndex)
 import Data.Map (lookup)
 import qualified Data.Map as M
 import Data.Text (toTitle)
-import GHC.IO.Exception (ExitCode (..))
 import Relude
-import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
 
 aesonYAMLOptions :: Options
@@ -227,14 +223,6 @@ getField = select "Field"
 select :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
 
-execCommand :: (MonadIO m) => FilePath -> [String] -> [String] -> m (Either String String)
-execCommand name args options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode name (args <> map ("--" <>) options) "")
-  pure
-    $ if isSuccess code
-      then Right out
-      else Left out
-
 printException :: SomeException -> String
 printException = show
 
@@ -245,7 +233,3 @@ safeIO = tryJust (Just . printException)
 
 withThrow :: (MonadFail m) => m (Result a) -> m a
 withThrow x = x >>= either (throwError . msg) pure
-
-isSuccess :: ExitCode -> Bool
-isSuccess ExitSuccess = True
-isSuccess ExitFailure {} = False

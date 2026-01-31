@@ -47,6 +47,7 @@ executable hmm
       HMM.Utils.Chalk
       HMM.Utils.Class
       HMM.Utils.Core
+      HMM.Utils.Execute
       HMM.Utils.FromConf
       HMM.Utils.Http
       HMM.Utils.Log

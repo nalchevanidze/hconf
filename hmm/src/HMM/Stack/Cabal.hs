@@ -27,11 +27,11 @@ import HMM.Utils.Class
 import HMM.Utils.Core
   ( Msg (..),
     PkgName,
-    execCommand,
     getField,
     throwError,
     withThrow,
   )
+import HMM.Utils.Execute (execute)
 import HMM.Utils.Log
   ( alert,
     field,
@@ -74,14 +74,14 @@ getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (HIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  result <- execCommand "stack" [cmd, toString pkg] options
+  result <- execute "stack" [cmd, toString pkg] options
   case result of
     Left out -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
     Right out -> printWarnings cmd (parseWarnings out)
 
 upload :: (HIO m) => PkgName -> m ()
 upload pkg = do
-  result <- execCommand "stack" ["upload", toString pkg] []
+  result <- execute "stack" ["upload", toString pkg] []
   case result of
     Left out -> fail $ "upload: " <> unpack (indentText $ pack out)
     Right out -> printWarnings "upload" (parseWarnings out)
