@@ -1,4 +1,6 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -11,6 +13,9 @@ module HMM.Core.PkgDir
     packageFile,
     cabalFile,
     pkgFile,
+    Pkg (..),
+    resolveDir,
+    resolvePkg,
   )
 where
 
@@ -18,7 +23,9 @@ import Data.Aeson (FromJSON (..), ToJSON (toJSON))
 import Data.Aeson.Types (Value (..))
 import Data.List (stripPrefix)
 import Data.Text (intercalate)
+import HMM.Utils.Class (HIO)
 import HMM.Utils.Core (Msg (..), Name, PkgName, withString)
+import HMM.Utils.Yaml (readYaml)
 import Relude hiding (Undefined, intercalate)
 import System.FilePath.Glob (glob)
 import System.FilePath.Posix
@@ -78,3 +85,14 @@ instance FromJSON PkgDir where
 
 instance ToJSON PkgDir where
   toJSON = String . fromString . resolve []
+
+newtype Pkg = Pkg {name :: PkgName}
+  deriving
+    ( Generic,
+      FromJSON,
+      Show,
+      ToJSON
+    )
+
+resolvePkg :: (HIO m) => PkgDir -> m Pkg
+resolvePkg dir = trace (packageFile dir) $ readYaml $ packageFile dir

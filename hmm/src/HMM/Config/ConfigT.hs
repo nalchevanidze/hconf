@@ -4,6 +4,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -28,7 +29,7 @@ import HMM.Config.PkgGroup (PkgGroup, pkgDirs)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
 import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap)
-import HMM.Core.PkgDir (PkgDirs)
+import HMM.Core.PkgDir (Pkg (..), PkgDirs, resolvePkg)
 import HMM.Core.Version (Version)
 import HMM.Utils.Chalk (Color (Green), chalk)
 import HMM.Utils.Class
@@ -36,7 +37,7 @@ import HMM.Utils.Class
     Format (format),
     HIO (..),
   )
-import HMM.Utils.Core (DependencyName (..), getField, printException)
+import HMM.Utils.Core (DependencyName (..), PkgName, getField, printException)
 import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..), readList)
 import HMM.Utils.Http (hackage)
 import HMM.Utils.Log
@@ -50,7 +51,8 @@ data HCEnv = HCEnv
   { config :: Config,
     env :: Env,
     indention :: Int,
-    versionsMap :: VersionsMap
+    versionsMap :: VersionsMap,
+    pkgs :: Map PkgName PkgGroup
   }
 
 newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
@@ -63,8 +65,13 @@ newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
       MonadFail
     )
 
+includePackages :: PkgGroup -> IO (Map PkgName PkgGroup)
+includePackages g = Map.fromList . map ((,g) . name) <$> traverse resolvePkg (pkgDirs g)
+
 runConfigT :: ConfigT a -> Env -> Config -> VersionsMap -> IO (Either String a)
-runConfigT (ConfigT (ReaderT f)) env config versionsMap = tryJust (Just . printException) (f HCEnv {indention = 0, ..})
+runConfigT (ConfigT (ReaderT f)) env config versionsMap = do
+  pkgs <- Map.unions <$> traverse includePackages (groups config)
+  tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
 indent :: Int -> String -> String
 indent i = (replicate (i * 2) ' ' <>)
