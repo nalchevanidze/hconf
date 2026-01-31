@@ -1,5 +1,5 @@
-# hash: 03a418565a88f3b8921543aa86d02ba1a4e5f9ce15d2c0830d8e5cba10a1a5b9
-version: 1.1.0
+# hash: a7dae44d0d137ed71071dadacb008b31cddd5218f4293473abba710585814cf3
+version: 1.1.1
 bounds: '>= 1.1.0 && < 1.2.0'
 groups:
 - name: lib
