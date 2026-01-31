@@ -6,7 +6,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HMM.Stack.Config
+module HMM.Stack.StackYaml
   ( Stack,
     syncStackYaml,
   )

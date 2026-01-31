@@ -41,9 +41,9 @@ executable hmm
       HMM.Format
       HMM.Hie
       HMM.Stack.Cabal
-      HMM.Stack.Config
       HMM.Stack.Lib
       HMM.Stack.Package
+      HMM.Stack.StackYaml
       HMM.Utils.Chalk
       HMM.Utils.Class
       HMM.Utils.Core
