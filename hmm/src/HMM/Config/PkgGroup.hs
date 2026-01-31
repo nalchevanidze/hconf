@@ -29,7 +29,7 @@ import qualified Data.Map as Map
 import HMM.Core.PkgDir (PkgDirs, genPkgDir)
 import qualified HMM.Core.PkgDir as P
 import HMM.Utils.Core (DependencyName (DependencyName), Name, PkgName (..))
-import Relude hiding (isPrefixOf)
+import Relude
 
 data PkgGroup = PkgGroup
   { name :: Name,
