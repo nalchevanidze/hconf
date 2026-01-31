@@ -43,7 +43,7 @@ import HMM.Utils.Log
   ( alert,
     task,
   )
-import HMM.Utils.Yaml (readYaml, rewrite)
+import HMM.Utils.Yaml (readYaml, rewrite_)
 import Relude
 
 data HCEnv = HCEnv
@@ -177,13 +177,10 @@ save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
   cfg <- asks config
   ctx <- asks id
-  let hash = computeConfigHash cfg
-      filePath = hmm $ env ctx
-  -- Write the config normally first
-  rewrite filePath (const $ pure cfg) $> ()
-  -- Then prepend the hash comment
+  let filePath = hmm $ env ctx
+  rewrite_ filePath (const $ pure cfg)
   content <- liftIO $ T.decodeUtf8 <$> readFileBS filePath
-  let contentWithHash = "# hash: " <> hash <> "\n" <> content
+  let contentWithHash = "# hash: " <> computeConfigHash cfg <> "\n" <> content
   liftIO $ writeFileBS filePath (T.encodeUtf8 contentWithHash)
 
 instance ReadFromConf ConfigT PkgDirs where

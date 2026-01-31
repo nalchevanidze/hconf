@@ -23,7 +23,7 @@ import HMM.Utils.Class
 import HMM.Utils.Core (Name)
 import HMM.Utils.FromConf (ReadConf, readEnv)
 import HMM.Utils.Log (task)
-import HMM.Utils.Yaml (rewrite)
+import HMM.Utils.Yaml (rewrite_)
 import Relude
 
 data Component = Component
@@ -78,4 +78,4 @@ syncHie :: (ReadConf m Env) => m ()
 syncHie = task "hie" $ task "hie.yaml" $ do
   Env {..} <- readEnv id
   components <- concatMap toLib <$> resolvePackages
-  rewrite hie (const $ pure $ packHie Components {stackYaml = stack, components}) $> ()
+  rewrite_ hie (const $ pure $ packHie Components {stackYaml = stack, components})

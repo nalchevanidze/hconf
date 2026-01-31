@@ -21,7 +21,7 @@ import HMM.Utils.Class (Format (..))
 import HMM.Utils.Core (Name, ResolverName, aesonYAMLOptions)
 import HMM.Utils.FromConf (ReadConf, readEnv)
 import HMM.Utils.Log (task)
-import HMM.Utils.Yaml (rewrite)
+import HMM.Utils.Yaml (rewrite_)
 import Relude
 
 data Stack = Stack
@@ -49,7 +49,7 @@ syncStackYaml tag = do
     $ task "stack.yaml"
     $ do
       p <- readEnv stack
-      rewrite p (updateStack version) $> ()
+      rewrite_ p (updateStack version)
 
 updateStack :: (ReadConf m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do
