@@ -15,10 +15,10 @@ module HMM
 where
 
 import Data.Version (showVersion)
-import HMM.Config.Bump (Bump (..))
 import HMM.Config.Config (Config (..), bumpVersion, updateConfig)
 import HMM.Config.ConfigT (HCEnv (..), run)
 import HMM.Config.Tag (Tag (Latest))
+import HMM.Core.Bump (Bump (..))
 import HMM.Core.Env (Env (..), defaultConfig)
 import HMM.Format (format)
 import HMM.Hie (syncHie)

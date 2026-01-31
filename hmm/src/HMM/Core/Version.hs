@@ -19,7 +19,7 @@ import Data.Aeson
     Value (..),
   )
 import GHC.Show (Show (..))
-import HMM.Config.Bump (Bump (..))
+import HMM.Core.Bump (Bump (..))
 import HMM.Utils.Class
   ( Format (..),
     Parse (..),

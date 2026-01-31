@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HMM.Config.Bump
+module HMM.Core.Bump
   ( Bump (..),
   )
 where

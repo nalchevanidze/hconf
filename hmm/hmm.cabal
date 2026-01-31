@@ -27,12 +27,12 @@ executable hmm
   other-modules:
       HMM
       HMM.Config.Build
-      HMM.Config.Bump
       HMM.Config.Config
       HMM.Config.ConfigT
       HMM.Config.PkgGroup
       HMM.Config.Tag
       HMM.Core.Bounds
+      HMM.Core.Bump
       HMM.Core.Dependencies
       HMM.Core.Env
       HMM.Core.HkgRef
