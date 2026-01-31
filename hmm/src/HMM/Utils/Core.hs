@@ -17,12 +17,10 @@ module HMM.Utils.Core
     notElemError,
     maybeToError,
     maybeMapToList,
-    maybeBool,
     throwError,
     Msg (..),
     ErrorMsg (..),
     withString,
-    exec,
     ResolverName,
     printException,
     safeIO,
@@ -32,7 +30,6 @@ module HMM.Utils.Core
     DependencyName (..),
     select,
     PkgName (..),
-    isSuccess,
   )
 where
 
@@ -44,9 +41,7 @@ import Data.List (elemIndex)
 import Data.Map (lookup)
 import qualified Data.Map as M
 import Data.Text (toTitle)
-import GHC.IO.Exception (ExitCode (..))
 import Relude
-import System.Process (readProcessWithExitCode)
 import Text.URI (URI)
 
 aesonYAMLOptions :: Options
@@ -218,19 +213,11 @@ checkElem name listName x xs =
 maybeMapToList :: Maybe (Map k a) -> [(k, a)]
 maybeMapToList = maybe [] M.toList
 
-maybeBool :: Maybe Bool -> Bool
-maybeBool = fromMaybe False
-
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
 
 select :: (MonadFail m, Msg t, Ord t) => ErrorMsg -> t -> Map t a -> m a
 select e k = maybeToError ("Unknown " <> e <> ": " <> msg k <> "!") . lookup k
-
-exec :: (MonadIO m) => FilePath -> [String] -> m (String, Bool)
-exec name options = do
-  (code, _, out) <- liftIO (readProcessWithExitCode name options "")
-  pure (out, isSuccess code)
 
 printException :: SomeException -> String
 printException = show
@@ -242,7 +229,3 @@ safeIO = tryJust (Just . printException)
 
 withThrow :: (MonadFail m) => m (Result a) -> m a
 withThrow x = x >>= either (throwError . msg) pure
-
-isSuccess :: ExitCode -> Bool
-isSuccess ExitSuccess = True
-isSuccess ExitFailure {} = False

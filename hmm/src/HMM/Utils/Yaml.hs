@@ -6,6 +6,7 @@
 module HMM.Utils.Yaml
   ( readYaml,
     rewrite,
+    rewrite_,
   )
 where
 
@@ -63,6 +64,9 @@ rewrite pkg f = do
   logFileChange pkg (fromRight "" original == newFile)
   withThrow (write pkg newFile)
   pure (getData yaml)
+
+rewrite_ :: (HIO m, FromJSON t, ToJSON t) => FilePath -> (Maybe t -> m t) -> m ()
+rewrite_ pkg = rewrite pkg >=> (pure . const ())
 
 readYaml :: (FromJSON a, HIO m) => FilePath -> m a
 readYaml = withThrow . read >=> (liftIO . decodeThrow)

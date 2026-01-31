@@ -6,7 +6,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module HMM.Stack.Config
+module HMM.Stack.StackYaml
   ( Stack,
     syncStackYaml,
   )
@@ -21,7 +21,7 @@ import HMM.Utils.Class (Format (..))
 import HMM.Utils.Core (Name, ResolverName, aesonYAMLOptions)
 import HMM.Utils.FromConf (ReadConf, readEnv)
 import HMM.Utils.Log (task)
-import HMM.Utils.Yaml (rewrite)
+import HMM.Utils.Yaml (rewrite_)
 import Relude
 
 data Stack = Stack
@@ -45,11 +45,11 @@ instance ToJSON Stack where
 syncStackYaml :: (ReadConf m '[Builds, Env]) => Maybe Tag -> m ()
 syncStackYaml tag = do
   version <- resolveVersion (fromMaybe Latest tag)
-  task ("stack(" <> show version <> ")")
+  task ("ghc-" <> show version <> "")
     $ task "stack.yaml"
     $ do
       p <- readEnv stack
-      rewrite p (updateStack version) $> ()
+      rewrite_ p (updateStack version)
 
 updateStack :: (ReadConf m '[Builds, Env]) => Tag -> Maybe Stack -> m Stack
 updateStack version _ = do

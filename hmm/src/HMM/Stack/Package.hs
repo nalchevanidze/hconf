@@ -11,18 +11,20 @@ module HMM.Stack.Package
   ( Package (..),
     syncPackages,
     resolvePackages,
+    publishPackages,
   )
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
+import HMM.Config.PkgGroup (PkgGroup, pkgDirs, pkgGroupName)
 import HMM.Core.Bounds (BoundsByName)
 import HMM.Core.Dependencies (Dependencies)
 import HMM.Core.PkgDir (PkgDir, packageFile)
 import HMM.Core.Version (Version, readVersion)
-import HMM.Stack.Cabal (Cabal (..), CabalSrc (..))
+import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), upload)
 import HMM.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HMM.Utils.Class (Check (..))
-import HMM.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
+import HMM.Utils.Core (Name, PkgName, aesonYAMLOptions, throwError, tupled)
 import HMM.Utils.FromConf (ReadConf, readList)
 import HMM.Utils.Log (task)
 import HMM.Utils.Yaml (readYaml, rewrite)
@@ -78,10 +80,32 @@ rewritePackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m Package
 rewritePackage path = task "package" $ rewrite (packageFile path) updatePackage
 
 checkPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
-checkPackage pkgDir =
-  task (toString pkgDir) $ do
-    Package {..} <- rewritePackage pkgDir
-    check CabalSrc {pkgDir, target = Cabal {..}}
+checkPackage pkgDir = do
+  Package {..} <- rewritePackage pkgDir
+  check CabalSrc {pkgDir, target = Cabal {..}}
+
+forPackages :: (ReadConf m ()) => (PkgDir -> m b) -> m ()
+forPackages f =
+  task "packages"
+    $ readList
+    >>= traverse_ (\p -> task (toString p) (f p))
 
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
-syncPackages = task "packages" $ readList >>= traverse_ checkPackage
+syncPackages = forPackages checkPackage
+
+publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Name -> m ()
+publishPackages (Just x) = task ("group " <> toString x) $ do
+  groups <- readList
+  g <- case filter ((== x) . pkgGroupName) groups of
+    [] -> fail $ "Package group \"" <> toString x <> "\" not found! available groups: " <> intercalate ", " (map (show . pkgGroupName) groups)
+    (g : _) -> pure g
+  publishGroup g
+publishPackages Nothing = task "groups" $ readList >>= traverse_ publishGroup
+
+publishGroup :: (ReadConf m '[Version, BoundsByName]) => PkgGroup -> m ()
+publishGroup g = task (toString $ pkgGroupName g) $ traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)
+
+publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
+publishPackage path = do
+  Package {name} <- readYaml $ packageFile path
+  upload name

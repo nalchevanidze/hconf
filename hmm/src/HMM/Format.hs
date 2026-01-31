@@ -6,7 +6,8 @@ module HMM.Format (format) where
 
 import HMM.Core.PkgDir (explore)
 import HMM.Utils.Class (HIO)
-import HMM.Utils.Core (isSuccess, throwError)
+import HMM.Utils.Core (throwError)
+import HMM.Utils.Execute (isSuccess)
 import HMM.Utils.FromConf (ReadConf, readList)
 import HMM.Utils.Log (task)
 import Ormolu

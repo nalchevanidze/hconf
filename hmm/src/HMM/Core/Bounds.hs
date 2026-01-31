@@ -19,7 +19,7 @@ import Data.Aeson
     Value (..),
   )
 import Data.List (maximum, minimum)
-import HMM.Config.Bump (Bump (Minor))
+import HMM.Core.Bump (Bump (Minor))
 import HMM.Core.HkgRef (VersionsMap, lookupVersions)
 import HMM.Core.Version (Version, dropPatch, nextVersion)
 import HMM.Utils.Chalk (Color (Yellow), chalk)

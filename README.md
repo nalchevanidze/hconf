@@ -33,33 +33,45 @@ HMM helps you manage a monorepo with multiple internal packages and a compiler m
 
 ---
 
+
+
 ## Commands
 
 - `hmm use <ghc>`  
-  Select a build from `hmm.yaml` and generate the active build config:
+  Selects a build from `hmm.yaml` and generates the active build config:
   - rewrites `stack.yaml` for that GHC/resolver
 
 - `hmm sync`  
-  Sync package metadata to match `hmm.yaml`:
+  Syncs package metadata to match `hmm.yaml`:
   - generates/updates `hie.yaml`
   - regenerates `**/**/package.yaml`
   - validates `**/**/<name>.cabal` against version/bounds policy
   - validates `builds[].extra` dependency versions exist on Hackage
 
 - `hmm version`  
-  Show current version/config.
+  Shows the current **monorepo/project version** and config (from `hmm.yaml`).
+  
+  > **Note:** This shows the version of your monorepo/project, **not** the version of the HMM CLI tool itself. To see the CLI version, use `hmm --version`.
 
 - `hmm version <bump>` (`major|minor|patch`)  
-  Bump project version and update bounds in `hmm.yaml` (then you typically run `hmm sync`).
+  Bumps project version and updates bounds in `hmm.yaml` (then you typically run `hmm sync`).
 
 - `hmm update-deps`  
-  Check dependencies in `hmm.yaml` against Hackage, update bounds if newer versions exist, and **sync packages after updating**.
+  Checks dependencies in `hmm.yaml` against Hackage, updates bounds if newer versions exist, and **syncs packages after updating**.
 
 - `hmm format [--check]`  
-  Format/check with Ormolu.
+  Formats/checks with Ormolu.
+
+- `hmm publish [NAME]`  
+  Publishes packages to Hackage. Optionally specify a package group name to publish only that group.
 
 - `hmm --version`  
-  Show the HMM tool version.
+  Shows the HMM CLI tool version.
+
+- `hmm --quiet`  
+  Runs quietly with minimal output (can be combined with any command).
+
+_See the [Package Groups and Publishing](#package-groups-and-publishing) section for more details on group usage and publishing._
 
 ---
 
@@ -269,6 +281,52 @@ hmm sync
 hmm use 9.4.5
 stack test
 ```
+
+--- 
+
+## Package Groups and Publishing
+
+HMM supports **package groups** to help you organize and manage related packages within your monorepo. A package group is a named collection of packages (usually libraries or executables) that live in a common directory or share a common purpose.
+
+### Why use package groups?
+
+- **Logical organization:** Group related packages (e.g., core libraries, backend, frontend, plugins) for clarity and maintainability.
+- **Scoped operations:** Some commands (like `hmm publish [NAME]`) can target a specific group, making it easy to publish or operate on just a subset of your monorepo.
+- **Simpler configuration:** Define shared settings (like directory, bounds, or build options) once per group instead of repeating for each package.
+- **Scalability:** As your monorepo grows, groups help keep configuration and workflows manageable.
+
+### Example
+
+```yaml
+groups:
+  - name: backend
+    packages:
+      - api-server
+      - database-layer
+    dir: ./backend/
+  - name: frontend
+    prefix: web
+    packages:
+      - client # will be resolved as: web-client
+    dir: ./frontend/
+```
+
+In this example, you have two groups: `backend` and `frontend`, each with their own packages and base directory. You can then run commands like:
+
+```bash
+hmm publish backend   # Only publish the backend group
+```
+
+Groups are defined in your `hmm.yaml` and are referenced by name in commands that support them.
+
+### Publishing Packages
+
+The `hmm publish` command allows you to publish all packages, or just a specific group, to Hackage:
+
+- `hmm publish` — Publishes all packages in the monorepo.
+- `hmm publish <group>` — Publishes only the packages in the specified group.
+
+This makes it easy to coordinate releases for related packages or to release only a subset of your monorepo as needed.
 
 ---
 

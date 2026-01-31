@@ -24,7 +24,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import HMM.Config.Build (Builds, allDeps)
 import HMM.Config.Config (Config (..), getRule)
-import HMM.Config.PkgGroup (pkgDirs)
+import HMM.Config.PkgGroup (PkgGroup, pkgDirs)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
 import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap)
@@ -37,13 +37,13 @@ import HMM.Utils.Class
     HIO (..),
   )
 import HMM.Utils.Core (DependencyName (..), getField, printException)
-import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..))
+import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..), readList)
 import HMM.Utils.Http (hackage)
 import HMM.Utils.Log
   ( alert,
     task,
   )
-import HMM.Utils.Yaml (readYaml, rewrite)
+import HMM.Utils.Yaml (readYaml, rewrite_)
 import Relude
 
 data HCEnv = HCEnv
@@ -177,17 +177,17 @@ save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
   cfg <- asks config
   ctx <- asks id
-  let hash = computeConfigHash cfg
-      filePath = hmm $ env ctx
-  -- Write the config normally first
-  rewrite filePath (const $ pure cfg) $> ()
-  -- Then prepend the hash comment
+  let filePath = hmm $ env ctx
+  rewrite_ filePath (const $ pure cfg)
   content <- liftIO $ T.decodeUtf8 <$> readFileBS filePath
-  let contentWithHash = "# hash: " <> hash <> "\n" <> content
+  let contentWithHash = "# hash: " <> computeConfigHash cfg <> "\n" <> content
   liftIO $ writeFileBS filePath (T.encodeUtf8 contentWithHash)
 
 instance ReadFromConf ConfigT PkgDirs where
-  readFromConf = const $ concatMap pkgDirs <$> asks (groups . config)
+  readFromConf _ = concatMap pkgDirs <$> readList
+
+instance ReadFromConf ConfigT [PkgGroup] where
+  readFromConf _ = asks (groups . config)
 
 instance ReadFromConf ConfigT Builds where
   readFromConf = const $ asks (builds . config)

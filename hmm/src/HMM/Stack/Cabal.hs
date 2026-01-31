@@ -10,6 +10,8 @@
 module HMM.Stack.Cabal
   ( Cabal (..),
     CabalSrc (..),
+    stack,
+    upload,
   )
 where
 
@@ -25,25 +27,22 @@ import HMM.Utils.Class
 import HMM.Utils.Core
   ( Msg (..),
     PkgName,
-    exec,
     getField,
     throwError,
     withThrow,
   )
+import HMM.Utils.Execute (execute, parseWarnings, printWarnings)
 import HMM.Utils.Log
   ( alert,
     field,
     task,
-    warn,
   )
 import HMM.Utils.Source
   ( fromByteString,
     ignoreEmpty,
     indentText,
-    isIndentedLine,
     parseField,
     parseLines,
-    startsLike,
   )
 import Relude
 
@@ -65,40 +64,22 @@ instance Parse Cabal where
           $ map parseField
           $ parseLines bs
 
-data Warning = Warning Text [Text]
-
 getCabal :: (HIO m) => FilePath -> m Cabal
 getCabal path = withThrow (read path) >>= parse . fromByteString
 
 stack :: (HIO m) => String -> PkgDir -> [String] -> m ()
 stack cmd pkg options = do
-  (out, success) <- exec "stack" (cmd : (toString pkg : map ("--" <>) options))
-  ( if success
-      then printWarnings cmd (parseWarnings out)
-      else alert $ cmd <> ": " <> unpack (indentText $ pack out)
-    )
+  result <- execute "stack" [cmd, toString pkg] options
+  case result of
+    Left out -> alert $ cmd <> ": " <> unpack (indentText $ pack out)
+    Right out -> printWarnings cmd (parseWarnings out)
 
-instance Log Warning where
-  log (Warning x ls) = warn (unpack x) >> traverse_ (warn . unpack) ls
-
-printWarnings :: (HIO m) => String -> [Warning] -> m ()
-printWarnings cmd [] = field cmd "ok"
-printWarnings cmd xs = task cmd $ traverse_ log xs
-
-parseWarnings :: String -> [Warning]
-parseWarnings = mapMaybe toWarning . groupTopics . parseLines . pack
-
-toWarning :: [Text] -> Maybe Warning
-toWarning (h : lns) | startsLike "warning" h = Just $ Warning h $ takeWhile isIndentedLine lns
-toWarning _ = Nothing
-
-groupTopics :: [Text] -> [[Text]]
-groupTopics = regroup . break emptyLine
-  where
-    emptyLine = (== "")
-    regroup (h, t)
-      | null t = [h]
-      | otherwise = h : groupTopics (dropWhile emptyLine t)
+upload :: (HIO m) => PkgName -> m ()
+upload pkg = do
+  result <- execute "stack" ["upload", toString pkg] []
+  case result of
+    Left out -> fail $ "upload: " <> unpack (indentText $ pack out)
+    Right out -> printWarnings "upload" (parseWarnings out)
 
 data CabalSrc = CabalSrc
   { pkgDir :: PkgDir,
