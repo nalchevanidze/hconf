@@ -96,11 +96,14 @@ syncPackages = forPackages checkPackage
 publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Name -> m ()
 publishPackages (Just x) = task ("group " <> toString x) $ do
   groups <- readList
-  traverse_ publihsGroup groups
-publishPackages Nothing = task "groups" $ readList >>= traverse_ publihsGroup
+  g <- case filter ((== x) . pkgGroupName) groups of
+    [] -> fail $ "Package group \"" <> toString x <> "\" not found!"
+    (g : _) -> pure g
+  publishGroup g
+publishPackages Nothing = task "groups" $ readList >>= traverse_ publishGroup
 
-publihsGroup :: (ReadConf m '[Version, BoundsByName]) => PkgGroup -> m ()
-publihsGroup g = task (toString $ pkgGroupName g) $ traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)
+publishGroup :: (ReadConf m '[Version, BoundsByName]) => PkgGroup -> m ()
+publishGroup g = task (toString $ pkgGroupName g) $ traverse_ (\p -> task (toString p) (publishPackage p)) (pkgDirs g)
 
 publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
 publishPackage path = do
