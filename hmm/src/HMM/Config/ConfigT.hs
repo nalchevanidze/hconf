@@ -202,7 +202,7 @@ instance ReadFromConf ConfigT Version where
   readFromConf = const $ asks (version . config)
 
 instance ReadFromConf ConfigT (ByKey DependencyName Bounds) where
-  readFromConf name = do 
+  readFromConf name = do
     ps <- asks pkgs
     ByKey <$> (asks config >>= getRule ps name)
 

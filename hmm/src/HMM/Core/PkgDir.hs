@@ -1,9 +1,9 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE DeriveAnyClass #-}
 
 module HMM.Core.PkgDir
   ( PkgDir,
@@ -90,4 +90,4 @@ newtype Pkg = Pkg {name :: PkgName}
   deriving (Generic, FromJSON, Show, ToJSON)
 
 resolvePkg :: (HIO m) => PkgDir -> m Pkg
-resolvePkg = readYaml . packageFile 
+resolvePkg = readYaml . packageFile
