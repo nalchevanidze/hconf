@@ -1,6 +1,6 @@
-# hash: be44c991ab7382a4cd08e0f712426fbe491d7812d819714ee9284c8895c36eef
-version: 1.0.0
-bounds: '>= 1.0.0 && < 1.1.0'
+# hash: 03a418565a88f3b8921543aa86d02ba1a4e5f9ce15d2c0830d8e5cba10a1a5b9
+version: 1.1.0
+bounds: '>= 1.1.0 && < 1.2.0'
 groups:
 - name: lib
   packages:
