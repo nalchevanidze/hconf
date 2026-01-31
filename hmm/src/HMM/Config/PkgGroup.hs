@@ -23,14 +23,14 @@ import Data.Aeson.Types
   )
 import Data.Text (isPrefixOf)
 import HMM.Core.PkgDir (PkgDirs, genPkgDir)
-import HMM.Utils.Core (Name, maybeBool)
+import HMM.Utils.Core (Name)
 import Relude hiding (isPrefixOf)
 
 data PkgGroup = PkgGroup
   { name :: Name,
     dir :: Maybe FilePath,
     packages :: [Name],
-    prefix :: Maybe Bool
+    prefix :: Maybe Text
   }
   deriving
     ( Generic,
@@ -46,7 +46,7 @@ instance ToJSON PkgGroup where
 pkgDirs :: PkgGroup -> PkgDirs
 pkgDirs PkgGroup {..} = map pkgPath packages
   where
-    pkgPath pkg = genPkgDir dir ([name | maybeBool prefix] <> [pkg | pkg /= "."])
+    pkgPath pkg = genPkgDir dir (maybeToList prefix <> [pkg | pkg /= "."])
 
 isMember :: Name -> PkgGroups -> Bool
 isMember pkgName = any ((`isPrefixOf` pkgName) . name)

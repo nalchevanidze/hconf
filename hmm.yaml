@@ -1,8 +1,8 @@
-# hash: 5de52d9ec780a3b2befdf3fc91b9d9d7e14068bb2954067d51be8fa7c5d62368
+# hash: be44c991ab7382a4cd08e0f712426fbe491d7812d819714ee9284c8895c36eef
 version: 1.0.0
 bounds: '>= 1.0.0 && < 1.1.0'
 groups:
-- name: hmm
+- name: lib
   packages:
   - hmm
   dir: ./

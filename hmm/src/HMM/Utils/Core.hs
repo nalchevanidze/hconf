@@ -17,7 +17,6 @@ module HMM.Utils.Core
     notElemError,
     maybeToError,
     maybeMapToList,
-    maybeBool,
     throwError,
     Msg (..),
     ErrorMsg (..),
@@ -213,9 +212,6 @@ checkElem name listName x xs =
 
 maybeMapToList :: Maybe (Map k a) -> [(k, a)]
 maybeMapToList = maybe [] M.toList
-
-maybeBool :: Maybe Bool -> Bool
-maybeBool = fromMaybe False
 
 getField :: (MonadFail m) => Name -> Map Name a -> m a
 getField = select "Field"
