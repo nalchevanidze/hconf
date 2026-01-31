@@ -19,7 +19,6 @@ import HMM
     defaultConfig,
     exec,
   )
-import HMM.Utils.Core (Name)
 import Options.Applicative
   ( Parser,
     argument,
