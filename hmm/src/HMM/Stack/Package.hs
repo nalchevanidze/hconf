@@ -16,6 +16,7 @@ module HMM.Stack.Package
 where
 
 import Data.Aeson (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
+import HMM.Config.PkgGroup
 import HMM.Core.Bounds (BoundsByName)
 import HMM.Core.Dependencies (Dependencies)
 import HMM.Core.PkgDir (PkgDir, packageFile)
@@ -23,7 +24,7 @@ import HMM.Core.Version (Version, readVersion)
 import HMM.Stack.Cabal (Cabal (..), CabalSrc (..), upload)
 import HMM.Stack.Lib (Libraries, Library, updateDependencies, updateLibrary)
 import HMM.Utils.Class (Check (..))
-import HMM.Utils.Core (PkgName, aesonYAMLOptions, throwError, tupled)
+import HMM.Utils.Core (Name, PkgName, aesonYAMLOptions, throwError, tupled)
 import HMM.Utils.FromConf (ReadConf, readList)
 import HMM.Utils.Log (task)
 import HMM.Utils.Yaml (readYaml, rewrite)
@@ -83,11 +84,6 @@ checkPackage pkgDir = do
   Package {..} <- rewritePackage pkgDir
   check CabalSrc {pkgDir, target = Cabal {..}}
 
-publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
-publishPackage path = do
-  Package {name} <- readYaml $ packageFile path
-  upload name
-
 forPackages :: (ReadConf m ()) => (PkgDir -> m b) -> m ()
 forPackages f =
   task "packages"
@@ -97,5 +93,13 @@ forPackages f =
 syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = forPackages checkPackage
 
-publishPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
-publishPackages = forPackages publishPackage
+publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Name -> m ()
+publishPackages name = task "packages" $ do
+  groups <- readList
+  let pkgs = concatMap pkgDirs groups
+  traverse_ (\p -> task (toString p) (publishPackage p)) pkgs
+
+publishPackage :: (ReadConf m '[Version, BoundsByName]) => PkgDir -> m ()
+publishPackage path = do
+  Package {name} <- readYaml $ packageFile path
+  upload name

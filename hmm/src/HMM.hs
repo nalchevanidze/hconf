@@ -25,6 +25,7 @@ import HMM.Hie (syncHie)
 import HMM.Stack.Package (publishPackages, syncPackages)
 import HMM.Stack.StackYaml (syncStackYaml)
 import HMM.Utils.Class (Parse (..))
+import HMM.Utils.Core (Name)
 import qualified Paths_hmm as CLI
 import Relude hiding (fix)
 
@@ -34,7 +35,7 @@ data Command
   | Version {bump :: Maybe Bump}
   | UpdateDeps
   | Format {check :: Bool}
-  | Publish {}
+  | Publish {groupName :: Maybe Name}
   deriving (Show)
 
 currentVersion :: String
@@ -42,7 +43,7 @@ currentVersion = showVersion CLI.version
 
 exec :: Command -> Env -> IO ()
 -- commands that must do build validation and require https requests
-exec Publish {} = run False (Just "publish") Nothing publishPackages
+exec Publish {groupName} = run False (Just "publish") Nothing (publishPackages groupName)
 exec Use {tag} = run False (Just "use") Nothing $ syncStackYaml tag
 exec UpdateDeps = run False (Just "update deps") (Just updateConfig) syncPackages
 exec Version {bump = Just bump} = run True (Just "version") (Just (pure . bumpVersion bump)) syncPackages

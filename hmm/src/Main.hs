@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module Main
@@ -7,6 +8,7 @@ module Main
   )
 where
 
+import Data.Text (pack)
 import HMM
   ( Bump,
     Command (..),
@@ -17,6 +19,7 @@ import HMM
     defaultConfig,
     exec,
   )
+import HMM.Utils.Core (Name)
 import Options.Applicative
   ( Parser,
     argument,
@@ -76,7 +79,7 @@ instance CLIType Command where
         ("version", "show project info, or bump version with: major|minor|patch", Version <$> optional cliType),
         ("update-deps", "check and update dependency version bounds", pure UpdateDeps),
         ("format", "format Haskell source files using Ormolu (use --check to validate only)", Format <$> switch (long "check" <> short 'c' <> help "check formatting without making changes")),
-        ("publish", "publish packages to Hackage", pure Publish)
+        ("publish", "publish packages to Hackage", Publish <$> optional (argument (pack <$> str) (metavar "NAME" <> help "name of the package group to publish")))
       ]
 
 data Options = Options
