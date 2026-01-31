@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module HMM.Config.PkgGroup
@@ -10,6 +11,8 @@ module HMM.Config.PkgGroup
     pkgDirs,
     isMember,
     pkgGroupName,
+    pkgRegistry,
+    PkgRegistry,
   )
 where
 
@@ -22,9 +25,11 @@ import Data.Aeson
 import Data.Aeson.Types
   ( defaultOptions,
   )
+import qualified Data.Map as Map
 import Data.Text (isPrefixOf)
 import HMM.Core.PkgDir (PkgDirs, genPkgDir)
-import HMM.Utils.Core (Name)
+import qualified HMM.Core.PkgDir as P
+import HMM.Utils.Core (Name, PkgName)
 import Relude hiding (isPrefixOf)
 
 data PkgGroup = PkgGroup
@@ -54,3 +59,11 @@ isMember pkgName = any ((`isPrefixOf` pkgName) . name)
 
 pkgGroupName :: PkgGroup -> Name
 pkgGroupName PkgGroup {..} = name
+
+resolveGroup :: PkgGroup -> IO PkgRegistry
+resolveGroup g = Map.fromList . map ((,g) . P.name) <$> traverse P.resolvePkg (pkgDirs g)
+
+type PkgRegistry = Map PkgName PkgGroup
+
+pkgRegistry :: [PkgGroup] -> IO PkgRegistry
+pkgRegistry = fmap Map.unions . traverse resolveGroup

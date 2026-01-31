@@ -4,7 +4,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -25,11 +24,11 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import HMM.Config.Build (Builds, allDeps)
 import HMM.Config.Config (Config (..), getRule)
-import HMM.Config.PkgGroup (PkgGroup, pkgDirs)
+import HMM.Config.PkgGroup (PkgGroup, PkgRegistry, pkgDirs, pkgRegistry)
 import HMM.Core.Bounds (Bounds)
 import HMM.Core.Env (Env (..))
 import HMM.Core.HkgRef (VersionMap, Versions, VersionsMap)
-import HMM.Core.PkgDir (Pkg (..), PkgDirs, resolvePkg)
+import HMM.Core.PkgDir (PkgDirs)
 import HMM.Core.Version (Version)
 import HMM.Utils.Chalk (Color (Green), chalk)
 import HMM.Utils.Class
@@ -37,7 +36,7 @@ import HMM.Utils.Class
     Format (format),
     HIO (..),
   )
-import HMM.Utils.Core (DependencyName (..), PkgName, getField, printException)
+import HMM.Utils.Core (DependencyName (..), getField, printException)
 import HMM.Utils.FromConf (ByKey (..), ReadFromConf (..), readList)
 import HMM.Utils.Http (hackage)
 import HMM.Utils.Log
@@ -52,7 +51,7 @@ data HCEnv = HCEnv
     env :: Env,
     indention :: Int,
     versionsMap :: VersionsMap,
-    pkgs :: Map PkgName PkgGroup
+    pkgs :: PkgRegistry
   }
 
 newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
@@ -65,12 +64,9 @@ newtype ConfigT (a :: Type) = ConfigT {_runConfigT :: ReaderT HCEnv IO a}
       MonadFail
     )
 
-includePackages :: PkgGroup -> IO (Map PkgName PkgGroup)
-includePackages g = Map.fromList . map ((,g) . name) <$> traverse resolvePkg (pkgDirs g)
-
 runConfigT :: ConfigT a -> Env -> Config -> VersionsMap -> IO (Either String a)
 runConfigT (ConfigT (ReaderT f)) env config versionsMap = do
-  pkgs <- Map.unions <$> traverse includePackages (groups config)
+  pkgs <- pkgRegistry (groups config)
   tryJust (Just . printException) (f HCEnv {indention = 0, ..})
 
 indent :: Int -> String -> String
