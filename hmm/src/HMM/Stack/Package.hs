@@ -94,7 +94,7 @@ syncPackages :: (ReadConf m '[Version, BoundsByName]) => m ()
 syncPackages = forPackages checkPackage
 
 publishPackages :: (ReadConf m '[Version, BoundsByName, [PkgGroup]]) => Maybe Name -> m ()
-publishPackages (Just x) = task ("group " <> toString x) $ do
+publishPackages (Just x) = task ("group(" <> toString x <> ")") $ do
   prePublish
   groups <- readList
   g <- case filter ((== x) . pkgGroupName) groups of
