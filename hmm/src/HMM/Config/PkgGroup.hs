@@ -26,10 +26,9 @@ import Data.Aeson.Types
   ( defaultOptions,
   )
 import qualified Data.Map as Map
-import Data.Text (isPrefixOf)
 import HMM.Core.PkgDir (PkgDirs, genPkgDir)
 import qualified HMM.Core.PkgDir as P
-import HMM.Utils.Core (Name, PkgName)
+import HMM.Utils.Core (DependencyName (DependencyName), Name, PkgName (..))
 import Relude hiding (isPrefixOf)
 
 data PkgGroup = PkgGroup
@@ -54,8 +53,8 @@ pkgDirs PkgGroup {..} = map pkgPath packages
   where
     pkgPath pkg = genPkgDir dir (maybeToList prefix <> [pkg | pkg /= "."])
 
-isMember :: Name -> PkgGroups -> Bool
-isMember pkgName = any ((`isPrefixOf` pkgName) . name)
+isMember :: DependencyName -> PkgRegistry -> Bool
+isMember (DependencyName name) = Map.member (PkgName name)
 
 pkgGroupName :: PkgGroup -> Name
 pkgGroupName PkgGroup {..} = name
