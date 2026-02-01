@@ -121,21 +121,31 @@ isConfigChanged cfg filePath = do
     Just hash -> pure (hash /= currentHash)
 
 run_ :: (ParseResponse a) => Bool -> ConfigT a -> Env -> IO ()
-run_ fast m env@Env {..}
-  | fast = do
-      cfg <- readYaml hmm
-      runConfigT m env cfg Map.empty >>= handle
-  | otherwise = do
-      cfg <- readYaml hmm
-      changed <- isConfigChanged cfg hmm
-      if changed
-        then do
-          -- Config changed, do full check with HTTP calls
-          deps <- prefetchVersionsMap cfg
-          runConfigT (asks config >>= check >> save >> m) env cfg deps >>= handle
-        else do
-          -- Config unchanged, skip expensive operations
-          runConfigT m env cfg Map.empty >>= handle
+run_ fast m env@Env {..} = readYaml hmm >>= runwith
+  where
+    runwith cfg
+      | fast = runConfigT m env cfg Map.empty >>= handle
+      | otherwise = do
+          changed <- isConfigChanged cfg hmm
+          if changed
+            then do
+              -- Config changed, do full check with HTTP calls
+              deps <- prefetchVersionsMap cfg
+              runConfigT (asks config >>= check >> save >> m) env cfg deps >>= handle
+            else do
+              -- Config unchanged, skip expensive operations
+              runConfigT m env cfg Map.empty >>= handle
+
+run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
+run fast label f m env = withLabel label
+  where
+    withLabel (Just n) = run_ fast (task n (localConfig f) >> ptintOk env) env
+    withLabel Nothing = run_ fast (localConfig f) env
+    localConfig Nothing = m
+    localConfig (Just f') = do
+      cfg <- asks config
+      updatedCfg <- f' cfg
+      local (\env' -> env' {config = updatedCfg}) (save >> m)
 
 class ParseResponse a where
   parseResponse :: a -> Maybe String
@@ -153,19 +163,6 @@ ptintOk :: (HIO f) => Env -> f ()
 ptintOk env
   | quiet env = pure ()
   | otherwise = putLine (chalk Green "\nOk")
-
-run' :: (ParseResponse a) => Bool -> Maybe String -> ConfigT a -> Env -> IO ()
-run' fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
-run' fast Nothing m env = run_ fast m env
-
-run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
-run fast name up m = run' fast name (localConfig up)
-  where
-    localConfig Nothing = m
-    localConfig (Just f) = do
-      cfg <- asks config
-      updatedCfg <- f cfg
-      local (\env' -> env' {config = updatedCfg}) (save >> m)
 
 handle :: (ParseResponse a, HIO m) => Either String a -> m ()
 handle res = case res of
