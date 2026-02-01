@@ -91,10 +91,8 @@ fetchVersions name = do
   pure (name, vs)
 
 prefetchVersionsMap :: (HIO m) => Config -> m VersionsMap
-prefetchVersionsMap cfg = do
-  let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
-  ps <- traverse fetchVersions extras
-  pure (Map.fromList ps)
+prefetchVersionsMap cfg =
+  Map.fromList <$> traverse fetchVersions (toList (Set.fromList $ concatMap allDeps (builds cfg)))
 
 computeConfigHash :: Config -> Text
 computeConfigHash cfg =
@@ -120,22 +118,31 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run_ :: (ParseResponse a) => Bool -> ConfigT a -> Env -> IO ()
-run_ fast m env@Env {..}
-  | fast = do
-      cfg <- readYaml hmm
-      runConfigT m env cfg Map.empty >>= handle
+runConfig :: Bool -> ConfigT a -> Env -> Config -> IO (Either String a)
+runConfig fast m env cfg
+  | fast = runConfigT m env cfg Map.empty
   | otherwise = do
-      cfg <- readYaml hmm
-      changed <- isConfigChanged cfg hmm
-      if changed
-        then do
-          -- Config changed, do full check with HTTP calls
-          deps <- prefetchVersionsMap cfg
-          runConfigT (asks config >>= check >> save >> m) env cfg deps >>= handle
-        else do
-          -- Config unchanged, skip expensive operations
-          runConfigT m env cfg Map.empty >>= handle
+      deps <- prefetchVersionsMap cfg
+      runConfigT (asks config >>= check >> save >> m) env cfg deps
+
+run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
+run fast label f m env@Env {..} = do
+  cfg <- readYaml hmm
+  changed <- isConfigChanged cfg hmm
+  result <- runConfig (fast || not changed) updatedM env cfg
+  case result of
+    Left x -> alert ("ERROR: " <> x) >> liftIO exitFailure
+    (Right x) -> pure x
+  where
+    updatedM = withLabel label
+    withLabel (Just name) = task name (updateConfig f) >> putLine (chalk Green "\nOk")
+    withLabel Nothing = updateConfig f >>= (`for_` putLine) . parseResponse
+    -- Helper to update config if function is provided
+    updateConfig Nothing = m
+    updateConfig (Just f') = do
+      cfg <- asks config
+      updatedCfg <- f' cfg
+      local (\env' -> env' {config = updatedCfg}) (save >> m)
 
 class ParseResponse a where
   parseResponse :: a -> Maybe String
@@ -148,33 +155,6 @@ instance ParseResponse Version where
 
 instance ParseResponse () where
   parseResponse _ = Nothing
-
-ptintOk :: (HIO f) => Env -> f ()
-ptintOk env
-  | quiet env = pure ()
-  | otherwise = putLine (chalk Green "\nOk")
-
-run' :: (ParseResponse a) => Bool -> Maybe String -> ConfigT a -> Env -> IO ()
-run' fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
-run' fast Nothing m env = run_ fast m env
-
-run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
-run fast name Nothing m = run' fast name m
-run fast name (Just f) m = run' fast name localConfig
-  where
-    localConfig = do
-      cfg <- asks config
-      updatedCfg <- f cfg
-      local (\env' -> env' {config = updatedCfg}) (save >> m)
-
-handle :: (ParseResponse a, HIO m) => Either String a -> m ()
-handle res = case res of
-  Left x -> do
-    alert ("ERROR: " <> x)
-    liftIO exitFailure
-  (Right x) -> case parseResponse x of
-    Nothing -> pure ()
-    Just msg -> putLine (toString msg)
 
 save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
