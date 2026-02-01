@@ -124,7 +124,6 @@ runConfig :: Bool -> ConfigT a -> Env -> Config -> IO (Either String a)
 runConfig fast m env cfg
   | fast = runConfigT m env cfg Map.empty
   | otherwise = do
-      -- Config changed, do full check with HTTP calls
       deps <- prefetchVersionsMap cfg
       runConfigT (asks config >>= check >> save >> m) env cfg deps
 
@@ -132,12 +131,12 @@ run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Con
 run fast label f m env@Env {..} = do
   cfg <- readYaml hmm
   changed <- isConfigChanged cfg hmm
-  result <- runConfig (fast || not changed) (withLabel label) env cfg
+  result <- runConfig (fast || not changed) updatedM env cfg
   handle result
   where
-    updatedM = updateConfig f
-    withLabel (Just n) = task n updatedM >> ok
-    withLabel Nothing = updatedM >>= (`for_` putLine) . parseResponse
+    updatedM = withLabel label
+    withLabel (Just n) = task n (updateConfig f) >> ok
+    withLabel Nothing = updateConfig f >>= (`for_` putLine) . parseResponse
     -- Helper to print Ok message
     ok
       | quiet = pure ()
