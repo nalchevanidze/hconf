@@ -135,12 +135,8 @@ run fast label f m env@Env {..} = do
   handle result
   where
     updatedM = withLabel label
-    withLabel (Just n) = task n (updateConfig f) >> ok
+    withLabel (Just name) = task name (updateConfig f) >> putLine (chalk Green "\nOk")
     withLabel Nothing = updateConfig f >>= (`for_` putLine) . parseResponse
-    -- Helper to print Ok message
-    ok
-      | quiet = pure ()
-      | otherwise = putLine (chalk Green "\nOk")
     -- Helper to update config if function is provided
     updateConfig Nothing = m
     updateConfig (Just f') = do
