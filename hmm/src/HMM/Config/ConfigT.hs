@@ -132,7 +132,9 @@ run fast label f m env@Env {..} = do
   cfg <- readYaml hmm
   changed <- isConfigChanged cfg hmm
   result <- runConfig (fast || not changed) updatedM env cfg
-  handle result
+  case result of
+    Left x -> alert ("ERROR: " <> x) >> liftIO exitFailure
+    (Right x) -> pure x
   where
     updatedM = withLabel label
     withLabel (Just name) = task name (updateConfig f) >> putLine (chalk Green "\nOk")
@@ -155,11 +157,6 @@ instance ParseResponse Version where
 
 instance ParseResponse () where
   parseResponse _ = Nothing
-
-handle :: (HIO m) => Either String () -> m ()
-handle res = case res of
-  Left x -> alert ("ERROR: " <> x) >> liftIO exitFailure
-  (Right x) -> pure x
 
 save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
