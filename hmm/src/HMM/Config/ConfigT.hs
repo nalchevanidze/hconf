@@ -120,33 +120,35 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run_ :: Bool -> ConfigT a -> Env -> IO (Either String a)
-run_ fast m env@Env {..} = readYaml hmm >>= runwith
+runConfig :: Bool -> ConfigT a -> Env -> Config -> IO (Either String a)
+runConfig fast m env@Env {..} cfg
+  | fast = fastRun
+  | otherwise = do
+      changed <- isConfigChanged cfg hmm
+      if changed then validatedRun else fastRun
   where
-    runwith cfg
-      | fast = runConfigT m env cfg Map.empty
-      | otherwise = do
-          changed <- isConfigChanged cfg hmm
-          if changed
-            then do
-              -- Config changed, do full check with HTTP calls
-              deps <- prefetchVersionsMap cfg
-              runConfigT (asks config >>= check >> save >> m) env cfg deps
-            else do
-              -- Config unchanged, skip expensive operations
-              runConfigT m env cfg Map.empty
+    fastRun = runConfigT m env cfg Map.empty
+    validatedRun = do
+      -- Config changed, do full check with HTTP calls
+      deps <- prefetchVersionsMap cfg
+      runConfigT (asks config >>= check >> save >> m) env cfg deps
 
 run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
-run fast label f m env = withLabel label >>= handle
+run fast label f m env@Env {..} = do
+  cfg <- readYaml hmm
+  result <- runConfig fast (withLabel label) env cfg
+  handle result
   where
-    withLabel (Just n) = run_ fast (task n (localConfig f) >> ok $> Nothing) env
-      where
-        ok
-          | quiet env = pure ()
-          | otherwise = putLine (chalk Green "\nOk")
-    withLabel Nothing = run_ fast (parseResponse <$> localConfig f) env
-    localConfig Nothing = m
-    localConfig (Just f') = do
+    updatedM = updateConfig f
+    withLabel (Just n) = task n updatedM >> ok
+    withLabel Nothing = updatedM >>= (`for_` putLine) . parseResponse
+    -- Helper to print Ok message
+    ok
+      | quiet = pure ()
+      | otherwise = putLine (chalk Green "\nOk")
+    -- Helper to update config if function is provided
+    updateConfig Nothing = m
+    updateConfig (Just f') = do
       cfg <- asks config
       updatedCfg <- f' cfg
       local (\env' -> env' {config = updatedCfg}) (save >> m)
@@ -163,12 +165,10 @@ instance ParseResponse Version where
 instance ParseResponse () where
   parseResponse _ = Nothing
 
-handle :: (HIO m) => Either String (Maybe String) -> m ()
+handle :: (HIO m) => Either String () -> m ()
 handle res = case res of
-  Left x -> do
-    alert ("ERROR: " <> x)
-    liftIO exitFailure
-  (Right x) -> for_ x putLine
+  Left x -> alert ("ERROR: " <> x) >> liftIO exitFailure
+  (Right x) -> pure x
 
 save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
