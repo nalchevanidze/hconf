@@ -121,14 +121,9 @@ isConfigChanged cfg filePath = do
     Just hash -> pure (hash /= currentHash)
 
 runConfig :: Bool -> ConfigT a -> Env -> Config -> IO (Either String a)
-runConfig fast m env@Env {..} cfg
-  | fast = fastRun
+runConfig fast m env cfg
+  | fast = runConfigT m env cfg Map.empty
   | otherwise = do
-      changed <- isConfigChanged cfg hmm
-      if changed then validatedRun else fastRun
-  where
-    fastRun = runConfigT m env cfg Map.empty
-    validatedRun = do
       -- Config changed, do full check with HTTP calls
       deps <- prefetchVersionsMap cfg
       runConfigT (asks config >>= check >> save >> m) env cfg deps
@@ -136,7 +131,8 @@ runConfig fast m env@Env {..} cfg
 run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
 run fast label f m env@Env {..} = do
   cfg <- readYaml hmm
-  result <- runConfig fast (withLabel label) env cfg
+  changed <- isConfigChanged cfg hmm
+  result <- runConfig (fast || not changed) (withLabel label) env cfg
   handle result
   where
     updatedM = updateConfig f
