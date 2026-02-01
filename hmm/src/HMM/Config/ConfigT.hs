@@ -91,10 +91,8 @@ fetchVersions name = do
   pure (name, vs)
 
 prefetchVersionsMap :: (HIO m) => Config -> m VersionsMap
-prefetchVersionsMap cfg = do
-  let extras = toList (Set.fromList $ concatMap allDeps (builds cfg))
-  ps <- traverse fetchVersions extras
-  pure (Map.fromList ps)
+prefetchVersionsMap cfg =
+  Map.fromList <$> traverse fetchVersions (toList (Set.fromList $ concatMap allDeps (builds cfg)))
 
 computeConfigHash :: Config -> Text
 computeConfigHash cfg =
