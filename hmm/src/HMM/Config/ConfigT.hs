@@ -120,27 +120,31 @@ isConfigChanged cfg filePath = do
     Nothing -> pure True -- No hash means we should do full check
     Just hash -> pure (hash /= currentHash)
 
-run_ :: (ParseResponse a) => Bool -> ConfigT a -> Env -> IO ()
+run_ :: Bool -> ConfigT a -> Env -> IO (Either String a)
 run_ fast m env@Env {..} = readYaml hmm >>= runwith
   where
     runwith cfg
-      | fast = runConfigT m env cfg Map.empty >>= handle
+      | fast = runConfigT m env cfg Map.empty
       | otherwise = do
           changed <- isConfigChanged cfg hmm
           if changed
             then do
               -- Config changed, do full check with HTTP calls
               deps <- prefetchVersionsMap cfg
-              runConfigT (asks config >>= check >> save >> m) env cfg deps >>= handle
+              runConfigT (asks config >>= check >> save >> m) env cfg deps
             else do
               -- Config unchanged, skip expensive operations
-              runConfigT m env cfg Map.empty >>= handle
+              runConfigT m env cfg Map.empty
 
 run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
-run fast label f m env = withLabel label
+run fast label f m env = withLabel label >>= handle
   where
-    withLabel (Just n) = run_ fast (task n (localConfig f) >> ptintOk env) env
-    withLabel Nothing = run_ fast (localConfig f) env
+    withLabel (Just n) = run_ fast (task n (localConfig f) >> ok $> Nothing) env
+      where
+        ok
+          | quiet env = pure ()
+          | otherwise = putLine (chalk Green "\nOk")
+    withLabel Nothing = run_ fast (parseResponse <$> localConfig f) env
     localConfig Nothing = m
     localConfig (Just f') = do
       cfg <- asks config
@@ -159,19 +163,12 @@ instance ParseResponse Version where
 instance ParseResponse () where
   parseResponse _ = Nothing
 
-ptintOk :: (HIO f) => Env -> f ()
-ptintOk env
-  | quiet env = pure ()
-  | otherwise = putLine (chalk Green "\nOk")
-
-handle :: (ParseResponse a, HIO m) => Either String a -> m ()
+handle :: (HIO m) => Either String (Maybe String) -> m ()
 handle res = case res of
   Left x -> do
     alert ("ERROR: " <> x)
     liftIO exitFailure
-  (Right x) -> case parseResponse x of
-    Nothing -> pure ()
-    Just msg -> putLine (toString msg)
+  (Right x) -> for_ x putLine
 
 save :: ConfigT ()
 save = task "save" $ task "hmm.yaml" $ do
