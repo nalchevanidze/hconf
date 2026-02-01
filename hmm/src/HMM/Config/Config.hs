@@ -12,7 +12,7 @@ module HMM.Config.Config
   ( Config (..),
     getRule,
     bumpVersion,
-    updateConfig,
+    updateDeps,
   )
 where
 
@@ -65,7 +65,7 @@ bumpVersion bump Config {..} =
       bounds' = versionBounds version'
    in Config {version = version', bounds = bounds', ..}
 
-updateConfig :: (HIO m, ReadConf m '[VersionsMap]) => Config -> m Config
-updateConfig Config {..} = do
+updateDeps :: (HIO m, ReadConf m '[VersionsMap]) => Config -> m Config
+updateDeps Config {..} = do
   dependencies' <- traverseDeps updateDepBounds dependencies
   pure Config {dependencies = dependencies', ..}

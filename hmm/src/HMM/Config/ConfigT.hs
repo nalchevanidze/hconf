@@ -159,10 +159,10 @@ run' fast (Just name) m env = run_ fast (task name m >> ptintOk env) env
 run' fast Nothing m env = run_ fast m env
 
 run :: (ParseResponse a) => Bool -> Maybe String -> Maybe (Config -> ConfigT Config) -> ConfigT a -> Env -> IO ()
-run fast name Nothing m = run' fast name m
-run fast name (Just f) m = run' fast name localConfig
+run fast name up m = run' fast name (localConfig up)
   where
-    localConfig = do
+    localConfig Nothing = m
+    localConfig (Just f) = do
       cfg <- asks config
       updatedCfg <- f cfg
       local (\env' -> env' {config = updatedCfg}) (save >> m)
